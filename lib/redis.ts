@@ -14,17 +14,7 @@ declare global {
  * - Uses `globalThis` to avoid opening multiple connections in dev / HMR.
  */
 export function getRedis(): IORedis | null {
-  if (process.env.npm_lifecycle_event === "build" || process.env.NEXT_PHASE === "phase-production-build") return null;
-  if (!env.REDIS_URL) return null;
-
-  if (!globalThis._videoshare_redis) {
-    globalThis._videoshare_redis = new IORedis(env.REDIS_URL, {
-      maxRetriesPerRequest: null,
-      enableReadyCheck: true,
-    });
-  }
-
-  return globalThis._videoshare_redis;
+  return null;
 }
 
 export async function redisGetJSON<T>(key: string): Promise<T | null> {

@@ -34,6 +34,10 @@ import { membershipBillingScanJob } from "./jobs/memberships/billingScan";
 import { weeklyDigestJob } from "./jobs/notifications/weeklyDigest";
 import { continueWatchingDigestJob } from "./jobs/notifications/continueWatchingDigest";
 
+if (process.env.BUILDING === "1") {
+  process.exit(0);
+}
+
 function log(...args: any[]) {
   console.log(new Date().toISOString(), ...args);
 }

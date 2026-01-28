@@ -3,7 +3,7 @@ import { Queue } from "bullmq";
 import { env } from "./env";
 
 export const connection =
-  process.env.npm_lifecycle_event === "build" || process.env.NEXT_PHASE === "phase-production-build"
+  process.env.BUILDING === "1" || process.env.npm_lifecycle_event === "build" || process.env.NEXT_PHASE === "phase-production-build"
     ? null
     : env.REDIS_URL
     ? new IORedis(env.REDIS_URL, { maxRetriesPerRequest: null })
