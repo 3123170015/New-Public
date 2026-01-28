@@ -27,7 +27,7 @@ prompt() {
 }
 
 DEFAULT_SITE_URL="https://your-domain.com"
-DEFAULT_DB_URL="mysql://videoshare:password@127.0.0.1:3306/videoshare"
+DEFAULT_DB_URL="mysql://videoshare:CHANGE_ME@127.0.0.1:3306/videoshare"
 DEFAULT_REDIS_URL="redis://127.0.0.1:6379"
 DEFAULT_AUTH_SECRET="$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
 
@@ -42,6 +42,25 @@ prompt R2_ACCESS_KEY_ID "R2_ACCESS_KEY_ID" ""
 prompt R2_SECRET_ACCESS_KEY "R2_SECRET_ACCESS_KEY" ""
 prompt R2_BUCKET "R2_BUCKET" ""
 prompt R2_PUBLIC_BASE_URL "R2_PUBLIC_BASE_URL" ""
+
+mask_value() {
+  local value="$1"
+  local len="${#value}"
+  if [ "$len" -le 8 ]; then
+    printf "%s" "****"
+    return
+  fi
+  printf "%s****%s" "${value:0:4}" "${value: -4}"
+}
+
+mask_url() {
+  local value="$1"
+  if [[ "$value" == *"://"* && "$value" == *"@"* ]]; then
+    printf "%s" "${value}" | sed -E 's#(://[^:]+:)[^@]+(@)#\1****\2#'
+  else
+    mask_value "$value"
+  fi
+}
 
 ENV_CONTENT=$(cat <<EOF
 SITE_URL="${SITE_URL}"
@@ -60,13 +79,27 @@ EOF
 )
 
 echo ""
-echo "== Environment preview (.env) =="
-echo "$ENV_CONTENT"
+echo "== Environment preview (.env, masked) =="
+cat <<EOF
+SITE_URL="${SITE_URL}"
+NEXTAUTH_URL="${NEXTAUTH_URL}"
+AUTH_SECRET="$(mask_value "$AUTH_SECRET")"
+DATABASE_URL="$(mask_url "$DATABASE_URL")"
+REDIS_URL="$(mask_url "$REDIS_URL")"
+
+# Cloudflare R2
+R2_ACCOUNT_ID="$(mask_value "$R2_ACCOUNT_ID")"
+R2_ACCESS_KEY_ID="$(mask_value "$R2_ACCESS_KEY_ID")"
+R2_SECRET_ACCESS_KEY="$(mask_value "$R2_SECRET_ACCESS_KEY")"
+R2_BUCKET="$(mask_value "$R2_BUCKET")"
+R2_PUBLIC_BASE_URL="$(mask_value "$R2_PUBLIC_BASE_URL")"
+EOF
 echo ""
 
 read -rp "Write .env to ${ROOT_DIR}/.env? (y/N): " WRITE_ENV || true
 if [[ "${WRITE_ENV}" =~ ^[Yy]$ ]]; then
   printf "%s\n" "$ENV_CONTENT" > "${ROOT_DIR}/.env"
+  chmod 600 "${ROOT_DIR}/.env"
   echo ".env written."
 else
   echo "Skipped writing .env. Copy the output above into aaPanel Env config."
@@ -95,3 +128,5 @@ echo ""
 echo "Install finished. Start web/worker with PM2 or systemd, then verify:"
 echo "  - /api/verify"
 echo "  - /api/verify/worker"
+echo ""
+echo "Note: review .env.example for optional configs (uploads, payments, webhooks) after install."
