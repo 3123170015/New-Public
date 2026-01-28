@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return Response.json({ ok: false, error: "INVALID_INPUT" }, { status: 400 });
 
-  const userId = \(session\.user as any\)\.id as string;
+  const userId = (session.user as any).id as string;
 const rl = await rateLimit(`topup:submit-tx:user:${userId}`, Number(process.env.TOPUP_SUBMIT_TX_LIMIT || 8), Number(process.env.TOPUP_SUBMIT_TX_WINDOW_MS || 10 * 60 * 1000));
 if (!rl.ok) {
   await createFraudAlert({

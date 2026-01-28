@@ -58,7 +58,7 @@ export default async function NftMintPage() {
           Phí mint: <b>{cfg.nftMintFeeStars}</b> stars / NFT.
         </div>
         <div className="small muted" style={{ marginTop: 4 }}>
-          NFT sẽ được tạo dưới dạng "internal" trong hệ thống (không export on-chain ở bản này).
+          NFT sẽ được tạo dưới dạng &quot;internal&quot; trong hệ thống (không export on-chain ở bản này).
         </div>
       </div>
 

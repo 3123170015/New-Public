@@ -99,7 +99,7 @@ export default async function StudioVideoAnalyticsPage({ params }: { params: { i
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="card">
           <div className="text-lg font-extrabold">Audience (Top countries, 7 days)</div>
-          <div className="small muted mt-1">Country inferred from request headers (CF/Vercel). "ZZ" = unknown.</div>
+          <div className="small muted mt-1">Country inferred from request headers (CF/Vercel). &quot;ZZ&quot; = unknown.</div>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
