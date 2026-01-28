@@ -45,7 +45,7 @@ export default async function SeriesPage({ params }: { params: { slug: string } 
   const coverUrl = playlist.coverKey ? resolveMediaUrl(playlist.coverKey) : null;
 
   const items = playlist.items
-    .map((it) => it.video)
+    .map((it: { video: any }) => it.video)
     .filter(Boolean)
     .filter((v: any) => v.status === "PUBLISHED" || canSeeUnpublished);
 
@@ -69,13 +69,13 @@ export default async function SeriesPage({ params }: { params: { slug: string } 
 
       <div className="card">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
-          {items.map((v: any) => (
+          {items.map((v: { id: string; title?: string | null; viewCount?: number | null; likeCount?: number | null; starCount?: number | null; thumbKey?: string | null; isSensitive?: boolean | null }) => (
             <div key={v.id} className="card">
               <Link href={`/v/${v.id}?list=${encodeURIComponent(playlist.id)}`}>
                 <div style={{ fontWeight: 900 }}>{v.title}</div>
                 <div className="small muted mt-1">{v.viewCount} views • {v.likeCount} likes • {v.starCount} stars</div>
                 <div style={{ marginTop: 10, aspectRatio: "16/9", borderRadius: 14, overflow: "hidden", background: "#f3f3f3" }}>
-                  <SensitiveThumb src={resolveMediaUrl(v.thumbKey)} alt={v.title} isSensitive={Boolean((v as any).isSensitive)} mode={sensitiveMode as any} />
+                  <SensitiveThumb src={resolveMediaUrl(v.thumbKey)} alt={v.title ?? ""} isSensitive={Boolean((v as any).isSensitive)} mode={sensitiveMode as any} />
                 </div>
               </Link>
             </div>

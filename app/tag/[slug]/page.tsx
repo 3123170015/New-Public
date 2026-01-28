@@ -26,6 +26,7 @@ export default async function TagPage({ params, searchParams }: { params: { slug
   const hideSensitive = shouldHideSensitiveInListings(sensitiveMode);
 
   const where: any = { status: "PUBLISHED", access: allowAccess, ...(hideSensitive ? { isSensitive: false } : {}), tags: { some: { tagId: tag.id } } };
+  type TagVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
   const items = await prisma.video.findMany({
     where,
     orderBy: [{ createdAt: "desc" as const }],
@@ -50,7 +51,7 @@ export default async function TagPage({ params, searchParams }: { params: { slug
       <div className="small muted">{total} videos • page {page}/{totalPages}</div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((v) => (
+        {(items as TagVideoRow[]).map((v: TagVideoRow) => (
           <a key={v.id} href={`/v/${v.id}`} className="card block">
             <div className="aspect-video overflow-hidden rounded-xl bg-zinc-100">
               <SensitiveThumb src={resolveMediaUrl(v.thumbKey)} alt={v.title} isSensitive={Boolean(v.isSensitive)} mode={sensitiveMode as any} />

@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export default async function StudioPage() {
+  type StudioVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -100,7 +102,7 @@ export default async function StudioPage() {
               </tr>
             </thead>
             <tbody>
-              {videos.map((v) => (
+              {(videos as StudioVideoRow[]).map((v: StudioVideoRow) => (
                 <tr key={v.id} className="border-b">
                   <td className="py-2">
                     <input type="checkbox" name="videoIds" value={v.id} />

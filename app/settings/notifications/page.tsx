@@ -18,7 +18,7 @@ export default async function NotificationSettingsPage() {
 
   const disabled = (row?.disabledTypesCsv || "")
     .split(",")
-    .map((x) => x.trim())
+    .map((x: string) => x.trim())
     .filter(Boolean);
 
   return (

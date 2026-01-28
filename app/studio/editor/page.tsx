@@ -6,6 +6,8 @@ import EditorTrimPanel from "@/components/studio/EditorTrimPanel";
 export const dynamic = "force-dynamic";
 
 export default async function StudioEditorPage() {
+  type EditorVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -26,7 +28,7 @@ export default async function StudioEditorPage() {
       </div>
 
       <EditorTrimPanel
-        videos={videos.map((v) => ({
+        videos={(videos as EditorVideoRow[]).map((v: EditorVideoRow) => ({
           id: v.id,
           title: v.title,
           durationSec: v.durationSec,

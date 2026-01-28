@@ -24,6 +24,7 @@ export async function GET(req: Request) {
   const base = baseUrl(req);
   const site = await prisma.siteConfig.findFirst({ where: { id: 1 }, select: { siteName: true, defaultDescription: true } });
 
+  type RssVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
   const videos = await prisma.video.findMany({
     where: { status: "PUBLISHED", access: "PUBLIC", isSensitive: false },
     orderBy: { createdAt: "desc" },
@@ -45,7 +46,7 @@ export async function GET(req: Request) {
   const homeLink = base.toString().replace(/\/$/, "");
 
   const itemsXml = videos
-    .map((v) => {
+    .map((v: RssVideoRow) => {
       const link = new URL(`/v/${v.id}`, base).toString();
       const authorName = v.author?.name ?? v.author?.username ?? "";
       const desc = (v.description ?? "").slice(0, 5000);

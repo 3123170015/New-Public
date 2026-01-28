@@ -12,6 +12,8 @@ import { Separator } from "@/components/ui/separator";
 export const dynamic = "force-dynamic";
 
 export default async function StudioClipsPage() {
+  type ClipRow = Awaited<ReturnType<typeof prisma.clip.findMany>>[number];
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -50,7 +52,7 @@ export default async function StudioClipsPage() {
         {clips.length === 0 ? (
           <Card className="p-4 text-sm text-muted-foreground">Chưa có clip nào.</Card>
         ) : (
-          clips.map((c) => {
+          (clips as ClipRow[]).map((c: ClipRow) => {
             const latestListing = (c.nftItems?.[0] as any)?.listings?.[0] as any | undefined;
             const clipNft = c.clipNft as any | null;
             const mintedCount = clipNft?.mints?.length ?? 0;

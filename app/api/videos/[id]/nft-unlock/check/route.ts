@@ -22,6 +22,7 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
   const gates = await prisma.videoNftGate.findMany({ where: { videoId, enabled: true } });
   if (gates.length === 0) return Response.json({ ok: false, message: "NO_NFT_GATE" }, { status: 400 });
 
+  type WalletRow = Awaited<ReturnType<typeof prisma.userWallet.findMany>>[number];
   const wallets = await prisma.userWallet.findMany({
     where: { userId: viewerId, verifiedAt: { not: null } },
     select: { chain: true, address: true, assets: { select: { assetKey: true, balance: true } } },
@@ -31,15 +32,15 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
   // Enqueue a fast sync to reduce false negatives (non-blocking).
   await queues.nft.add(
     "nft_gate_sync",
-    { reason: "premium_nft_check", addresses: wallets.map((w) => ({ chain: w.chain, address: w.address })) },
+    { reason: "premium_nft_check", addresses: (wallets as WalletRow[]).map((w: WalletRow) => ({ chain: w.chain, address: w.address })) },
     { removeOnComplete: true, removeOnFail: 1000 }
   );
 
-  const allowed = gates.some((g) => {
+  const allowed = gates.some((g: { collectionAddress?: string | null; tokenMint?: string | null; chain: string }) => {
     const keys = [g.collectionAddress, g.tokenMint].filter(Boolean).map((x) => String(x));
-    return wallets.some((w) =>
+    return (wallets as WalletRow[]).some((w: WalletRow) =>
       w.chain === g.chain &&
-      w.assets.some((a) => a.balance >= 1 && keys.some((k) => String(a.assetKey) === k || String(a.assetKey).toLowerCase() === String(k).toLowerCase()))
+      w.assets.some((a: { assetKey: string; balance: number }) => a.balance >= 1 && keys.some((k) => String(a.assetKey) === k || String(a.assetKey).toLowerCase() === String(k).toLowerCase()))
     );
   });
 

@@ -12,6 +12,7 @@ export async function GET(req: Request) {
 
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
+  type MetricRow = Awaited<ReturnType<typeof prisma.videoMetricDaily.groupBy>>[number];
   const rows = await prisma.videoMetricDaily.groupBy({
     by: ["videoId"],
     where: { day: { gte: since } },
@@ -21,7 +22,7 @@ export async function GET(req: Request) {
   });
 
   // trending score: weights tuned for shorts
-  const scored = rows.map((r) => {
+  const scored = (rows as MetricRow[]).map((r: MetricRow) => {
     const v = r._sum.views ?? 0;
     const l = r._sum.likes ?? 0;
     const s = r._sum.shares ?? 0;
@@ -33,18 +34,18 @@ export async function GET(req: Request) {
   });
 
   scored.sort((a, b) => b.score - a.score);
-  const topIds = scored.slice(0, 60).map((x) => x.videoId);
+  const topIds = scored.slice(0, 60).map((x: { videoId: string }) => x.videoId);
 
   const videos = await prisma.video.findMany({
     where: { id: { in: topIds }, status: "PUBLISHED", access: "PUBLIC", deletedAt: null },
     select: { id: true, title: true, thumbKey: true, createdAt: true, viewCount: true, likeCount: true, commentCount: true, shareCount: true, starCount: true, giftCount: true },
   });
-  const map = new Map(videos.map((v) => [v.id, v]));
+  const map = new Map(videos.map((v: { id: string }) => [v.id, v]));
 
   const out = scored
     .slice(0, 60)
-    .map((x) => ({ ...x, video: map.get(x.videoId) }))
-    .filter((x) => Boolean(x.video));
+    .map((x: { videoId: string }) => ({ ...x, video: map.get(x.videoId) }))
+    .filter((x: { video?: unknown }) => Boolean(x.video));
 
   return Response.json({ ok: true, days, items: out });
 }

@@ -9,12 +9,13 @@ export async function POST() {
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) return Response.json({ ok: false, message: "UNAUTHORIZED" }, { status: 401 });
 
+  type WalletRow = Awaited<ReturnType<typeof prisma.userWallet.findMany>>[number];
   const wallets = await prisma.userWallet.findMany({ where: { userId }, select: { chain: true, address: true } });
   if (wallets.length === 0) return Response.json({ ok: true, enqueued: 0 });
 
   await queues.nft.add(
     "nft_gate_sync",
-    { reason: "user_manual_sync", addresses: wallets.map((w) => ({ chain: w.chain, address: w.address })) },
+    { reason: "user_manual_sync", addresses: (wallets as WalletRow[]).map((w: WalletRow) => ({ chain: w.chain, address: w.address })) },
     { removeOnComplete: true, removeOnFail: 1000 }
   );
 

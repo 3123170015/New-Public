@@ -12,6 +12,10 @@ import { getActiveMembershipTier } from "@/lib/membership";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  type BoostOrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findMany>>[number];
+  type CommunityPostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number];
+  type ProgressRow = Awaited<ReturnType<typeof prisma.videoProgress.findMany>>[number];
+
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
   const isAdmin = session?.user?.role === "ADMIN";
@@ -34,8 +38,8 @@ export default async function HomePage() {
         take: 18,
       });
 
-  const boosted = boostedOrders
-    .map((b) => b.video)
+  const boosted = (boostedOrders as BoostOrderRow[])
+    .map((b: BoostOrderRow) => b.video)
     .filter((v) => v && v.status === "PUBLISHED")
     .slice(0, 12);
 
@@ -52,7 +56,7 @@ export default async function HomePage() {
   const voteMap = new Map<string, string>();
   if (viewerId && recentPosts.length) {
     const votes = await prisma.communityPollVote.findMany({
-      where: { userId: viewerId, postId: { in: recentPosts.map((p) => p.id) } },
+      where: { userId: viewerId, postId: { in: (recentPosts as CommunityPostRow[]).map((p: CommunityPostRow) => p.id) } },
       select: { postId: true, optionId: true },
     });
     for (const v of votes) voteMap.set(v.postId, v.optionId);
@@ -118,8 +122,8 @@ export default async function HomePage() {
         }}
       >
         {recentProgress
-          .filter((p) => p.video && (p.video as any).status === "PUBLISHED")
-          .map((p) => (
+          .filter((p: ProgressRow) => p.video && (p.video as any).status === "PUBLISHED")
+          .map((p: ProgressRow) => (
             <div key={p.id} className="card">
               <TrackedVideoLink href={`/v/${(p.video as any).id}?t=${p.seconds}`} videoId={(p.video as any).id} source="HOME" placement="continue_watching">
                 <div style={{ fontWeight: 800 }}>{(p.video as any).title}</div>
@@ -196,7 +200,7 @@ export default async function HomePage() {
               marginTop: 12,
             }}
           >
-            {boosted.map((v) => (
+            {(boosted as { id: string; title?: string | null; thumbKey?: string | null; viewCount?: number | null; likeCount?: number | null; isSensitive?: boolean | null }[]).map((v: { id: string; title?: string | null; thumbKey?: string | null; viewCount?: number | null; likeCount?: number | null; isSensitive?: boolean | null }) => (
               <div key={v.id} className="card" style={{ border: "1px solid #ffd7a8" }}>
                 <TrackedVideoLink href={`/v/${v.id}`} videoId={v.id} source="HOME" placement="home_boosted">
                   <div className="small muted">Sponsored • Boosted</div>
@@ -212,7 +216,7 @@ export default async function HomePage() {
                   >
                     <SensitiveThumb
                       src={resolveMediaUrl(v.thumbKey)}
-                      alt={v.title}
+                      alt={v.title ?? ""}
                       isSensitive={Boolean((v as any).isSensitive)}
                       mode={sensitiveMode}
                     />
@@ -248,7 +252,7 @@ export default async function HomePage() {
               marginTop: 12,
             }}
           >
-            {recentPosts.map((p) => (
+            {(recentPosts as CommunityPostRow[]).map((p: CommunityPostRow) => (
               <div key={p.id} className="card">
                 <div className="small muted">
                   <Link href={`/u/${p.authorId}`}>{p.author?.name ?? "Unknown"}</Link> •{" "}
@@ -289,7 +293,7 @@ export default async function HomePage() {
                   <div style={{ marginTop: 10 }}>
                     <CommunityPoll
                       postId={p.id}
-                      options={p.pollOptions.map((o) => ({ id: o.id, text: o.text, votes: o._count.votes }))}
+                      options={(p.pollOptions ?? []).map((o: { id: string; text: string; _count: { votes: number } }) => ({ id: o.id, text: o.text, votes: o._count.votes }))}
                       viewerVotedOptionId={voteMap.get(p.id) ?? null}
                     />
                   </div>

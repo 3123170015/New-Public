@@ -33,11 +33,14 @@ export default async function NftMintPage() {
     );
   }
 
+  type MintedRow = Awaited<ReturnType<typeof prisma.nftItem.findMany>>[number];
+  type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+
   const minted = await prisma.nftItem.findMany({
     where: { videoId: { not: null }, collection: { creatorId: userId } },
     select: { videoId: true },
   });
-  const mintedIds = new Set(minted.map((m) => m.videoId!).filter(Boolean));
+  const mintedIds = new Set((minted as MintedRow[]).map((m: MintedRow) => m.videoId!).filter(Boolean));
 
   const videos = await prisma.video.findMany({
     where: {
@@ -63,7 +66,7 @@ export default async function NftMintPage() {
       </div>
 
       <div className="grid" style={{ gap: 12 }}>
-        {videos.map((v) => (
+        {(videos as VideoRow[]).map((v: VideoRow) => (
           <div key={v.id} className="card">
             <div className="flex" style={{ alignItems: "center", gap: 12 }}>
               <div style={{ flex: 1, minWidth: 0 }}>

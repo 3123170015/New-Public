@@ -71,7 +71,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       id: updated.id,
       url: updated.url,
       enabled: updated.enabled,
-      events: (updated.eventsCsv || "").split(",").map((x) => x.trim()).filter(Boolean),
+      events: (updated.eventsCsv || "").split(",").map((x: string) => x.trim()).filter(Boolean),
       createdAt: updated.createdAt.toISOString(),
       updatedAt: updated.updatedAt.toISOString(),
     },

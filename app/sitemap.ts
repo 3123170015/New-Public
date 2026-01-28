@@ -3,7 +3,8 @@ import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = env.SITE_URL;
+  const base = env.SITE_URL ?? "http://localhost:3000";
+  type SitemapVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
   const videos = await prisma.video.findMany({
     where: { status: "PUBLISHED", access: "PUBLIC" },
     select: { id: true, updatedAt: true },
@@ -14,6 +15,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: base, lastModified: new Date() },
     { url: `${base}/feed`, lastModified: new Date() },
-    ...videos.map((v) => ({ url: `${base}/v/${v.id}`, lastModified: v.updatedAt })),
+    ...(videos as SitemapVideoRow[]).map((v: SitemapVideoRow) => ({ url: `${base}/v/${v.id}`, lastModified: v.updatedAt })),
   ];
 }
