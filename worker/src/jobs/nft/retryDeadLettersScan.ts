@@ -2,7 +2,7 @@ import { prisma } from "../../prisma";
 import { Queue } from "bullmq";
 import { connection } from "../../queues";
 
-const qNft = new Queue("nft", { connection });
+const qNft = new Queue("nft", { connection: connection as any });
 
 export async function nftRetryDeadLettersScanJob() {
   const cutoff = new Date(Date.now() - 10 * 60 * 1000);

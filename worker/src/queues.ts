@@ -2,16 +2,16 @@ import IORedis from "ioredis";
 import { Queue } from "bullmq";
 import { env } from "./env";
 
-export const connection = new IORedis(env.REDIS_URL, { maxRetriesPerRequest: null });
+export const connection = null;
 
 // Payments queue (stars topup webhooks + reconcile)
-export const paymentsQueue = new Queue("payments", { connection });
+export const paymentsQueue = new Queue("payments", { connection: connection as any });
 
 // Analytics queue (watch time / retention / realtime / A/B)
-export const analyticsQueue = new Queue("analytics", { connection });
+export const analyticsQueue = new Queue("analytics", { connection: connection as any });
 
 // Notifications queue (in-app, digest)
-export const notificationsQueue = new Queue("notifications", { connection });
+export const notificationsQueue = new Queue("notifications", { connection: connection as any });
 
 // Storage queue (R2/FTP/Drive redundancy)
-export const storageQueue = new Queue("storage", { connection });
+export const storageQueue = new Queue("storage", { connection: connection as any });

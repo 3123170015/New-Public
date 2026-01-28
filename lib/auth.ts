@@ -13,25 +13,27 @@ const credentialsSchema = z.object({
 export const authOptions: NextAuthOptions = {
   secret: env.AUTH_SECRET,
   session: { strategy: "jwt" },
-  providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: { email: { label: "Email" }, password: { label: "Password", type: "password" } },
-      async authorize(raw) {
-        const parsed = credentialsSchema.safeParse(raw);
-        if (!parsed.success) return null;
+  providers: prisma
+    ? [
+        CredentialsProvider({
+          name: "Credentials",
+          credentials: { email: { label: "Email" }, password: { label: "Password", type: "password" } },
+          async authorize(raw) {
+            const parsed = credentialsSchema.safeParse(raw);
+            if (!parsed.success) return null;
 
-        const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
-        if (!user?.passwordHash) return null;
+            const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+            if (!user?.passwordHash) return null;
 
-        const ok = await compare(parsed.data.password, user.passwordHash);
-        if (!ok) return null;
+            const ok = await compare(parsed.data.password, user.passwordHash);
+            if (!ok) return null;
 
-        // Keep this small; the session callback will fetch fresh membership/role from DB.
-        return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
-      },
-    }),
-  ],
+            // Keep this small; the session callback will fetch fresh membership/role from DB.
+            return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
+          },
+        }),
+      ]
+    : [],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

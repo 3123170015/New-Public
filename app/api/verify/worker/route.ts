@@ -12,13 +12,17 @@ export async function GET() {
   }
 
   const env = requireEnv();
+  if (!env.REDIS_URL || process.env.NEXT_PHASE === "phase-production-build") {
+    return Response.json({ ok: false, message: "Redis chưa cấu hình", latencyMs: 0 } satisfies Res, { status: 400 });
+  }
   const t0 = Date.now();
 
   try {
     const IORedis = (await import("ioredis")).default;
     const { Queue, QueueEvents } = await import("bullmq");
 
-    const connection = new IORedis(env.REDIS_URL, { maxRetriesPerRequest: 1, enableOfflineQueue: false });
+    const connection = new IORedis(env.REDIS_URL, { maxRetriesPerRequest: 1, enableOfflineQueue: false, lazyConnect: true });
+    await connection.connect();
     const queueName = "verify";
     const queue = new Queue(queueName, { connection });
     const events = new QueueEvents(queueName, { connection });

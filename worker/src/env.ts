@@ -2,14 +2,14 @@ import { z } from "zod";
 
 const schema = z.object({
   DATABASE_URL: z.string().min(1),
-  REDIS_URL: z.string().min(1),
-  SITE_URL: z.string().url(),
+  REDIS_URL: z.string().min(1).optional().default(""),
+  SITE_URL: z.string().url().optional().default("http://localhost:3000"),
 
-  R2_ACCOUNT_ID: z.string().min(1),
-  R2_ACCESS_KEY_ID: z.string().min(1),
-  R2_SECRET_ACCESS_KEY: z.string().min(1),
-  R2_BUCKET: z.string().min(1),
-  R2_PUBLIC_BASE_URL: z.string().url(),
+  R2_ACCOUNT_ID: z.string().min(1).optional().default(""),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional().default(""),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional().default(""),
+  R2_BUCKET: z.string().min(1).optional().default(""),
+  R2_PUBLIC_BASE_URL: z.string().url().optional().default("http://localhost:3000"),
 
   SUBTITLES_AUTO_ENABLED: z.string().optional().default("false"),
   OPENAI_API_KEY: z.string().optional().default(""),
@@ -49,13 +49,13 @@ const schema = z.object({
   MEMBERSHIP_BILLING_EVERY_MS: z.coerce.number().int().positive().optional().default(3600000),
   MEMBERSHIP_RENEW_AHEAD_HOURS: z.coerce.number().int().min(0).optional().default(24),
 
-  SOLANA_RPC_URL: z.string().url().optional().default(""),
+  SOLANA_RPC_URL: z.string().url().optional().nullable().default(null),
   SOLANA_NFT_MINT_ENABLED: z.string().optional().default("false"),
   SOLANA_MINT_AUTHORITY_SECRET_JSON: z.string().optional().default(""),
-  EVM_RPC_URL_ETHEREUM: z.string().url().optional().default(""),
-  EVM_RPC_URL_POLYGON: z.string().url().optional().default(""),
-  EVM_RPC_URL_BSC: z.string().url().optional().default(""),
-  EVM_RPC_URL_BASE: z.string().url().optional().default(""),
+  EVM_RPC_URL_ETHEREUM: z.string().url().optional().nullable().default(null),
+  EVM_RPC_URL_POLYGON: z.string().url().optional().nullable().default(null),
+  EVM_RPC_URL_BSC: z.string().url().optional().nullable().default(null),
+  EVM_RPC_URL_BASE: z.string().url().optional().nullable().default(null),
 
   ALCHEMY_WEBHOOK_SIGNING_KEY: z.string().optional().default(""),
   QUICKNODE_WEBHOOK_SECRET: z.string().optional().default(""),
@@ -64,7 +64,7 @@ const schema = z.object({
   TRONGRID_API_URL: z.string().url().optional().default("https://api.trongrid.io"),
   TRONGRID_API_KEY: z.string().optional().default(""),
 
-  DISCORD_ALERT_WEBHOOK_URL: z.string().url().optional().default(""),
+  DISCORD_ALERT_WEBHOOK_URL: z.string().url().optional().nullable().default(null),
 
   // Cloudflare smart purge (optional)
   CLOUDFLARE_ZONE_ID: z.string().optional().default(""),
@@ -80,7 +80,9 @@ const schema = z.object({
   IPFS_GATEWAY_BASE_URL: z.string().url().optional().default("https://ipfs.io/ipfs"),
 });
 
-export const env = schema.parse(process.env);
+export const env = process.env.NEXT_PHASE === "phase-production-build"
+  ? schema.parse({})
+  : schema.parse(process.env);
 export const flags = {
   subtitlesAuto: env.SUBTITLES_AUTO_ENABLED === "true",
   clamav: env.CLAMAV_ENABLED === "true",

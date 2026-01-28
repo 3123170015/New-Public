@@ -66,6 +66,7 @@ export async function analyticsIngestEventsJob(input: {
   const variantIncs = new Map<string, { exposures: number; views: number; watchSeconds: number; completes: number }>();
 
   // Redis operations
+  if (!connection) return { ok: false, reason: "REDIS_NOT_CONFIGURED" } as any;
   const pipe = connection.pipeline();
 
   // Presence: always update for realtime

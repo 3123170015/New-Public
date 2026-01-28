@@ -17,15 +17,15 @@ function isEvm(chain: Chain) {
 function rpcUrlForChain(chain: Chain): string {
   switch (chain) {
     case "SOLANA":
-      return env.SOLANA_RPC_URL;
+      return env.SOLANA_RPC_URL ?? "";
     case "ETHEREUM":
-      return env.EVM_RPC_URL_ETHEREUM;
+      return env.EVM_RPC_URL_ETHEREUM ?? "";
     case "POLYGON":
-      return env.EVM_RPC_URL_POLYGON;
+      return env.EVM_RPC_URL_POLYGON ?? "";
     case "BSC":
-      return env.EVM_RPC_URL_BSC;
+      return env.EVM_RPC_URL_BSC ?? "";
     case "BASE":
-      return env.EVM_RPC_URL_BASE;
+      return env.EVM_RPC_URL_BASE ?? "";
     default:
       return "";
   }

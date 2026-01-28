@@ -38,28 +38,28 @@ function log(...args: any[]) {
   console.log(new Date().toISOString(), ...args);
 }
 
-const qEncode = new Queue("encodeHls", { connection });
-const qSubs = new Queue("subtitles", { connection });
-const qStorage = new Queue("storage", { connection });
-const qProcessVideo = new Queue("processVideo", { connection });
-const qCreatorWebhooks = new Queue("creatorWebhooks", { connection });
-const qEditor = new Queue("editor", { connection });
-const qCdn = new Queue("cdn", { connection });
-const qModeration = new Queue("moderation", { connection });
-const qNotifications = new Queue("notifications", { connection });
-const qNft = new Queue("nft", { connection });
+const qEncode = new Queue("encodeHls", { connection: connection as any });
+const qSubs = new Queue("subtitles", { connection: connection as any });
+const qStorage = new Queue("storage", { connection: connection as any });
+const qProcessVideo = new Queue("processVideo", { connection: connection as any });
+const qCreatorWebhooks = new Queue("creatorWebhooks", { connection: connection as any });
+const qEditor = new Queue("editor", { connection: connection as any });
+const qCdn = new Queue("cdn", { connection: connection as any });
+const qModeration = new Queue("moderation", { connection: connection as any });
+const qNotifications = new Queue("notifications", { connection: connection as any });
+const qNft = new Queue("nft", { connection: connection as any });
 
 // Scheduler for repeatable creator webhook deliveries
-const schedulerCreatorWebhooks = new Queue("creatorWebhooks", { connection });
-const schedulerEditor = new Queue("editor", { connection });
-const schedulerCdn = new Queue("cdn", { connection });
-const schedulerModeration = new Queue("moderation", { connection });
-const schedulerNotifications = new Queue("notifications", { connection });
+const schedulerCreatorWebhooks = new Queue("creatorWebhooks", { connection: connection as any });
+const schedulerEditor = new Queue("editor", { connection: connection as any });
+const schedulerCdn = new Queue("cdn", { connection: connection as any });
+const schedulerModeration = new Queue("moderation", { connection: connection as any });
+const schedulerNotifications = new Queue("notifications", { connection: connection as any });
 
 // Scheduler for repeatable/delayed jobs
-const schedulerPayments = new Queue("payments", { connection });
-const schedulerNft = new Queue("nft", { connection });
-const schedulerStorage = new Queue("storage", { connection });
+const schedulerPayments = new Queue("payments", { connection: connection as any });
+const schedulerNft = new Queue("nft", { connection: connection as any });
+const schedulerStorage = new Queue("storage", { connection: connection as any });
 
 async function ensurePaymentsRepeatableJobs() {
   // Repeatable jobs are de-duplicated by (name + repeat opts). These are safe to call on every boot.
@@ -190,7 +190,7 @@ const workerProcessVideo = new Worker(
     await qEncode.add("encode", { videoId }, { removeOnComplete: true, removeOnFail: 100 });
     return { ok: true };
   },
-  { connection, concurrency: 2 }
+  { connection: connection as any, concurrency: 2 }
 );
 
 const workerEncodeHls = new Worker(
@@ -206,7 +206,7 @@ const workerEncodeHls = new Worker(
 
     return out;
   },
-  { connection, concurrency: 1 }
+  { connection: connection as any, concurrency: 1 }
 );
 
 const workerSyncApi = new Worker(
@@ -216,7 +216,7 @@ const workerSyncApi = new Worker(
     log("syncApiSource", apiSourceId);
     return syncApiSource(apiSourceId);
   },
-  { connection, concurrency: 1 }
+  { connection: connection as any, concurrency: 1 }
 );
 
 const workerSubtitles = new Worker(
@@ -226,7 +226,7 @@ const workerSubtitles = new Worker(
     log("subtitles", videoId, lang);
     return generateSubtitles(videoId, lang);
   },
-  { connection, concurrency: 1 }
+  { connection: connection as any, concurrency: 1 }
 );
 
 const workerStorage = new Worker(
@@ -255,7 +255,7 @@ const workerStorage = new Worker(
         throw new Error(`Unknown storage job: ${job.name}`);
     }
   },
-  { connection, concurrency: 1 },
+  { connection: connection as any, concurrency: 1 },
 );
 
 const workerPayments = new Worker(
@@ -296,7 +296,7 @@ const workerPayments = new Worker(
         return { ok: true };
     }
   },
-  { connection, concurrency: 5 },
+  { connection: connection as any, concurrency: 5 },
 );
 
 const workerNft = new Worker(
@@ -330,7 +330,7 @@ const workerNft = new Worker(
         return { ok: true };
     }
   },
-  { connection, concurrency: 2 },
+  { connection: connection as any, concurrency: 2 },
 );
 
 const workerAnalytics = new Worker(
@@ -345,7 +345,7 @@ const workerAnalytics = new Worker(
         return { ok: true };
     }
   },
-  { connection, concurrency: 10 },
+  { connection: connection as any, concurrency: 10 },
 );
 
 const workerCreatorWebhooks = new Worker(
@@ -360,7 +360,7 @@ const workerCreatorWebhooks = new Worker(
         return { ok: true };
     }
   },
-  { connection, concurrency: 2 },
+  { connection: connection as any, concurrency: 2 },
 );
 
 const workerCdn = new Worker(
@@ -374,7 +374,7 @@ const workerCdn = new Worker(
         return { ok: true };
     }
   },
-  { connection, concurrency: 2 },
+  { connection: connection as any, concurrency: 2 },
 );
 
 const workerModeration = new Worker(
@@ -388,7 +388,7 @@ const workerModeration = new Worker(
         return { ok: true };
     }
   },
-  { connection, concurrency: 2 },
+  { connection: connection as any, concurrency: 2 },
 );
 
 const workerEditor = new Worker(
@@ -412,7 +412,7 @@ const workerEditor = new Worker(
         return { ok: true };
     }
   },
-  { connection, concurrency: 1 },
+  { connection: connection as any, concurrency: 1 },
 );
 
 
@@ -428,7 +428,7 @@ const workerNotifications = new Worker(
         return { ok: true };
     }
   },
-  { connection, concurrency: 1 },
+  { connection: connection as any, concurrency: 1 },
 );
 
 
@@ -438,7 +438,7 @@ const workerVerify = new Worker(
     if (job.name !== "ping") return { ok: true };
     return { pong: true, ts: Date.now() };
   },
-  { connection, concurrency: 1 }
+  { connection: connection as any, concurrency: 1 }
 );
 
 for (const w of [workerProcessVideo, workerEncodeHls, workerSyncApi, workerSubtitles, workerStorage, workerPayments, workerNft, workerAnalytics, workerCreatorWebhooks, workerCdn, workerModeration, workerEditor, workerNotifications, workerVerify]) {

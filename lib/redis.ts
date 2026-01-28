@@ -13,17 +13,8 @@ declare global {
  * - Returns `null` if `REDIS_URL` is not configured (to support Install Wizard).
  * - Uses `globalThis` to avoid opening multiple connections in dev / HMR.
  */
-export function getRedis() {
-  if (!env.REDIS_URL) return null;
-
-  if (!globalThis._videoshare_redis) {
-    globalThis._videoshare_redis = new IORedis(env.REDIS_URL, {
-      maxRetriesPerRequest: null,
-      enableReadyCheck: true,
-    });
-  }
-
-  return globalThis._videoshare_redis;
+export function getRedis(): IORedis | null {
+  return null;
 }
 
 export async function redisGetJSON<T>(key: string): Promise<T | null> {

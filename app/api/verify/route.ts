@@ -29,8 +29,12 @@ async function checkDb(): Promise<Check> {
 async function checkRedis(): Promise<Check> {
   try {
     const env = requireEnv();
+    if (!env.REDIS_URL || process.env.NEXT_PHASE === "phase-production-build") {
+      return { ok: false, message: "Redis chưa cấu hình", latencyMs: 0 };
+    }
     const Redis = (await import("ioredis")).default;
-    const r = new Redis(env.REDIS_URL, { maxRetriesPerRequest: 1, enableOfflineQueue: false });
+    const r = new Redis(env.REDIS_URL, { maxRetriesPerRequest: 1, enableOfflineQueue: false, lazyConnect: true });
+    await r.connect();
     const t = await timeIt(async () => r.ping());
     await r.quit();
     return { ok: true, message: `Redis OK (${String(t.result)})`, latencyMs: t.ms };
