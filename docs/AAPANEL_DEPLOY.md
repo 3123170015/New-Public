@@ -168,6 +168,20 @@ export TELEGRAM_CHAT_ID="123456789"
 ```
 Script sẽ gửi thông báo khi có update hoặc khi update xong.
 
+### Auto restart & backup (tuỳ chọn)
+```bash
+export AUTO_RESTART=1
+export PM2_WEB_NAME="videoshare-web"
+export PM2_WORKER_NAME="videoshare-worker"
+export SYSTEMD_WEB_SERVICE=""
+export SYSTEMD_WORKER_SERVICE=""
+
+# Backup before migrate (requires mysqldump)
+export BACKUP_BEFORE_MIGRATE=1
+export BACKUP_DIR="/www/wwwroot/videoshare/backups"
+export BACKUP_GZIP=1
+```
+
 Gợi ý chạy cron trong aaPanel (1 lần/ngày):
 ```
 0 4 * * * /www/wwwroot/videoshare/scripts/aapanel-update.sh >> /www/wwwroot/videoshare/logs/update.log 2>&1
