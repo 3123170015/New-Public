@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import ReferralClient from "./ui/ReferralClient";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export default async function ReferralPage() {
   const session = await auth();

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { nextLevelXp } from "@/lib/gamification/levels";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function dayStartUtc(d: Date) {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));

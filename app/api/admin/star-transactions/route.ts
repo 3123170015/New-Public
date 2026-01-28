@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 import { isAdmin } from "@/lib/authz";
 
 export async function GET() {

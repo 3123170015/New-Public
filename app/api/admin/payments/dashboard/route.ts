@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth";
 import { requireAdmin } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+export const dynamic = "force-dynamic";
+
 const { sql, empty } = Prisma as any;
 
 type DepositRow = Awaited<ReturnType<typeof prisma.starDeposit.findMany>>[number];

@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function csvEscape(s: string) {
   const v = String(s ?? "");

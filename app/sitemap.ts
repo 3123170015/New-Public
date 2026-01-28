@@ -5,12 +5,14 @@ import { prisma } from "@/lib/prisma";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = env.SITE_URL ?? "http://localhost:3000";
   type SitemapVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
-  const videos = await prisma.video.findMany({
-    where: { status: "PUBLISHED", access: "PUBLIC" },
-    select: { id: true, updatedAt: true },
-    orderBy: { updatedAt: "desc" },
-    take: 5000,
-  });
+  const videos = prisma
+    ? await prisma.video.findMany({
+        where: { status: "PUBLISHED", access: "PUBLIC" },
+        select: { id: true, updatedAt: true },
+        orderBy: { updatedAt: "desc" },
+        take: 5000,
+      })
+    : [];
 
   return [
     { url: base, lastModified: new Date() },

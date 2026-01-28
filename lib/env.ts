@@ -11,10 +11,7 @@ const schema = z.object({
   DATABASE_URL: z.string().min(1).optional(),
   AUTH_SECRET: z.string().min(10).optional(),
   NEXTAUTH_URL: z.string().url().optional(),
-  REDIS_URL: z
-    .string()
-    .optional()
-    .transform((value) => (value && value.trim().length > 0 ? value : undefined)),
+  REDIS_URL: z.string().optional(),
 
   // Similar videos cache (Redis)
   SIMILAR_CACHE_TTL_SECONDS: z.coerce.number().int().positive().optional().default(900),
