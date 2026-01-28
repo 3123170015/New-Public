@@ -1,4 +1,5 @@
 import { prisma } from "../../prisma";
+import type { Prisma } from "@prisma/client";
 import { env } from "../../env";
 import { keccak_256 } from "@noble/hashes/sha3";
 import { bigintFromHex, normalizeTronAddressToHex41 } from "../../lib/tron";
@@ -100,7 +101,7 @@ function parseMintedRefMintAddress(mintedRef: string | null | undefined) {
 
 async function verifySolanaMint(args: { txHash: string; walletAddress: string; mintAddress?: string }): Promise<{ ok: boolean; mintAddress?: string }> {
   if (!env.SOLANA_RPC_URL) throw new Error("SOLANA_RPC_URL_MISSING");
-  const result = await jsonRpc<any>(env.SOLANA_RPC_URL, "getTransaction", [
+  const result = await jsonRpc(env.SOLANA_RPC_URL, "getTransaction", [
     args.txHash,
     { encoding: "jsonParsed", maxSupportedTransactionVersion: 0 },
   ]);
@@ -265,7 +266,7 @@ export async function nftExportVerifyTxJob(exportRequestId: string) {
     if (!match) throw new Error("TRANSFER_NOT_FOUND");
   }
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const base = (() => {
       try {
         return JSON.parse(req.mintedRef || "{}") as any;

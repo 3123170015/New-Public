@@ -1,4 +1,4 @@
-import type { Chain } from "@prisma/client";
+type Chain = "SOLANA" | "ETHEREUM" | "POLYGON" | "BSC" | "BASE" | "TRON";
 
 export function inferChainFromAlchemy(payload: any): Chain | null {
   const net = payload?.event?.network || payload?.network || payload?.data?.network || payload?.webhook?.network;

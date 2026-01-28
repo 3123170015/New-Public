@@ -1,5 +1,20 @@
 import { prisma } from "@/lib/prisma";
-import type { FraudAlertKind, FraudAlertSeverity } from "@prisma/client";
+
+type FraudAlertKind =
+  | "MANUAL_CREDIT_LARGE"
+  | "TOPUP_RATE_LIMIT"
+  | "DUP_TX_HASH"
+  | "STAR_WITHDRAW_HIGH_AMOUNT"
+  | "STAR_WITHDRAW_SUSPICIOUS_PATTERN"
+  | "STAR_WITHDRAW_BLACKLISTED_WALLET"
+  | "STARS_CREDIT_RISK"
+  | "STARS_DEPOSIT_MISMATCH"
+  | "PAYMENT_PROVIDER_MISMATCH"
+  | "PAYMENT_PROVIDER_TIMEOUT"
+  | "PAYMENT_PROVIDER_MISSING_SECRET"
+  | "PAYMENT_PROVIDER_STALE"
+  | "PAYMENT_PROVIDER_UNKNOWN";
+type FraudAlertSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 export type CreateFraudAlertInput = {
   kind: FraudAlertKind;

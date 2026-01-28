@@ -166,12 +166,12 @@ export async function nftGateSyncJob(data: { addresses?: Addr[]; reason?: string
         select: { chain: true, assets: { select: { assetKey: true, balance: true } } },
       });
 
-      const satisfied = rules.filter((r) => {
+      const satisfied = rules.filter((r: { collectionAddress?: string | null; tokenMint?: string | null }) => {
         const keys = [ (r as any).collectionAddress, (r as any).tokenMint ].filter(Boolean).map((x) => String(x));
         if (keys.length === 0) return false;
-        return userWallets.some((w) =>
-          String(w.chain) === String(r.chain) &&
-          w.assets.some((a) => a.balance >= (r as any).minBalance && keys.some((k) => (String(a.assetKey) === k) || (String(a.assetKey).toLowerCase() === String(k).toLowerCase())))
+        return userWallets.some((w: { chain: string; assets: { balance: number; assetKey: string }[] }) =>
+          String(w.chain) === String((r as any).chain) &&
+          w.assets.some((a: { balance: number; assetKey: string }) => a.balance >= (r as any).minBalance && keys.some((k) => (String(a.assetKey) === k) || (String(a.assetKey).toLowerCase() === String(k).toLowerCase())))
         );
       });
 
@@ -187,14 +187,14 @@ export async function nftGateSyncJob(data: { addresses?: Addr[]; reason?: string
         where: { userId, status: "ACTIVE", source: "PAID", expiresAt: { gt: new Date() } },
         select: { plan: { select: { userId: true } } },
       });
-      const paidCreators = new Set(paidActive.map((m) => (m.plan as any)?.userId).filter(Boolean));
+      const paidCreators = new Set(paidActive.map((m: { plan?: { userId?: string | null } | null }) => m.plan?.userId).filter(Boolean));
 
       // Lapse old NFT_GATE memberships for creators touched by rules but not satisfied
-      const creatorsWithRules = new Set(rules.map((r) => r.creatorId));
+      const creatorsWithRules = new Set(rules.map((r: { creatorId?: string | null }) => r.creatorId).filter(Boolean));
       const creatorsToConsider = [...creatorsWithRules];
       const allowedCreators = new Set(best.keys());
 
-      for (const creatorId of creatorsToConsider) {
+      for (const creatorId of creatorsToConsider as string[]) {
         if (allowedCreators.has(creatorId)) continue;
         await prisma.creatorMembership.updateMany({
           where: {

@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Queue, Worker, QueueScheduler } from "bullmq";
+import { Queue, Worker } from "bullmq";
 import { connection, paymentsQueue, notificationsQueue } from "./queues";
 import { processVideo } from "./jobs/processVideo";
 import { encodeHls } from "./jobs/encodeHls";
@@ -50,16 +50,16 @@ const qNotifications = new Queue("notifications", { connection });
 const qNft = new Queue("nft", { connection });
 
 // Scheduler for repeatable creator webhook deliveries
-const schedulerCreatorWebhooks = new QueueScheduler("creatorWebhooks", { connection });
-const schedulerEditor = new QueueScheduler("editor", { connection });
-const schedulerCdn = new QueueScheduler("cdn", { connection });
-const schedulerModeration = new QueueScheduler("moderation", { connection });
-const schedulerNotifications = new QueueScheduler("notifications", { connection });
+const schedulerCreatorWebhooks = new Queue("creatorWebhooks", { connection });
+const schedulerEditor = new Queue("editor", { connection });
+const schedulerCdn = new Queue("cdn", { connection });
+const schedulerModeration = new Queue("moderation", { connection });
+const schedulerNotifications = new Queue("notifications", { connection });
 
 // Scheduler for repeatable/delayed jobs
-const schedulerPayments = new QueueScheduler("payments", { connection });
-const schedulerNft = new QueueScheduler("nft", { connection });
-const schedulerStorage = new QueueScheduler("storage", { connection });
+const schedulerPayments = new Queue("payments", { connection });
+const schedulerNft = new Queue("nft", { connection });
+const schedulerStorage = new Queue("storage", { connection });
 
 async function ensurePaymentsRepeatableJobs() {
   // Repeatable jobs are de-duplicated by (name + repeat opts). These are safe to call on every boot.

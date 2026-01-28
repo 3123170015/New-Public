@@ -1,4 +1,5 @@
 import { prisma } from "../../prisma";
+import type { Prisma } from "@prisma/client";
 import { connection } from "../../queues";
 import { dayIsoUtc, dayStartUtc, hourStartUtc } from "../../lib/analyticsTime";
 
@@ -269,7 +270,7 @@ export async function analyticsIngestEventsJob(input: {
   }
 
   // DB writes
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     for (const [videoId, inc] of dailyByVideo.entries()) {
       if (inc.uniqueViews <= 0 && inc.watchSeconds <= 0 && inc.completes <= 0 && inc.impressions <= 0 && inc.clicks <= 0) continue;
       await tx.videoMetricDaily.upsert({

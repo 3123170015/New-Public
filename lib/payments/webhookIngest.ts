@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import type { Chain, PaymentProvider } from "@prisma/client";
+type Chain = "SOLANA" | "ETHEREUM" | "POLYGON" | "BSC" | "BASE" | "TRON";
+type PaymentProvider = "ALCHEMY" | "QUICKNODE" | "HELIUS" | "TRONGRID";
 import { getOrInitPaymentConfig, parseAllowlist } from "@/lib/payments/config";
 import { rateLimitRedis } from "@/lib/payments/rateLimit";
 import { verifyWebhookSignature } from "@/lib/payments/providerVerify";

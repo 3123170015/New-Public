@@ -1,4 +1,4 @@
-import type { Chain } from "@prisma/client";
+type Chain = "SOLANA" | "ETHEREUM" | "POLYGON" | "BSC" | "BASE" | "TRON";
 
 export function txExplorerUrl(chain: Chain, txHash: string) {
   const h = encodeURIComponent(txHash);

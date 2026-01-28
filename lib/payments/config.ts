@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { env } from "@/lib/env";
-import type { Chain, PaymentProvider } from "@prisma/client";
+type Chain = "SOLANA" | "ETHEREUM" | "POLYGON" | "BSC" | "BASE" | "TRON";
+type PaymentProvider = "ALCHEMY" | "QUICKNODE" | "HELIUS" | "TRONGRID";
 
 export type ProviderAllowlist = Partial<Record<Chain, PaymentProvider[]>>;
 

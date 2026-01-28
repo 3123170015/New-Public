@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import type { PaymentProvider } from "@prisma/client";
+type PaymentProvider = "ALCHEMY" | "QUICKNODE" | "HELIUS" | "TRONGRID";
 import { getProviderSecret } from "@/lib/payments/config";
 
 export async function verifyWebhookSignature(opts: {

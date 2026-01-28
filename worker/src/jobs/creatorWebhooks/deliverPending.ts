@@ -63,13 +63,14 @@ export async function deliverPendingCreatorWebhooks() {
       failed++;
       continue;
     }
+    const targetUrl = u.url!;
 
     const body = String(d.payloadJson || "{}");
     const ts = Math.floor(Date.now() / 1000);
     const sig = hmac(endpoint.secret, body);
 
     try {
-      const res = await fetch(u.url.toString(), {
+      const res = await fetch(targetUrl.toString(), {
         method: "POST",
         headers: {
           "content-type": "application/json",

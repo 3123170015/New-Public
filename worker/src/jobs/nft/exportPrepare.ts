@@ -1,4 +1,5 @@
 import { prisma } from "../../prisma";
+import type { Prisma } from "@prisma/client";
 import { env } from "../../env";
 
 const MAX_MEDIA_BYTES = 200 * 1024 * 1024; // 200MB safeguard
@@ -20,7 +21,7 @@ async function uploadBytesToNftStorage(args: { bytes: Uint8Array; contentType: s
       Authorization: `Bearer ${env.NFT_STORAGE_API_KEY}`,
       "Content-Type": args.contentType || "application/octet-stream",
     },
-    body: args.bytes,
+    body: args.bytes as any,
   });
   const j = (await res.json().catch(() => null)) as any;
   if (!res.ok || !j?.ok || !j?.value?.cid) {
@@ -128,7 +129,7 @@ export async function nftExportPrepareJob(exportRequestId: string) {
       if (feePerGb > 0 && uploadedBytesTotal > 0) {
         const gb = uploadedBytesTotal / (1024 * 1024 * 1024);
         const feeStars = Math.max(1, Math.ceil(gb * feePerGb));
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
           const u = await tx.user.findUnique({ where: { id: req.userId }, select: { starBalance: true } });
           if (!u) throw new Error("USER_NOT_FOUND");
           if ((u.starBalance ?? 0) < feeStars) throw new Error("INSUFFICIENT_STARS_FOR_MEDIA_UPLOAD");
@@ -143,7 +144,7 @@ export async function nftExportPrepareJob(exportRequestId: string) {
       }
     } catch (e: any) {
       // Fail the export request (and unfreeze item) if IPFS_MEDIA was selected but we cannot prepare.
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const base = safeParseJson(req.mintedRef) || {};
         await tx.nftExportRequest.update({ where: { id: req.id }, data: { status: "FAILED", mintedRef: JSON.stringify({ ...base, error: String(e?.message || e) }) } });
         await tx.nftItem.update({ where: { id: req.itemId }, data: { exportStatus: "NONE", exportChain: null, marketplaceFrozen: false } });
@@ -172,7 +173,7 @@ export async function nftExportPrepareJob(exportRequestId: string) {
 
   const tokenUri = await uploadJsonToNftStorage(metadata);
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const updated = await tx.nftExportRequest.updateMany({
       where: { id: req.id, status: "PENDING" },
       data: { tokenUri, status: "READY" },

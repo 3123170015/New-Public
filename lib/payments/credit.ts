@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import type { StarDeposit } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { evaluateStarsCreditRisk } from "@/lib/payments/risk";
 import { calcCouponBonusStars, getValidCouponTx, normalizeCouponCode } from "@/lib/coupons";
 import { applyReferralBonusTx } from "@/lib/referrals";
 
 export async function creditDepositStars(depositId: string, reason: string) {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const dep = await tx.starDeposit.findUnique({
       where: { id: depositId },
       include: { package: true, user: true, coupon: true },
@@ -150,7 +150,7 @@ export async function creditDepositStars(depositId: string, reason: string) {
 }
 
 export async function refundDepositStars(depositId: string, reason: string) {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const dep = await tx.starDeposit.findUnique({ where: { id: depositId }, include: { user: true } });
     if (!dep) throw new Error("DEPOSIT_NOT_FOUND");
     if (!dep.userId) throw new Error("NO_USER");
@@ -165,7 +165,7 @@ export async function refundDepositStars(depositId: string, reason: string) {
       select: { id: true, type: true, delta: true },
     });
 
-    const refundStars = credited.reduce((acc, t) => acc + Math.max(0, Number(t.delta) || 0), 0);
+    const refundStars = credited.reduce((acc: number, t: { delta: number | null }) => acc + Math.max(0, Number(t.delta) || 0), 0);
     if (refundStars <= 0) {
       await tx.starDeposit.update({ where: { id: dep.id }, data: { status: "REFUNDED", refundedAt: new Date() } });
       await tx.starDepositEvent.create({ data: { depositId: dep.id, type: "REFUND_NO_TX", message: "Refund marked without existing credit tx" } });
@@ -180,7 +180,7 @@ export async function refundDepositStars(depositId: string, reason: string) {
         delta: -refundStars,
         stars: refundStars,
         type: "REFUND",
-        note: `${reason}\nrefOfDeposit=${dep.id}\ncreditedTx=${credited.map((t) => `${t.type}:${t.id}`).join(",")}`,
+        note: `${reason}\nrefOfDeposit=${dep.id}\ncreditedTx=${credited.map((t: { type: string; id: string }) => `${t.type}:${t.id}`).join(",")}`,
       },
     });
 

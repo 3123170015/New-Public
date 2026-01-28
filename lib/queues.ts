@@ -1,17 +1,19 @@
-import { Queue } from "bullmq";
+import { Queue, type ConnectionOptions } from "bullmq";
 import { getRedis } from "./redis";
 
+const connection = getRedis() as ConnectionOptions;
+
 export const queues = {
-  processVideo: new Queue("processVideo", { connection: getRedis() }),
-  encodeHls: new Queue("encodeHls", { connection: getRedis() }),
-  syncApiSource: new Queue("syncApiSource", { connection: getRedis() }),
-  subtitles: new Queue("subtitles", { connection: getRedis() }),
-  clamavScan: new Queue("clamavScan", { connection: getRedis() }),
-  payments: new Queue("payments", { connection: getRedis() }),
-  nft: new Queue("nft", { connection: getRedis() }),
-  analytics: new Queue("analytics", { connection: getRedis() }),
-  creatorWebhooks: new Queue("creatorWebhooks", { connection: getRedis() }),
-  editor: new Queue("editor", { connection: getRedis() }),
-  moderation: new Queue("moderation", { connection: getRedis() }),
-  cdn: new Queue("cdn", { connection: getRedis() }),
+  processVideo: new Queue("processVideo", { connection }),
+  encodeHls: new Queue("encodeHls", { connection }),
+  syncApiSource: new Queue("syncApiSource", { connection }),
+  subtitles: new Queue("subtitles", { connection }),
+  clamavScan: new Queue("clamavScan", { connection }),
+  payments: new Queue("payments", { connection }),
+  nft: new Queue("nft", { connection }),
+  analytics: new Queue("analytics", { connection }),
+  creatorWebhooks: new Queue("creatorWebhooks", { connection }),
+  editor: new Queue("editor", { connection }),
+  moderation: new Queue("moderation", { connection }),
+  cdn: new Queue("cdn", { connection }),
 };

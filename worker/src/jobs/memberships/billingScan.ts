@@ -1,4 +1,5 @@
 import { prisma } from "../../prisma";
+import type { Prisma } from "@prisma/client";
 import { applyReferralBonusTx } from "../../lib/referrals";
 
 function monthKey(d: Date) {
@@ -46,7 +47,7 @@ export async function membershipBillingScanJob(opts: { renewAheadHours: number }
     const mk = monthKey(nextPeriodStart);
 
     try {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const invoice = await tx.creatorMembershipInvoice.findUnique({ where: { membershipId_monthKey: { membershipId: m.id, monthKey: mk } } });
         if (invoice) {
           skipped++;

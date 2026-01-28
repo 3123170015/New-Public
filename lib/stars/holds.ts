@@ -11,7 +11,7 @@ import { applyReferralBonusTx } from "@/lib/referrals";
  */
 
 export async function releaseMaturedHolds(userId: string, now: Date = new Date()) {
-  return prisma.$transaction((tx) => releaseMaturedHoldsTx(tx, userId, now));
+  return prisma.$transaction((tx: Prisma.TransactionClient) => releaseMaturedHoldsTx(tx, userId, now));
 }
 
 export async function releaseMaturedHoldsTx(tx: Prisma.TransactionClient, userId: string, now: Date = new Date()) {
@@ -33,7 +33,7 @@ export async function releaseMaturedHoldsTx(tx: Prisma.TransactionClient, userId
 
   // Mark holds as released.
   await tx.starHold.updateMany({
-    where: { id: { in: holds.map((h) => h.id) }, status: "HELD" },
+    where: { id: { in: holds.map((h: { id: string }) => h.id) }, status: "HELD" },
     data: { status: "RELEASED" },
   });
 

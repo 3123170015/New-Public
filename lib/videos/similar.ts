@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+const { sql, join } = Prisma as any;
 import { prisma } from "@/lib/prisma";
 import { SIMILAR_WEIGHTS } from "@/lib/videos/similarScoring";
 import { env } from "@/lib/env";
@@ -67,9 +68,9 @@ export async function getSimilarVideosAdvanced(
 
   if (!current) return [];
 
-  const tagIds = current.tags.map((t) => t.tagId);
+  const tagIds = current.tags.map((t: { tagId: string }) => t.tagId);
   const tagTokens = current.tags
-    .map((t) => t.tag.slug || t.tag.name)
+    .map((t: { tag: { slug?: string | null; name?: string | null } }) => t.tag.slug || t.tag.name)
     .filter(Boolean)
     .slice(0, 12);
 
@@ -97,7 +98,7 @@ export async function getSimilarVideosAdvanced(
   const W_TAG = SIMILAR_WEIGHTS.tagOverlap;
   const W_FT = SIMILAR_WEIGHTS.fullText;
 
-  const rows = await prisma.$queryRaw<Row[]>(Prisma.sql`
+  const rows = await prisma.$queryRaw(sql`
     SELECT
       v.id,
       (
@@ -113,7 +114,7 @@ export async function getSimilarVideosAdvanced(
     FROM Video v
     LEFT JOIN VideoTag vt
       ON vt.videoId = v.id
-      AND vt.tagId IN (${Prisma.join(tagIdsOrDummy)})
+      AND vt.tagId IN (${join(tagIdsOrDummy)})
     WHERE v.status = 'PUBLISHED'
       AND v.id <> ${videoId}
     GROUP BY v.id
@@ -122,7 +123,7 @@ export async function getSimilarVideosAdvanced(
     LIMIT ${maxCandidates};
   `);
 
-  const ids = rows.map((r) => r.id);
+  const ids = (rows as Row[]).map((r: Row) => r.id);
 
   const videos = ids.length
     ? await prisma.video.findMany({
@@ -134,13 +135,21 @@ export async function getSimilarVideosAdvanced(
       })
     : [];
 
-  const byId = new Map(videos.map((v) => [v.id, v]));
-  const debugById = new Map(rows.map((r) => [r.id, r]));
+  const byId = new Map(videos.map((v: { id: string; title: string; thumbKey: string | null; createdAt: Date; channel: SimilarVideo["channel"]; author: SimilarVideo["author"]; isSensitive?: boolean | null }) => [v.id, v]));
+  const debugById = new Map((rows as Row[]).map((r: Row) => [r.id, r]));
 
-  const out: SimilarVideo[] = [];
+    const out: SimilarVideo[] = [];
   for (const id of ids) {
-    const v = byId.get(id);
-    const dbg = debugById.get(id);
+    const v = byId.get(id) as {
+      id: string;
+      title: string;
+      thumbKey: string | null;
+      createdAt: Date;
+      channel: SimilarVideo["channel"];
+      author: SimilarVideo["author"];
+      isSensitive?: boolean | null;
+    } | undefined;
+    const dbg = debugById.get(id) as Row | undefined;
     if (!v || !dbg) continue;
     out.push({
       id: v.id,
@@ -164,7 +173,7 @@ export async function getSimilarVideosAdvanced(
   // Fallback fill (best-effort) to always show something.
   if (out.length < takeForCompute) {
     const remaining = takeForCompute - out.length;
-    const picked = new Set([videoId, ...out.map((x) => x.id)]);
+    const picked = new Set([videoId, ...out.map((x: SimilarVideo) => x.id)]);
 
     // 1) same channel
     if (current.channelId) {

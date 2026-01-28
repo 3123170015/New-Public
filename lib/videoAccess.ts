@@ -11,7 +11,8 @@ export type VideoAccessRow = {
   status: VideoStatus;
   access: VideoAccess;
   authorId: string | null;
-    earlyAccessTier?: "BRONZE" | "SILVER" | "GOLD" | null;
+  interactionsLocked?: boolean | null;
+  earlyAccessTier?: "BRONZE" | "SILVER" | "GOLD" | null;
   earlyAccessUntil?: Date | string | null;
 };
 

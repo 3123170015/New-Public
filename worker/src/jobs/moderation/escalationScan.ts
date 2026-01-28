@@ -1,4 +1,5 @@
 import { prisma } from "../../prisma";
+import type { Prisma } from "@prisma/client";
 import { env } from "../../env";
 
 async function postDiscord(message: string) {
@@ -51,7 +52,7 @@ export async function moderationEscalationScanJob() {
     });
 
     for (const u of banTargets) {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         await tx.user.update({ where: { id: u.id }, data: { bannedAt: now, banReason: `AUTO_BAN_STRIKES_${banAt}` } });
         await tx.moderationAction.create({
           data: {
@@ -79,7 +80,7 @@ export async function moderationEscalationScanJob() {
     });
 
     for (const u of muteTargets) {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         await tx.user.update({ where: { id: u.id }, data: { mutedUntil: addDays(now, 7) } });
         await tx.moderationAction.create({
           data: {
@@ -110,8 +111,8 @@ export async function moderationEscalationScanJob() {
     }),
   ]);
 
-  const videoIds = Array.from(new Set(videoReports.map((r) => r.videoId)));
-  const commentIds = Array.from(new Set(commentReports.map((r) => r.commentId)));
+  const videoIds = Array.from(new Set(videoReports.map((r: { videoId: string }) => r.videoId)));
+  const commentIds = Array.from(new Set(commentReports.map((r: { commentId: string }) => r.commentId)));
 
   const [videos, comments] = await Promise.all([
     videoIds.length
@@ -122,17 +123,17 @@ export async function moderationEscalationScanJob() {
       : Promise.resolve([] as Array<{ id: string; userId: string }>),
   ]);
 
-  const videoToAuthor = new Map(videos.map((v) => [v.id, v.authorId]));
-  const commentToAuthor = new Map(comments.map((c) => [c.id, c.userId]));
+  const videoToAuthor = new Map(videos.map((v: { id: string; authorId: string }) => [v.id, v.authorId]));
+  const commentToAuthor = new Map(comments.map((c: { id: string; userId: string }) => [c.id, c.userId]));
 
   const counts = new Map<string, number>();
   for (const r of videoReports) {
-    const uid = videoToAuthor.get(r.videoId);
+    const uid = videoToAuthor.get(r.videoId) as string | undefined;
     if (!uid) continue;
     counts.set(uid, (counts.get(uid) ?? 0) + 1);
   }
   for (const r of commentReports) {
-    const uid = commentToAuthor.get(r.commentId);
+    const uid = commentToAuthor.get(r.commentId) as string | undefined;
     if (!uid) continue;
     counts.set(uid, (counts.get(uid) ?? 0) + 1);
   }
@@ -148,7 +149,7 @@ export async function moderationEscalationScanJob() {
     if (!u || u.role === "ADMIN" || u.bannedAt) continue;
     if (u.mutedUntil && new Date(u.mutedUntil).getTime() > now.getTime()) continue;
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.user.update({ where: { id: uid }, data: { mutedUntil: addDays(now, 7) } });
       await tx.moderationAction.create({
         data: {
