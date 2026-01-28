@@ -9,6 +9,7 @@ function fmt(n: number) {
 }
 
 export default async function StudioRevenuePage() {
+  type TipRow = Awaited<ReturnType<typeof prisma.creatorTip.findMany>>[number];
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -20,7 +21,7 @@ export default async function StudioRevenuePage() {
     include: { fromUser: { select: { id: true, name: true } } },
   });
 
-  const total = tips.reduce((s, t) => s + t.stars, 0);
+  const total = (tips as TipRow[]).reduce((s: number, t: TipRow) => s + t.stars, 0);
 
   return (
     <div className="space-y-4">
@@ -50,7 +51,7 @@ export default async function StudioRevenuePage() {
                   </td>
                 </tr>
               ) : (
-                tips.map((t) => (
+                (tips as TipRow[]).map((t: TipRow) => (
                   <tr key={t.id} className="border-t">
                     <td className="py-2 whitespace-nowrap">{new Date(t.createdAt).toLocaleString()}</td>
                     <td className="py-2">{t.fromUser?.name ?? "(unknown)"}</td>

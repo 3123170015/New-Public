@@ -13,6 +13,11 @@ function fmtNumber(n: number) {
 }
 
 export default async function StudioVideoAnalyticsPage({ params }: { params: { id: string } }) {
+  type DailyMetricRow = Awaited<ReturnType<typeof prisma.videoMetricDaily.findMany>>[number];
+  type HourlyMetricRow = Awaited<ReturnType<typeof prisma.videoMetricHourly.findMany>>[number];
+  type CountryRow = Awaited<ReturnType<typeof prisma.videoAudienceCountryDaily.findMany>>[number];
+  type ExperimentRow = NonNullable<Awaited<ReturnType<typeof prisma.videoExperiment.findFirst>>>;
+  type VariantRow = NonNullable<ExperimentRow["variants"]>[number];
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -28,7 +33,7 @@ export default async function StudioVideoAnalyticsPage({ params }: { params: { i
     select: { day: true, views: true, uniqueViews: true, watchSeconds: true, completes: true },
   });
 
-  const daily: DailyRow[] = dailyRaw.map((r) => ({
+  const daily: DailyRow[] = (dailyRaw as DailyMetricRow[]).map((r: DailyMetricRow) => ({
     day: r.day.toISOString().slice(0, 10),
     views: r.views,
     uniqueViews: (r as any).uniqueViews ?? 0,
@@ -43,7 +48,7 @@ export default async function StudioVideoAnalyticsPage({ params }: { params: { i
     select: { hour: true, uniqueViews: true, watchSeconds: true, completes: true },
   });
 
-  const hourly: HourlyRow[] = hourlyRaw.map((r) => ({
+  const hourly: HourlyRow[] = (hourlyRaw as HourlyMetricRow[]).map((r: HourlyMetricRow) => ({
     hour: r.hour.toISOString(),
     uniqueViews: r.uniqueViews,
     watchSeconds: r.watchSeconds,
@@ -61,7 +66,7 @@ export default async function StudioVideoAnalyticsPage({ params }: { params: { i
     select: { country: true, uniqueViews: true, watchSeconds: true },
   });
   const cMap = new Map<string, { uniqueViews: number; watchSeconds: number }>();
-  for (const r of countriesRaw) {
+  for (const r of countriesRaw as CountryRow[]) {
     const c = cMap.get(r.country) ?? { uniqueViews: 0, watchSeconds: 0 };
     c.uniqueViews += r.uniqueViews;
     c.watchSeconds += r.watchSeconds;
@@ -110,7 +115,7 @@ export default async function StudioVideoAnalyticsPage({ params }: { params: { i
                 </tr>
               </thead>
               <tbody>
-                {countries.map((c) => (
+                {countries.map((c: { country: string; uniqueViews: number; watchSeconds: number }) => (
                   <tr key={c.country} className="border-t">
                     <td className="py-2 font-semibold">{c.country}</td>
                     <td className="py-2">{fmtNumber(c.uniqueViews)}</td>
@@ -138,7 +143,7 @@ export default async function StudioVideoAnalyticsPage({ params }: { params: { i
                   </tr>
                 </thead>
                 <tbody>
-                  {experiment.variants.map((v) => (
+                  {(experiment.variants as VariantRow[]).map((v: VariantRow) => (
                     <tr key={v.id} className="border-t">
                       <td className="py-2 font-semibold">{v.name}</td>
                       <td className="py-2">{fmtNumber(v.exposures)}</td>

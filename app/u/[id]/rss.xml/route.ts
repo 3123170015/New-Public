@@ -31,6 +31,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     return new Response("Not Found", { status: 404 });
   }
 
+  type RssVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
   const videos = await prisma.video.findMany({
     where: { authorId: params.id, status: "PUBLISHED", access: "PUBLIC", isSensitive: false },
     orderBy: { createdAt: "desc" },
@@ -46,7 +47,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   const homeLink = new URL(`/u/${params.id}`, base).toString();
 
   const itemsXml = videos
-    .map((v) => {
+    .map((v: RssVideoRow) => {
       const link = new URL(`/v/${v.id}`, base).toString();
       const desc = (v.description ?? "").slice(0, 5000);
       return [

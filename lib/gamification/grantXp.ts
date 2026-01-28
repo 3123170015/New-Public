@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { levelFromXp } from "@/lib/gamification/levels";
 
 export type GrantXpInput = {
@@ -72,7 +73,7 @@ export async function grantXp(input: GrantXpInput) {
   const amount = Math.max(0, Math.floor(input.amount || 0));
   if (!userId || !sourceKey || amount <= 0) return { ok: true, granted: false, xp: 0, level: 1 };
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const existing = await tx.xpEvent.findUnique({
       where: { userId_sourceKey: { userId, sourceKey } },
       select: { id: true },

@@ -79,8 +79,8 @@ export default async function StudioVideoSeoPage({ params }: { params: { id: str
   }
   if (v.authorId !== uid && !isAdmin(session)) redirect("/studio");
 
-  const tagsStr = v.tags
-    .map((t) => t.tag.slug || t.tag.name)
+  const tagsStr = (v.tags as { tag: { slug?: string | null; name?: string | null } }[])
+    .map((t: { tag: { slug?: string | null; name?: string | null } }) => t.tag.slug || t.tag.name)
     .filter(Boolean)
     .join(", ");
 
@@ -119,7 +119,7 @@ export default async function StudioVideoSeoPage({ params }: { params: { id: str
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center gap-2">
-            <Badge variant={score >= 80 ? "default" : score >= 60 ? "secondary" : "destructive"}>{score}/100</Badge>
+            <Badge variant={score >= 80 ? "default" : score >= 60 ? "secondary" : "danger"}>{score}/100</Badge>
             <span className="text-sm text-zinc-600">
               {score >= 80 ? "Good" : score >= 60 ? "OK" : "Needs work"}
             </span>

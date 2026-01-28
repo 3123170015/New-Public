@@ -11,7 +11,7 @@ export async function pingIndexNow(urls: string[]) {
   if (!flags.indexNow) return { ok: true, skipped: true };
 
   if (!env.INDEXNOW_KEY) throw new Error("INDEXNOW_KEY missing");
-  const host = new URL(env.SITE_URL).host;
+  const host = new URL(env.SITE_URL ?? "http://localhost:3000").host;
 
   const body: IndexNowBody = {
     host,

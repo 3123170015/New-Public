@@ -212,16 +212,15 @@ export default function TikTokVerticalFeed({
                     poster={v.posterUrl ?? v.poster ?? undefined}
                     title={v.title}
                     playerMode="tiktok"
-                    storyboard={v.storyboard}
+                    storyboard={v.storyboard as any}
                   />
                 ) : (
-                  <VideoPlayer
-                    src={v.hlsUrl}
-                    poster={v.posterUrl ?? v.poster ?? undefined}
-                    title={v.title}
-                    mode="tiktok"
-                    storyboard={v.storyboard}
-                  />
+                    <VideoPlayer
+                      src={v.hlsUrl}
+                      poster={v.posterUrl ?? v.poster ?? undefined}
+                      mode="tiktok"
+                      storyboard={v.storyboard as any}
+                    />
                 )}
               </div>
 

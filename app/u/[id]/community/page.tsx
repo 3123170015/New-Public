@@ -6,6 +6,8 @@ import CommunityPoll from "@/components/community/CommunityPoll";
 export const dynamic = "force-dynamic";
 
 export default async function CommunityPage({ params }: { params: { id: string } }) {
+  type CommunityPostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number];
+
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
   const isAdmin = session?.user?.role === "ADMIN";
@@ -43,7 +45,7 @@ export default async function CommunityPage({ params }: { params: { id: string }
       ) : null}
 
       <div className="space-y-3">
-        {posts.map((p) => {
+        {(posts as CommunityPostRow[]).map((p: CommunityPostRow) => {
           const vote = (p as any).pollVotes?.[0] ?? null;
           return (
             <div key={p.id} className="card space-y-2">
@@ -77,7 +79,7 @@ export default async function CommunityPage({ params }: { params: { id: string }
                   <CommunityPoll
                     postId={p.id}
                     viewerVotedOptionId={vote?.optionId ?? null}
-                    options={(p.pollOptions ?? []).map((o) => ({
+                    options={(p.pollOptions ?? []).map((o: { id: string; text: string; votes?: unknown[] }) => ({
                       id: o.id,
                       text: o.text,
                       votes: o.votes?.length ?? 0,

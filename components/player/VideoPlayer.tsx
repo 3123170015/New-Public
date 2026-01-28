@@ -331,7 +331,9 @@ useEffect(() => {
       setFatalOverlay(`Playback error. Tried multiple mirrors but still failing. Last error: ${reason}`);
     }
 
-    lastPlaybackRef.current = { t: video.currentTime || 0, wasPlaying: !video.paused };
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+    lastPlaybackRef.current = { t: videoEl.currentTime || 0, wasPlaying: !videoEl.paused };
     const next = sourceList[nextIdx];
     setActiveSrc(next.url);
     setActiveOrigin(String(next.origin || ""));

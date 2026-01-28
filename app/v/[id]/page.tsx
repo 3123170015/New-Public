@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { env } from "@/lib/env";
 import type { Metadata } from "next";
-import { notFound, unauthorized } from "next/navigation";
+import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import VideoPlayerClient from "@/components/player/VideoPlayerClient";
 import AdStream from "@/components/ads/AdStream";
@@ -38,6 +38,12 @@ import EarlyAccessGateClient from "./ui/EarlyAccessGateClient";
 
 export const dynamic = "force-dynamic";
 
+function unauthorized(): never {
+  const err = new Error("Unauthorized");
+  (err as any).digest = "NEXT_HTTP_ERROR;401";
+  throw err;
+}
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const v = await prisma.video.findUnique({
     where: { id: params.id },
@@ -69,7 +75,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
   if (v.isSensitive) {
     meta.other = {
-      ...(meta.other ?? {}),
+      ...((meta.other ?? {}) as Record<string, string | number | Array<string | number>>),
       rating: "adult",
     };
   }
@@ -88,6 +94,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
   const viewerFanClubTier = viewerId && v.authorId && viewerId !== v.authorId ? await getViewerFanClubTier(viewerId, v.authorId) : null;
+  const isAdmin = session?.user?.role === "ADMIN";
   const viewerFanClubLabel = viewerFanClubTier ? (viewerFanClubTier === "BRONZE" ? "Bronze" : viewerFanClubTier === "SILVER" ? "Silver" : "Gold") : null;
   const sensitiveMode = await getSensitiveModeForUser(viewerId ?? null);
   const access = ((v as any).access ?? "PUBLIC") as any;
@@ -161,7 +168,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
 
       const nftGates = await prisma.videoNftGate.findMany({ where: { videoId: v.id, enabled: true } });
       const walletCount = await prisma.userWallet.count({ where: { userId: viewerId, verifiedAt: { not: null } } });
-      const nftGateChains = Array.from(new Set(nftGates.map((g) => String(g.chain))));
+      const nftGateChains = Array.from(new Set(nftGates.map((g: { chain: string }) => String(g.chain)))) as string[];
 
       const plans = await prisma.creatorMembershipPlan.findMany({
         where: { userId: v.authorId, isActive: true },
@@ -277,7 +284,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
     const canViewPlaylist = Boolean(pl && (rolePl !== "NONE" || pl.visibility === "PUBLIC" || pl.visibility === "UNLISTED"));
 
     if (pl && canViewPlaylist) {
-      const list = pl.items.map((it) => it.video).filter(Boolean);
+      const list = pl.items.map((it: { video: any }) => it.video).filter(Boolean);
       const idx = list.findIndex((x: any) => x.id === v.id);
       if (idx >= 0) {
         for (let j = idx + 1; j < list.length; j++) {
@@ -300,7 +307,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
         where: { id: { in: ids } },
         select: { id: true, title: true, thumbKey: true, status: true, access: true, authorId: true, interactionsLocked: true },
       });
-      const map = new Map(rows.map((r) => [r.id, r]));
+      const map = new Map(rows.map((r: { id: string }) => [r.id, r]));
       for (const id of ids) {
         const cand = map.get(id);
         const picked = await pickIfViewable(cand, `/v/${id}`);
@@ -360,7 +367,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
           </div>
           {isSensitive ? (
             <div className="mt-2">
-              <Badge variant="destructive">Sensitive</Badge>
+              <Badge variant="danger">Sensitive</Badge>
             </div>
           ) : null}
 
@@ -457,7 +464,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
         </div>
         {isSensitive ? (
           <div className="mt-2">
-            <Badge variant="destructive">Sensitive</Badge>
+            <Badge variant="danger">Sensitive</Badge>
           </div>
         ) : null}
 
@@ -508,7 +515,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
               <div className="small muted">Chưa có subtitle.</div>
             ) : (
               <ul>
-                {v.subtitles.map((s) => (
+                {(v.subtitles as { id: string; vttKey: string | null; lang: string; provider: string | null }[]).map((s: { id: string; vttKey: string | null; lang: string; provider: string | null }) => (
                   <li key={s.id}>
                     <a href={resolveMediaUrl(s.vttKey) ?? "#"}>{s.lang}</a> <span className="small muted">({s.provider})</span>
                   </li>
@@ -552,12 +559,12 @@ async function TopSupporters({ videoId }: { videoId: string }) {
   }
 
   const users = await prisma.user.findMany({
-    where: { id: { in: rows.map((r) => r.userId) } },
+    where: { id: { in: rows.map((r: { userId: string }) => r.userId) } },
     select: { id: true, name: true, email: true },
   });
-  const map = new Map(users.map((u) => [u.id, u]));
+  const map = new Map(users.map((u: { id: string; name?: string | null; email?: string | null }) => [u.id, u]));
 
-  const total = rows.reduce((acc, r) => acc + (r._sum.stars ?? 0), 0);
+  const total = rows.reduce((acc: number, r: { _sum: { stars?: number | null } }) => acc + (r._sum.stars ?? 0), 0);
 
   return (
     <div className="card">
@@ -567,8 +574,8 @@ async function TopSupporters({ videoId }: { videoId: string }) {
       </div>
 
       <ol style={{ marginTop: 10, paddingLeft: 18 }}>
-        {rows.map((r, i) => {
-          const u = map.get(r.userId);
+        {rows.map((r: { userId: string; _sum: { stars?: number | null }; _count: { _all: number } }, i: number) => {
+          const u = map.get(r.userId) as { name?: string | null; email?: string | null } | undefined;
           const stars = r._sum.stars ?? 0;
           const name = u?.name ?? u?.email ?? "User";
           return (

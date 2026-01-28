@@ -6,6 +6,8 @@ import { env } from "@/lib/env";
 export const dynamic = "force-dynamic";
 
 export default async function UserNftsPage({ params }: { params: { id: string } }) {
+  type UserNftRow = Awaited<ReturnType<typeof prisma.nftItem.findMany>>[number];
+
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
   const isSelf = viewerId === params.id;
@@ -58,7 +60,7 @@ export default async function UserNftsPage({ params }: { params: { id: string } 
       </div>
 
       <div className="grid" style={{ gap: 12 }}>
-        {items.map((it) => {
+        {(items as UserNftRow[]).map((it: UserNftRow) => {
           const img = it.imageKey ? `${env.R2_PUBLIC_BASE_URL}/${it.imageKey}` : null;
           const isAvatar = user.avatarNftItemId === it.id;
           const canSetAvatar = isSelf && it.ownerId === user.id;

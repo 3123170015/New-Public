@@ -8,6 +8,8 @@ import { getActiveMembershipTier } from "@/lib/membership";
 export const dynamic = "force-dynamic";
 
 export default async function UserVideosPage({ params }: { params: { id: string } }) {
+  type UserVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+
   const { id } = params;
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
@@ -48,12 +50,12 @@ export default async function UserVideosPage({ params }: { params: { id: string 
     },
   });
 
-  const items = videos.map((v) => ({
+  const items = (videos as UserVideoRow[]).map((v: UserVideoRow) => ({
     kind: "video" as const,
     id: v.id,
-    title: v.title,
+    title: v.title ?? "",
     hlsUrl: resolveMediaUrl(v.masterM3u8Key) ?? "",
-    posterUrl: resolveMediaUrl(v.thumbKey) ?? undefined,
+    posterUrl: resolveMediaUrl(v.thumbKey) ?? null,
     isSensitive: v.isSensitive,
     storyboard: v.storyboardKey
       ? {

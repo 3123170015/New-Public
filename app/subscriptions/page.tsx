@@ -11,6 +11,10 @@ import { getActiveMembershipTier } from "@/lib/membership";
 export const dynamic = "force-dynamic";
 
 export default async function SubscriptionFeedPage() {
+  type SubscriptionRow = Awaited<ReturnType<typeof prisma.subscription.findMany>>[number];
+  type PostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number];
+  type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -26,7 +30,7 @@ export default async function SubscriptionFeedPage() {
     where: { subscriberId: userId },
     select: { channelUserId: true },
   });
-  const channelIds = subs.map((s) => s.channelUserId);
+  const channelIds = (subs as SubscriptionRow[]).map((s: SubscriptionRow) => s.channelUserId);
 
   if (channelIds.length === 0) {
     return (
@@ -77,9 +81,9 @@ export default async function SubscriptionFeedPage() {
   ]);
 
   const viewerVotes = new Map<string, string>();
-  for (const p of posts) {
+  for (const p of posts as PostRow[]) {
     if (p.type === "POLL") {
-      const voted = p.pollOptions.flatMap((o) => o.votes).find((v) => v.userId === userId);
+      const voted = p.pollOptions.flatMap((o: { votes: { userId: string }[] }) => o.votes).find((v: { userId: string }) => v.userId === userId);
       if (voted) viewerVotes.set(p.id, voted.id); // we store voteId? Actually need optionId; We'll compute later.
     }
   }
@@ -97,13 +101,13 @@ export default async function SubscriptionFeedPage() {
           <div className="small muted">Chưa có bài đăng.</div>
         ) : (
           <div className="space-y-3">
-            {posts.map((p) => {
-              const options = p.pollOptions.map((o) => ({
+    {(posts as PostRow[]).map((p: PostRow) => {
+              const options = p.pollOptions.map((o: { id: string; text: string; votes: unknown[] }) => ({
                 id: o.id,
                 text: o.text,
                 votes: o.votes.length,
               }));
-              const myOpt = p.pollOptions.find((o) => o.votes.some((v) => v.userId === userId))?.id ?? null;
+              const myOpt = p.pollOptions.find((o: { id: string; votes: { userId: string }[] }) => o.votes.some((v: { userId: string }) => v.userId === userId))?.id ?? null;
               return (
                 <div key={p.id} className="card">
                   <div className="small muted">
@@ -145,14 +149,14 @@ export default async function SubscriptionFeedPage() {
       <section className="space-y-3">
         <div className="text-sm font-semibold">Videos</div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          {videos.map((v) => (
+          {(videos as VideoRow[]).map((v: VideoRow) => (
             <Link key={v.id} href={`/v/${v.id}`} className="card block overflow-hidden">
               <div className="aspect-video w-full bg-black">
                 {v.thumbKey ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <SmartImage
                     src={resolveMediaUrl(v.thumbKey) ?? ""}
-                    alt={v.title}
+                    alt={v.title ?? ""}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 300px"
