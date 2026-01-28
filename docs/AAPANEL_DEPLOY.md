@@ -37,6 +37,7 @@
 - Clone repo vào `/www/wwwroot/videoshare`
 - `cp .env.example .env` và set env production
 - Hoặc dùng script tự động: `bash scripts/aapanel-install.sh`
+  - Script chỉ hỏi các biến chính (DB/Redis/R2). Vui lòng review `.env.example` để bổ sung các biến tuỳ chọn (upload limits, payments, webhooks, analytics).
 
 ### Install deps
 ```bash
@@ -156,10 +157,12 @@ Nếu bạn muốn, mình có thể thêm `docs/OPS_RUNBOOK.md` (SRE-lite) để
 ## 10) Update tự động (GitHub releases)
 Nếu repo có tag release (vd `v4.16.24`), có thể chạy script update:
 ```bash
-bash scripts/aapanel-update.sh
+bash scripts/aapanel-update.sh --yes
 ```
 
 Gợi ý chạy cron trong aaPanel (1 lần/ngày):
 ```
 0 4 * * * /www/wwwroot/videoshare/scripts/aapanel-update.sh >> /www/wwwroot/videoshare/logs/update.log 2>&1
 ```
+
+> Lưu ý: nên cấu hình logrotate hoặc ghi log theo ngày để tránh file log quá lớn.
