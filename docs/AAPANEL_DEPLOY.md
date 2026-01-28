@@ -36,12 +36,18 @@
 ### Pull code
 - Clone repo vào `/www/wwwroot/videoshare`
 - `cp .env.example .env` và set env production
+- Hoặc dùng script tự động: `bash scripts/aapanel-install.sh`
 
 ### Install deps
 ```bash
 cd /www/wwwroot/videoshare
 npm ci
 ```
+
+> aaPanel Script (tự hỏi thông tin cài đặt + build):
+> ```bash
+> bash scripts/aapanel-install.sh
+> ```
 
 > Nếu `npm ci` báo lockfile không khớp hoặc thiếu resolved/integrity:
 > ```bash
@@ -147,3 +153,13 @@ pm2 save
 
 ---
 Nếu bạn muốn, mình có thể thêm `docs/OPS_RUNBOOK.md` (SRE-lite) để quy định rotate keys, backups, và incident playbook.
+## 10) Update tự động (GitHub releases)
+Nếu repo có tag release (vd `v4.16.24`), có thể chạy script update:
+```bash
+bash scripts/aapanel-update.sh
+```
+
+Gợi ý chạy cron trong aaPanel (1 lần/ngày):
+```
+0 4 * * * /www/wwwroot/videoshare/scripts/aapanel-update.sh >> /www/wwwroot/videoshare/logs/update.log 2>&1
+```
