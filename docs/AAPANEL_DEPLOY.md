@@ -160,6 +160,14 @@ Nếu repo có tag release (vd `v4.16.24`), có thể chạy script update:
 bash scripts/aapanel-update.sh --yes
 ```
 
+### Telegram notify (ưu tiên)
+Set biến môi trường trong aaPanel hoặc shell:
+```bash
+export TELEGRAM_BOT_TOKEN="123456:ABC"
+export TELEGRAM_CHAT_ID="123456789"
+```
+Script sẽ gửi thông báo khi có update hoặc khi update xong.
+
 Gợi ý chạy cron trong aaPanel (1 lần/ngày):
 ```
 0 4 * * * /www/wwwroot/videoshare/scripts/aapanel-update.sh >> /www/wwwroot/videoshare/logs/update.log 2>&1

@@ -243,7 +243,7 @@ export default function VideoPlayer({
     tick();
     const id = window.setInterval(tick, 15_000);
     return () => window.clearInterval(id);
-  }, [videoId, analytics?.experimentId, analytics?.variantId, sendAnalytics]);
+  }, [analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId, sendAnalytics]);
 
   // Exposure event (counts impressions for A/B experiments).
   useEffect(() => {
@@ -251,7 +251,7 @@ export default function VideoPlayer({
     if (exposureSentRef.current) return;
     exposureSentRef.current = true;
     sendAnalytics([{ type: "EXPOSURE" }]);
-  }, [videoId, analytics?.experimentId, analytics?.variantId, sendAnalytics]);
+  }, [analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId, sendAnalytics]);
 
   // Attach HLS (only when src is an HLS playlist). Supports failover via `candidates`.
 useEffect(() => {

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+/* eslint-disable @next/next/no-img-element */
+
 type Payload = {
   videoId?: string;
   stars?: number;

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveMediaUrl } from "@/lib/mediaUrl";
 
 export const runtime = "nodejs";
+/* eslint-disable @next/next/no-img-element */
 // OpenGraph image for /clip/[id].
 //
 // Shows clip title + creator + source video context.
