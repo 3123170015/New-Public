@@ -6,3 +6,6 @@ export function getClientIp(req: Request) {
   if (xr) return xr;
   return "0.0.0.0";
 }
+
+// Alias for backward compatibility
+export const getRequestIp = getClientIp;
