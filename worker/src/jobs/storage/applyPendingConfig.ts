@@ -23,7 +23,7 @@ async function notifyAdmins(title: string, body: string, dataJson?: any) {
   const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true } });
   if (!admins.length) return;
   await prisma.notification.createMany({
-    data: admins.map((a) => ({ userId: a.id, type: "SYSTEM", title, body, url: "/admin/storage", dataJson: dataJson ? JSON.stringify(dataJson) : null })),
+    data: admins.map((a: { id: string }) => ({ userId: a.id, type: "SYSTEM", title, body, url: "/admin/storage", dataJson: dataJson ? JSON.stringify(dataJson) : null })),
   });
 }
 

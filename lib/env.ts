@@ -64,21 +64,21 @@ const schema = z.object({
   PAYMENTS_TOLERANCE_BPS: z.coerce.number().int().min(0).optional().default(50),
 
   // RPC endpoints (khuyến nghị đặt riêng theo chain)
-  SOLANA_RPC_URL: z.string().url().optional().default(""),
-  EVM_RPC_URL_ETHEREUM: z.string().url().optional().default(""),
-  EVM_RPC_URL_POLYGON: z.string().url().optional().default(""),
-  EVM_RPC_URL_BSC: z.string().url().optional().default(""),
-  EVM_RPC_URL_BASE: z.string().url().optional().default(""),
+  SOLANA_RPC_URL: z.string().url().optional().nullable().default(null),
+  EVM_RPC_URL_ETHEREUM: z.string().url().optional().nullable().default(null),
+  EVM_RPC_URL_POLYGON: z.string().url().optional().nullable().default(null),
+  EVM_RPC_URL_BSC: z.string().url().optional().nullable().default(null),
+  EVM_RPC_URL_BASE: z.string().url().optional().nullable().default(null),
 
   // Webhook provider secrets (fallback nếu không dùng DB-config)
   ALCHEMY_WEBHOOK_SIGNING_KEY: z.string().optional().default(""),
   QUICKNODE_WEBHOOK_SECRET: z.string().optional().default(""),
   HELIUS_WEBHOOK_SECRET: z.string().optional().default(""),
 
-  TRONGRID_API_URL: z.string().url().optional().default("https://api.trongrid.io"),
+  TRONGRID_API_URL: z.string().url().optional().nullable().default("https://api.trongrid.io"),
   TRONGRID_API_KEY: z.string().optional().default(""),
 
-  DISCORD_ALERT_WEBHOOK_URL: z.string().url().optional().default(""),
+  DISCORD_ALERT_WEBHOOK_URL: z.string().url().optional().nullable().default(null),
 
   // Creator webhooks (Task 14): strict allowlist domains, CSV (e.g. "example.com,hooks.myapp.com")
   CREATOR_WEBHOOK_ALLOWLIST: z.string().optional().default(""),

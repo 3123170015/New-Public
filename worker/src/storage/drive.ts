@@ -5,7 +5,7 @@ export async function makeDriveClient(serviceAccountJson: string) {
   const creds = JSON.parse(serviceAccountJson);
   const auth = new google.auth.GoogleAuth({ credentials: creds, scopes: ["https://www.googleapis.com/auth/drive"] });
   const client = await auth.getClient();
-  return google.drive({ version: "v3", auth: client });
+  return google.drive({ version: "v3", auth: client as any });
 }
 
 export async function uploadFileToDrive(args: { drive: any; folderId: string; filePath: string; name: string; mimeType: string }) {

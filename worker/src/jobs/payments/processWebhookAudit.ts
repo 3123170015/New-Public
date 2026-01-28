@@ -1,5 +1,9 @@
 import { prisma } from "../../prisma";
-import type { Chain, PaymentProvider, Prisma, DepositStatus } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+
+type Chain = "SOLANA" | "ETHEREUM" | "POLYGON" | "BSC" | "BASE" | "TRON";
+type PaymentProvider = "ALCHEMY" | "QUICKNODE" | "HELIUS" | "TRONGRID";
+type DepositStatus = "PENDING" | "MATCHED" | "UNMATCHED" | "CREDITED" | "NEEDS_REVIEW" | "REFUNDED" | "OBSERVED";
 import { extractObservations } from "./extract";
 import { getPaymentConfigCached } from "./paymentConfig";
 
@@ -172,8 +176,8 @@ export async function processWebhookAuditJob(auditLogId: string) {
               tokenId: token2 ? token2.id : undefined,
               custodialAddressId: custodial.id,
               packageId: (await prisma.starTopupPackage.findFirst({ where: { active: true }, orderBy: { sort: "asc" } }))?.id,
-              expectedAmount: new Prisma.Decimal(expAmount),
-              actualAmount: expAmount ? new Prisma.Decimal(expAmount) : null,
+              expectedAmount: expAmount as any,
+              actualAmount: expAmount ? (expAmount as any) : null,
               txHash: txHash || null,
               memo: memo || null,
               provider: log.provider,
@@ -190,7 +194,7 @@ export async function processWebhookAuditJob(auditLogId: string) {
     }
 
     // Update deposit fields
-    const update: Prisma.StarDepositUpdateInput = {
+    const update: Record<string, unknown> = {
       provider: log.provider,
       status: chooseCandidateStatus(deposit.status),
     };
@@ -199,7 +203,7 @@ export async function processWebhookAuditJob(auditLogId: string) {
     if (toAddress) {
       // keep custodialAddress by ID, but we store toAddress in event
     }
-    if (obs.amount != null) update.actualAmount = new Prisma.Decimal(obs.amount);
+    if (obs.amount != null) update.actualAmount = obs.amount as any;
 
     await prisma.starDeposit.update({ where: { id: deposit.id }, data: update });
     await upsertDepositEvent(deposit.id, "WEBHOOK_OBSERVED", `Webhook ${auditLogId} (${log.provider})`, {

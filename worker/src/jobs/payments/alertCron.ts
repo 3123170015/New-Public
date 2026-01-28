@@ -75,7 +75,7 @@ export async function paymentsAlertCronJob() {
     });
 
     const lines = chainBreak
-      .map((b) => `- ${b.chain}: ${b._count._all}`)
+      .map((b: { chain: string; _count: { _all: number } }) => `- ${b.chain}: ${b._count._all}`)
       .join("\n");
 
     await postDiscord(

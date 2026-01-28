@@ -35,21 +35,21 @@ export async function weeklyDigestJob() {
     where: { disabledTypesCsv: { contains: "WEEKLY_DIGEST" } },
     select: { userId: true },
   });
-  const disabledSet = new Set(disabled.map((x) => x.userId));
+  const disabledSet = new Set(disabled.map((x: { userId: string }) => x.userId));
 
   // Disabled users (email)
   const disabledEmail = await prisma.notificationSetting.findMany({
     where: { disabledTypesCsv: { contains: "WEEKLY_DIGEST_EMAIL" } },
     select: { userId: true },
   });
-  const disabledEmailSet = new Set(disabledEmail.map((x) => x.userId));
+  const disabledEmailSet = new Set(disabledEmail.map((x: { userId: string }) => x.userId));
 
   // Users already received this week
   const already = await prisma.notification.findMany({
     where: { type: "WEEKLY_DIGEST", createdAt: { gte: weekStart, lt: weekEnd } },
     select: { userId: true },
   });
-  const alreadySet = new Set(already.map((x) => x.userId));
+  const alreadySet = new Set(already.map((x: { userId: string }) => x.userId));
 
   let processed = 0;
   let created = 0;

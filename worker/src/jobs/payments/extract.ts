@@ -1,4 +1,5 @@
-import type { Chain, PaymentProvider } from "@prisma/client";
+type Chain = "SOLANA" | "ETHEREUM" | "POLYGON" | "BSC" | "BASE" | "TRON";
+type PaymentProvider = "ALCHEMY" | "QUICKNODE" | "HELIUS" | "TRONGRID";
 
 export type Observation = {
   provider: PaymentProvider;

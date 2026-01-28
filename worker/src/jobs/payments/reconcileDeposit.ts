@@ -1,4 +1,6 @@
-import type { Chain, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+
+type Chain = "SOLANA" | "ETHEREUM" | "POLYGON" | "BSC" | "BASE" | "TRON";
 import { prisma } from "../../prisma";
 import { env } from "../../env";
 import { getPaymentConfigCached } from "./paymentConfig";
@@ -138,7 +140,7 @@ async function getSolanaTransferTo(
 }
 
 async function creditIfPossible(depositId: string) {
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const dep = await tx.starDeposit.findUnique({
       where: { id: depositId },
       include: { package: true, user: true, coupon: true },
@@ -341,7 +343,7 @@ export async function reconcileDepositJob(depositId: string) {
     if (!withinTolerance(expected, actual, cfg.toleranceBps)) {
       await prisma.starDeposit.update({
         where: { id: dep.id },
-        data: { status: "NEEDS_REVIEW", actualAmount: new Prisma.Decimal(actualStr), failureReason: `tolerance_exceeded_${cfg.toleranceBps}bps` },
+        data: { status: "NEEDS_REVIEW", actualAmount: actualStr as any, failureReason: `tolerance_exceeded_${cfg.toleranceBps}bps` },
       });
       await prisma.starDepositEvent.create({
         data: {
@@ -355,7 +357,7 @@ export async function reconcileDepositJob(depositId: string) {
 
     await prisma.starDeposit.update({
       where: { id: dep.id },
-      data: { status: "CONFIRMED", actualAmount: new Prisma.Decimal(actualStr), failureReason: null },
+      data: { status: "CONFIRMED", actualAmount: actualStr as any, failureReason: null },
     });
     await prisma.starDepositEvent.create({
       data: { depositId: dep.id, type: "RECONCILE_CONFIRMED", message: `Confirmed amount ${actualStr}` },

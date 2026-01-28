@@ -40,7 +40,7 @@ export async function continueWatchingDigestJob() {
     });
     const disabled = (setting?.disabledTypesCsv || "")
       .split(",")
-      .map((s) => s.trim())
+      .map((s: string) => s.trim())
       .filter(Boolean);
     if (disabled.includes("CONTINUE_WATCHING_DIGEST")) continue;
 
@@ -71,14 +71,14 @@ export async function continueWatchingDigestJob() {
     });
 
     const unfinished = items
-      .filter((it) => it.video?.isPublished)
-      .filter((it) => (it.video?.durationSec || 0) > 0)
-      .filter((it) => it.seconds < (it.video!.durationSec - 15));
+      .filter((it: { video?: { isPublished?: boolean | null } }) => it.video?.isPublished)
+      .filter((it: { video?: { durationSec?: number | null } }) => (it.video?.durationSec || 0) > 0)
+      .filter((it: { seconds: number; video?: { durationSec?: number | null } }) => it.seconds < ((it.video?.durationSec ?? 0) - 15));
 
     if (unfinished.length === 0) continue;
 
     const top = unfinished.slice(0, env.NOTIFICATIONS_CONTINUE_WATCHING_MAX_ITEMS);
-    const titles = top.map((it) => `• ${it.video?.title || "Video"}`).join("\n");
+    const titles = top.map((it: { video?: { title?: string | null } }) => `• ${it.video?.title || "Video"}`).join("\n");
 
     await prisma.notification.create({
       data: {
@@ -88,7 +88,7 @@ export async function continueWatchingDigestJob() {
         body: `Bạn đang xem dở vài video:\n${titles}`,
         url: "/history",
         dataJson: JSON.stringify({
-          videoIds: top.map((t) => t.video!.id),
+          videoIds: top.map((t: { video?: { id: string } }) => t.video!.id),
           createdAt: now.toISOString(),
         }),
       },
