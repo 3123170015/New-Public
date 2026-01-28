@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSiteConfig } from "@/lib/siteConfig";
 import { calcNftSaleFees } from "@/lib/nft/fees";
@@ -26,7 +27,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const holdDays = Number((cfg as any).nftUnverifiedFirstSaleHoldDays ?? 10);
   const treasuryUserId = (cfg as any).treasuryUserId as string | null | undefined;
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const auction = await tx.nftAuction.findUnique({
       where: { id: params.id },
       include: {

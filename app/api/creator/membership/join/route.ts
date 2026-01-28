@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { releaseMaturedHoldsTx } from "@/lib/stars/holds";
 import { applyReferralBonusTx } from "@/lib/referrals";
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
   const body = schema.parse(await req.json());
   const idempotencyKey = idemFrom(req, body.idempotencyKey);
 
-  const out = await prisma.$transaction(async (tx) => {
+  const out = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const existing = await tx.creatorMembershipPurchase.findUnique({
       where: { userId_idempotencyKey: { userId, idempotencyKey } },
       select: { id: true, planId: true },
@@ -92,7 +93,7 @@ export async function POST(req: Request) {
 
     // Notify creator if enabled
     const ns = await tx.notificationSetting.findUnique({ where: { userId: plan.userId }, select: { disabledTypesCsv: true } });
-    const disabled = new Set((ns?.disabledTypesCsv || "").split(",").map((x) => x.trim()).filter(Boolean));
+    const disabled = new Set((ns?.disabledTypesCsv || "").split(",").map((x: string) => x.trim()).filter(Boolean));
     if (!disabled.has("CREATOR_MEMBERSHIP")) {
       await tx.notification.create({
         data: {

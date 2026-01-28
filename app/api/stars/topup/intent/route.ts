@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { calcCouponBonusStars, getValidCouponTx, normalizeCouponCode } from "@/lib/coupons";
 
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
   if (parsed.data.couponCode) {
     try {
       couponCode = normalizeCouponCode(parsed.data.couponCode);
-      const coupon = await prisma.$transaction(async (tx) =>
+      const coupon = await prisma.$transaction(async (tx: Prisma.TransactionClient) =>
         getValidCouponTx(tx as any, { code: couponCode!, userId, appliesTo: "TOPUP" })
       );
       couponId = coupon.id;

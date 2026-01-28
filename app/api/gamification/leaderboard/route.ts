@@ -14,6 +14,7 @@ export async function GET(req: Request) {
 
   const take = parsed.data.take ?? 50;
 
+  type LeaderboardUser = Awaited<ReturnType<typeof prisma.user.findMany>>[number];
   const users = await prisma.user.findMany({
     orderBy: [{ xp: "desc" }, { level: "desc" }, { createdAt: "asc" }],
     take,
@@ -22,7 +23,7 @@ export async function GET(req: Request) {
 
   return Response.json({
     ok: true,
-    items: users.map((u, idx) => ({
+    items: (users as LeaderboardUser[]).map((u: LeaderboardUser, idx) => ({
       rank: idx + 1,
       id: u.id,
       name: u.name,

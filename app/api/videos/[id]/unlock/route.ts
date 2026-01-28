@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { getSiteConfig } from "@/lib/siteConfig";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
@@ -37,7 +38,7 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
     return Response.json({ ok: false, message: "MEMBERSHIP_ONLY" }, { status: 400 });
   }
 
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const existing = await tx.videoUnlock.findUnique({ where: { userId_videoId: { userId: viewerId, videoId } } });
     if (existing) return { ok: true as const, unlocked: true as const, starsCost: existing.starsCost, already: true };
 

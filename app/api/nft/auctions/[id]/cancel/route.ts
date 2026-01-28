@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 export const runtime = "nodejs";
@@ -12,7 +13,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const form = await req.formData();
   const back = String(form.get("back") || req.headers.get("referer") || "/nft/market");
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const auction = await tx.nftAuction.findUnique({ where: { id: params.id }, include: { bids: { select: { id: true }, take: 1 } } });
     if (!auction) throw new Error("AUCTION_NOT_FOUND");
     if (auction.status !== "ACTIVE") throw new Error("AUCTION_NOT_ACTIVE");

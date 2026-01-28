@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getActiveMembershipTier } from "@/lib/membership";
 import { getSiteConfig } from "@/lib/siteConfig";
@@ -62,7 +63,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "Not enough stars" }, { status: 400 });
   }
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const col = collection
       ? collection
       : await tx.nftCollection.create({

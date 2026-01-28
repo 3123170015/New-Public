@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 export const runtime = "nodejs";
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid priceStars" }, { status: 400 });
   }
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const item = await tx.nftItem.findUnique({
       where: { id: itemId },
       select: { id: true, ownerId: true, marketplaceFrozen: true, exportStatus: true },

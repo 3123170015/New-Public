@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 export const runtime = "nodejs";
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
   const durationHours = Math.max(1, Math.min(168, toInt(form.get("durationHours"), 24)));
   if (!itemId) return Response.json({ error: "ITEM_ID_REQUIRED" }, { status: 400 });
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const item = await tx.nftItem.findUnique({
       where: { id: itemId },
       include: {

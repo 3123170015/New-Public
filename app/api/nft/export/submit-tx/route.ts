@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { enqueueNftExportVerify } from "@/lib/nft/exportQueue";
 
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
   if (!requestId) return Response.json({ error: "REQUEST_ID_REQUIRED" }, { status: 400 });
   if (!txHash) return Response.json({ error: "TX_HASH_REQUIRED" }, { status: 400 });
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const r = await tx.nftExportRequest.findUnique({ where: { id: requestId } });
     if (!r) throw new Error("REQUEST_NOT_FOUND");
     if (r.userId !== userId) throw new Error("FORBIDDEN");

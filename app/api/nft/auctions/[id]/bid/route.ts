@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { createHoldTx, releaseHoldNowTx, releaseMaturedHoldsTx } from "@/lib/stars/holds";
 
@@ -20,7 +21,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const back = String(form.get("back") || req.headers.get("referer") || "/nft/market");
   const amountStars = Math.max(1, toInt(form.get("amountStars"), 0));
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     // Release matured holds so user can bid using unlocked proceeds.
     await releaseMaturedHoldsTx(tx, userId);
 

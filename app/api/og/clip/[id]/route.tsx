@@ -52,7 +52,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
         <div style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "18px" }}>
           {clip.creator?.image ? (
             <img
-              src={resolveMediaUrl(clip.creator.image)}
+              src={resolveMediaUrl(clip.creator.image) ?? ""}
               width={56}
               height={56}
               style={{ borderRadius: 999, border: "2px solid rgba(255,255,255,.35)" }}

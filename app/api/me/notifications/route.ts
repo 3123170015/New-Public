@@ -12,6 +12,7 @@ export async function GET(req: Request) {
   const takeRaw = Number(url.searchParams.get("take") ?? 50);
   const take = Math.min(200, Math.max(1, Number.isFinite(takeRaw) ? takeRaw : 50));
 
+  type NotificationRow = Awaited<ReturnType<typeof prisma.notification.findMany>>[number];
   const items = await prisma.notification.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
@@ -30,7 +31,7 @@ export async function GET(req: Request) {
 
   return Response.json({
     ok: true,
-    notifications: items.map((n) => ({
+    notifications: (items as NotificationRow[]).map((n: NotificationRow) => ({
       id: n.id,
       type: n.type,
       title: n.title,

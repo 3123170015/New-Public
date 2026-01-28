@@ -55,6 +55,7 @@ export async function GET(req: Request) {
   const topSupporterUserId = grouped?.[0]?.userId ?? null;
   const topSupporterStars = grouped?.[0]?._sum?.superThanksStars ?? 0;
 
+  type CommentRow = Awaited<ReturnType<typeof prisma.comment.findMany>>[number];
   const comments = await prisma.comment.findMany({
     where: {
       videoId,
@@ -77,7 +78,7 @@ export async function GET(req: Request) {
   });
 
   // Fan Club badge: active CreatorMembership for this video's creator.
-  const commenterIds = Array.from(new Set(comments.map((c) => c.userId).filter(Boolean))) as string[];
+  const commenterIds = Array.from(new Set((comments as CommentRow[]).map((c: CommentRow) => c.userId).filter(Boolean))) as string[];
   const fanClubMap = new Map<string, string>();
 
   if (commenterIds.length && video.authorId) {
@@ -107,7 +108,7 @@ export async function GET(req: Request) {
     }
   }
 
-  const out = comments.map((c) => {
+  const out = (comments as CommentRow[]).map((c: CommentRow) => {
     const senderAnonymous = c.isSuperThanks ? parseAnonymous(c.starTx?.note) : false;
     const isTopSupporter = Boolean(
       topSupporterUserId &&
@@ -200,11 +201,11 @@ if (video.authorId) {
   });
   const kw = (s?.keywordsCsv || "")
     .split(",")
-    .map((x) => x.trim())
+    .map((x: string) => x.trim())
     .filter(Boolean);
   if (kw.length) {
     const lower = content.toLowerCase();
-    if (kw.some((k) => lower.includes(k.toLowerCase()))) {
+    if (kw.some((k: string) => lower.includes(k.toLowerCase()))) {
       visibility = "HIDDEN";
     }
   }

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 export const runtime = "nodejs";
@@ -53,7 +54,7 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
     .filter((c) => c.title.length > 0)
     .sort((a, b) => a.startSec - b.startSec);
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.videoChapter.deleteMany({ where: { videoId: ctx.params.id } });
     if (normalized.length) {
       await tx.videoChapter.createMany({

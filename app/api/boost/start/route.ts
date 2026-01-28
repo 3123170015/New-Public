@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { getActiveMembershipTier } from "@/lib/membership";
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
 
   // NOTE: quota enforcement is done inside the transaction to avoid races.
   try {
-    const order = await prisma.$transaction(async (tx) => {
+    const order = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const now = new Date();
       // Opportunistically release matured holds before checking balance.
       await releaseMaturedHoldsTx(tx, uid);

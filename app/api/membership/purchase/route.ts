@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSiteConfig } from "@/lib/siteConfig";
 import { releaseMaturedHoldsTx } from "@/lib/stars/holds";
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
 
   const now = new Date();
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     // Opportunistically release matured holds before checking balance.
     await releaseMaturedHoldsTx(tx, userId);
 

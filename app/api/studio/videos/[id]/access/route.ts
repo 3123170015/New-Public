@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { getSiteConfig } from "@/lib/siteConfig";
 import { z } from "zod";
 
@@ -45,7 +46,7 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
   const normalizeEarlyTier = earlyTier && earlyUntil ? earlyTier : null;
   const normalizeEarlyUntil = earlyTier && earlyUntil ? earlyUntil : null;
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.video.update({
       where: { id: videoId },
       data: {

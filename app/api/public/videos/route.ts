@@ -81,6 +81,7 @@ export async function GET(req: Request) {
     where.authorId = authorId;
   }
 
+  type PublicVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
   const items = await prisma.video.findMany({
     where,
     orderBy: pickOrderBy(sort),
@@ -107,7 +108,7 @@ export async function GET(req: Request) {
 
   const total = await prisma.video.count({ where });
 
-  const mapped = items.map((v) => ({
+  const mapped = (items as PublicVideoRow[]).map((v: PublicVideoRow) => ({
     id: v.id,
     title: v.title,
     description: v.description,
@@ -123,7 +124,7 @@ export async function GET(req: Request) {
     author: v.author,
     channel: v.channel,
     category: v.category,
-    tags: v.tags.map((t) => t.tag),
+    tags: (v.tags as { tag: { slug: string; name: string } }[]).map((t: { tag: { slug: string; name: string } }) => t.tag),
   }));
 
   return Response.json(

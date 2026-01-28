@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { incDailyMetric } from "@/lib/metrics";
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
   if (!(await canViewVideoDb(vGate as any, session))) return Response.json({ ok: false, message: "FORBIDDEN" }, { status: 403 });
   if (!(await canInteractWithVideoDb(vGate as any, session))) return Response.json({ ok: false, message: "INTERACTIONS_DISABLED" }, { status: 403 });
 
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     // Opportunistically release matured holds before checking balance.
     await releaseMaturedHoldsTx(tx, userId);
 

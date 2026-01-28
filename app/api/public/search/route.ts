@@ -75,6 +75,7 @@ export async function GET(req: Request) {
     where.category = { slug: category };
   }
 
+  type PublicVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
   const list = await prisma.video.findMany({
     where,
     orderBy: pickOrderBy(sort),
@@ -102,7 +103,7 @@ export async function GET(req: Request) {
       page,
       take,
       total,
-      items: list.map((v) => ({
+      items: (list as PublicVideoRow[]).map((v: PublicVideoRow) => ({
         ...v,
         watchUrl: `/v/${v.id}`,
         thumbUrl: resolveMediaUrl(v.thumbKey) ?? null,

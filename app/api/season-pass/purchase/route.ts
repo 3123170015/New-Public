@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { addDays } from "@/lib/seasonPass";
 import { calcCouponDiscountStars, getValidCouponTx, normalizeCouponCode } from "@/lib/coupons";
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
   const txId = idemFrom(req, body.data.txId);
 
   try {
-    const out = await prisma.$transaction(async (tx) => {
+    const out = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const existing = await tx.seasonPassPurchase.findFirst({ where: { userId, txId }, select: { id: true, endsAt: true } });
       if (existing) {
         const u = await tx.user.findUnique({ where: { id: userId }, select: { starBalance: true } });

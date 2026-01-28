@@ -6,7 +6,6 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const session = await auth();
-  // @ts-expect-error custom field
   const userId = session?.user?.id as string | undefined;
   if (!userId) return Response.json({ ok: false, message: "UNAUTHORIZED" }, { status: 401 });
 

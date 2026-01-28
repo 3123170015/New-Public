@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 
@@ -23,7 +24,7 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
     return Response.json({ ok: false, message: "CANNOT_JOIN_SELF" }, { status: 400 });
   }
 
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const existingPurchase = await tx.creatorMembershipPurchase.findUnique({
       where: { userId_idempotencyKey: { userId: viewerId, idempotencyKey: idem } },
       select: { id: true, planId: true, stars: true },

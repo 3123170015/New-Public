@@ -39,6 +39,7 @@ export async function GET(req: Request) {
     if (u) where.userId = u.id;
   }
 
+  type StarLedgerRow = Awaited<ReturnType<typeof prisma.starTransaction.findMany>>[number];
   const rows = await prisma.starTransaction.findMany({
     where,
     orderBy: { createdAt: "desc" },
@@ -47,7 +48,7 @@ export async function GET(req: Request) {
   });
 
   const header = ["createdAt", "txId", "userId", "email", "type", "delta", "stars", "depositId", "videoId", "videoTitle", "note"].join(",");
-  const lines = rows.map((r) =>
+  const lines = (rows as StarLedgerRow[]).map((r: StarLedgerRow) =>
     [
       r.createdAt.toISOString(),
       r.id,

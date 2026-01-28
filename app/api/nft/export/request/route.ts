@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSiteConfig } from "@/lib/siteConfig";
 import { enqueueNftExportPrepare } from "@/lib/nft/exportQueue";
@@ -82,7 +83,7 @@ export async function POST(req: Request) {
   const cfg = await getSiteConfig();
   const exportBaseFeeStars = Number((cfg as any).nftExportBaseFeeStars ?? 0);
 
-  const res = await prisma.$transaction(async (tx) => {
+  const res = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const item = await tx.nftItem.findUnique({
       where: { id: itemId },
       include: {

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+const { sql, join, empty } = Prisma as any;
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { getActiveMembershipTier } from "@/lib/membership";
@@ -96,20 +97,20 @@ export async function GET(req: Request) {
   if (useFulltext) {
     // In NATURAL LANGUAGE MODE; fallback to contains if MATCH fails.
     try {
-      const ids = await prisma.$queryRaw<Array<{ id: string }>>(
-        Prisma.sql`
+      const ids = await prisma.$queryRaw(
+        sql`
         SELECT v.id
         FROM Video v
         WHERE v.status = 'PUBLISHED'
-          AND v.access IN (${Prisma.join([...allowedAccess])})
-          ${hideSensitive ? Prisma.sql`AND v.isSensitive = 0` : Prisma.empty}
+          AND v.access IN (${join([...allowedAccess])})
+          ${hideSensitive ? sql`AND v.isSensitive = 0` : empty}
           AND MATCH(v.title, v.description) AGAINST (${qq} IN NATURAL LANGUAGE MODE)
         ORDER BY MATCH(v.title, v.description) AGAINST (${qq} IN NATURAL LANGUAGE MODE) DESC, v.viewCount DESC, v.createdAt DESC
         LIMIT ${take} OFFSET ${(page - 1) * take}
       `,
       );
 
-      const idList = ids.map((r) => r.id);
+      const idList = (ids as { id: string }[]).map((r: { id: string }) => r.id);
       if (idList.length) {
         const rows = await prisma.video.findMany({
           where: { id: { in: idList } },
@@ -126,7 +127,7 @@ export async function GET(req: Request) {
             category: { select: { id: true, name: true, slug: true } },
           },
         });
-        const byId = new Map(rows.map((r) => [r.id, r] as const));
+        const byId = new Map(rows.map((r: { id: string }) => [r.id, r] as const));
         list = idList.map((id) => byId.get(id)).filter(Boolean) as any[];
       }
 

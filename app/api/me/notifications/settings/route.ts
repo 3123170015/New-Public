@@ -31,7 +31,7 @@ export async function GET() {
 
   const disabled = (row?.disabledTypesCsv || "")
     .split(",")
-    .map((x) => x.trim())
+    .map((x: string) => x.trim())
     .filter(Boolean);
 
   return Response.json({ ok: true, disabled });
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
   }
 
   const cleaned = Array.from(
-    new Set(body.disabled.map((x) => String(x).trim()).filter((x) => x && KNOWN.has(x))),
+    new Set(body.disabled.map((x: string) => String(x).trim()).filter((x: string) => x && KNOWN.has(x))),
   );
 
   await prisma.notificationSetting.upsert({

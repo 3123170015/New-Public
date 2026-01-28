@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { getSiteConfig } from "@/lib/siteConfig";
 import { queues } from "@/lib/queues";
 
@@ -40,7 +41,7 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
   const defRoyalty = clampInt((cfg as any).nftDefaultRoyaltyBps ?? 500, 0, maxRoyalty, 500);
   const royaltyBps = clampInt(Number(form?.get("royaltyBps") ?? defRoyalty), 0, maxRoyalty, defRoyalty);
 
-  const out = await prisma.$transaction(async (tx) => {
+  const out = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     let nftItemId: string | null = null;
 
     if (mode === "MARKETPLACE_ONLY" || mode === "BOTH") {

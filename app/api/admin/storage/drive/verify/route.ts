@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
   try {
     const authClient = new google.auth.GoogleAuth({ credentials: creds, scopes: ["https://www.googleapis.com/auth/drive"] });
-    const drive = google.drive({ version: "v3", auth: await authClient.getClient() });
+    const drive = google.drive({ version: "v3", auth: authClient });
     const res = await drive.files.get({ fileId: folderId, fields: "id,name,mimeType" });
 
     await prisma.nftEventLog.create({

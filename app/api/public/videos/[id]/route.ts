@@ -1,2 +1,2 @@
-export { runtime } from "../../video/[id]/route";
+export const runtime = "nodejs";
 export { OPTIONS, GET } from "../../video/[id]/route";

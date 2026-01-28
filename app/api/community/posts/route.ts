@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -53,7 +54,7 @@ export async function POST(req: Request) {
     }
   }
 
-  const post = await prisma.$transaction(async (tx) => {
+  const post = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const created = await tx.communityPost.create({
       data: {
         authorId: userId,

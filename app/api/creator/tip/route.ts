@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { releaseMaturedHoldsTx } from "@/lib/stars/holds";
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
   const idempotencyKey = idemFrom(req, body.idempotencyKey);
   const msg = (body.message ?? "").trim().slice(0, 500);
 
-  const out = await prisma.$transaction(async (tx) => {
+  const out = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const existing = await tx.creatorTip.findFirst({
       where: { fromUserId, idempotencyKey },
       select: { id: true, stars: true, toUserId: true },
@@ -107,30 +108,31 @@ export async function POST(req: Request) {
     const disabled = new Set(
       (ns?.disabledTypesCsv || "")
         .split(",")
-        .map((x) => x.trim())
+        .map((x: string) => x.trim())
         .filter(Boolean),
     );
     if (!disabled.has("CREATOR_TIP")) {
       await tx.notification.create({
-      data: {
-        userId: body.toUserId,
-        type: "CREATOR_TIP",
-        title: "Bạn nhận được tip",
-        body: `${from?.name ?? "Ai đó"} đã tip ⭐ ${body.stars}`,
-        url: `/studio/revenue`,
-        dataJson: JSON.stringify({ tipId: tip.id, fromUserId, stars: body.stars }),
-      },
-    });
+        data: {
+          userId: body.toUserId,
+          type: "CREATOR_TIP",
+          title: "Bạn nhận được tip",
+          body: `${from?.name ?? "Ai đó"} đã tip ⭐ ${body.stars}`,
+          url: `/studio/revenue`,
+          dataJson: JSON.stringify({ tipId: tip.id, fromUserId, stars: body.stars }),
+        },
+      });
+    }
 
     // Creator webhook outbox (deliveries) for receiver
     const endpoints = await tx.creatorWebhookEndpoint.findMany({
       where: { userId: body.toUserId, enabled: true },
       select: { id: true, eventsCsv: true },
     });
-    const interested = endpoints.filter((e) => (e.eventsCsv || "").split(",").map((x) => x.trim()).filter(Boolean).includes("TIP_RECEIVED"));
+    const interested = endpoints.filter((e: { eventsCsv: string | null }) => (e.eventsCsv || "").split(",").map((x: string) => x.trim()).filter(Boolean).includes("TIP_RECEIVED"));
     const deliveries = interested.length
       ? await tx.creatorWebhookDelivery.createMany({
-          data: interested.map((e) => ({
+          data: interested.map((e: { id: string }) => ({
             endpointId: e.id,
             userId: body.toUserId,
             eventType: "TIP_RECEIVED",
@@ -148,7 +150,6 @@ export async function POST(req: Request) {
       : null;
 
     const toBalance = await tx.user.findUnique({ where: { id: body.toUserId }, select: { starBalance: true } });
-    }
     const fromBalance = await tx.user.findUnique({ where: { id: fromUserId }, select: { starBalance: true } });
     return {
       existing: false as const,

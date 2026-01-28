@@ -67,6 +67,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     return Response.json({ ok: false, error: "NOT_FOUND" }, { status: 404, headers: withCors() });
   }
 
+  type TagRow = { tag: { slug: string; name: string } };
+  type SubtitleRow = { lang: string; vttKey: string | null; provider: string | null };
+
   return Response.json(
     {
       ok: true,
@@ -95,9 +98,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         author: v.author,
         channel: v.channel,
         category: v.category,
-        tags: v.tags.map((t) => t.tag),
+        tags: (v.tags as TagRow[]).map((t: TagRow) => t.tag),
         chapters: v.chapters,
-        subtitles: v.subtitles.map((s) => ({ ...s, vttUrl: resolveMediaUrl(s.vttKey) })),
+        subtitles: (v.subtitles as SubtitleRow[]).map((s: SubtitleRow) => ({ ...s, vttUrl: resolveMediaUrl(s.vttKey) })),
       },
     },
     {
