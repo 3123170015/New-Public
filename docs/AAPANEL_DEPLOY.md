@@ -182,6 +182,22 @@ export BACKUP_DIR="/www/wwwroot/videoshare/backups"
 export BACKUP_GZIP=1
 ```
 
+### Log cleanup (tuỳ chọn)
+Giúp tự xoá hoặc truncate log update nếu quá nặng:
+```bash
+export LOG_CLEANUP=1
+export UPDATE_LOG_FILE="/www/wwwroot/videoshare/logs/update.log"
+export LOG_MAX_BYTES=10485760  # 10MB
+export LOG_TRUNCATE=1          # 1=truncate, 0=delete
+```
+
+### Post-update verify (tuỳ chọn)
+Sau update có thể ping `/api/verify/status` để check nhanh:
+```bash
+export POST_UPDATE_VERIFY=1
+export VERIFY_PORT=3000
+```
+
 Gợi ý chạy cron trong aaPanel (1 lần/ngày):
 ```
 0 4 * * * /www/wwwroot/videoshare/scripts/aapanel-update.sh >> /www/wwwroot/videoshare/logs/update.log 2>&1

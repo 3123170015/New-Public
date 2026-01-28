@@ -114,6 +114,30 @@ restart_services() {
   fi
 }
 
+cleanup_logs() {
+  if [ "${LOG_CLEANUP:-0}" != "1" ]; then
+    return 0
+  fi
+  local log_file="${UPDATE_LOG_FILE:-${ROOT_DIR}/logs/update.log}"
+  local max_bytes="${LOG_MAX_BYTES:-10485760}"
+  if [ ! -f "$log_file" ]; then
+    return 0
+  fi
+  local size
+  size="$(wc -c < "$log_file" | tr -d ' ')"
+  if [ "$size" -le "$max_bytes" ]; then
+    return 0
+  fi
+  local mode="${LOG_TRUNCATE:-1}"
+  if [ "$mode" = "0" ]; then
+    rm -f "$log_file"
+    notify_telegram "aaPanel update: log removed (size ${size} bytes)."
+  else
+    tail -c "$max_bytes" "$log_file" > "${log_file}.tmp" && mv "${log_file}.tmp" "$log_file"
+    notify_telegram "aaPanel update: log truncated to ${max_bytes} bytes."
+  fi
+}
+
 LATEST_TAG="$(curl -fsSL --connect-timeout 5 --max-time 10 -H "$AUTH_HEADER" "$REPO_URL" | node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync(0,'utf8'));console.log(data.tag_name||'');")"
 LATEST_VERSION="${LATEST_TAG#v}"
 
@@ -150,3 +174,13 @@ npm run build
 echo "Update complete. Restart web + worker processes (pm2/systemd)."
 notify_telegram "aaPanel update completed: ${LOCAL_VERSION} -> ${LATEST_VERSION}."
 restart_services
+if [ "${POST_UPDATE_VERIFY:-0}" = "1" ]; then
+  local_status=""
+  if curl -fsSL --connect-timeout 5 --max-time 10 "http://127.0.0.1:${VERIFY_PORT:-3000}/api/verify/status" >/dev/null; then
+    local_status="OK"
+  else
+    local_status="FAIL"
+  fi
+  notify_telegram "aaPanel verify status: ${local_status}."
+fi
+cleanup_logs

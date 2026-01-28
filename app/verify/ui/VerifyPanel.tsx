@@ -7,6 +7,19 @@ type Res =
   | { ok: false; configured: false; message: string }
   | { ok: boolean; configured: true; checks: { db: Check; redis: Check; r2: Check }; tip: string };
 
+type StatusRes = {
+  ok: boolean;
+  ts: string;
+  uptimeSec: number;
+  load: number[];
+  cpus: number;
+  platform: string;
+  release: string;
+  node: string;
+  configured: boolean;
+  memory: { total: number; free: number; used: number; usagePct: number };
+};
+
 function Badge({ ok }: { ok: boolean }) {
   return (
     <span
@@ -26,6 +39,8 @@ function Badge({ ok }: { ok: boolean }) {
 export default function VerifyPanel() {
   const [loading, setLoading] = useState(false);
   const [res, setRes] = useState<Res | null>(null);
+  const [status, setStatus] = useState<StatusRes | null>(null);
+  const [statusLoading, setStatusLoading] = useState(false);
 
   async function run() {
     setLoading(true);
@@ -41,18 +56,36 @@ export default function VerifyPanel() {
     }
   }
 
+  async function runStatus() {
+    setStatusLoading(true);
+    try {
+      const r = await fetch("/api/verify/status", { cache: "no-store" });
+      const data = (await r.json()) as StatusRes;
+      setStatus(data);
+    } catch (e: any) {
+      setStatus({ ok: false, ts: new Date().toISOString(), uptimeSec: 0, load: [], cpus: 0, platform: "", release: "", node: "", configured: false, memory: { total: 0, free: 0, used: 0, usagePct: 0 } });
+    } finally {
+      setStatusLoading(false);
+    }
+  }
+
   return (
     <div className="card" style={{ padding: 14 }}>
       <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
         <b>System checks</b>
-        <button onClick={run} disabled={loading}>
-          {loading ? "Running..." : "Run verify"}
-        </button>
+        <div className="row" style={{ gap: 8 }}>
+          <button onClick={runStatus} disabled={statusLoading}>
+            {statusLoading ? "Loading..." : "Load status"}
+          </button>
+          <button onClick={run} disabled={loading}>
+            {loading ? "Running..." : "Run verify"}
+          </button>
+        </div>
       </div>
 
-      {!res ? (
+      {!res && !status ? (
         <p className="small muted" style={{ marginTop: 8 }}>
-          Bấm <b>Run verify</b> để kiểm tra DB / Redis / R2 bằng env hiện tại.
+          Bấm <b>Load status</b> để xem trạng thái server, hoặc <b>Run verify</b> để kiểm tra DB / Redis / R2 bằng env hiện tại.
         </p>
       ) : null}
 
@@ -74,6 +107,21 @@ export default function VerifyPanel() {
             <div className="small muted" style={{ marginTop: 6 }}>
               Tổng: <Badge ok={res.ok} /> — {res.tip}
             </div>
+          </div>
+        </div>
+      ) : null}
+
+      {status ? (
+        <div className="card" style={{ marginTop: 12 }}>
+          <b>Server status</b>
+          <div className="small muted" style={{ marginTop: 6 }}>
+            {status.platform} {status.release} • Node {status.node} • CPUs {status.cpus}
+          </div>
+          <div className="small muted" style={{ marginTop: 6 }}>
+            Uptime {status.uptimeSec}s • Load {status.load.map((v) => v.toFixed(2)).join(", ") || "n/a"}
+          </div>
+          <div className="small muted" style={{ marginTop: 6 }}>
+            Memory {Math.round(status.memory.used / 1024 / 1024)}MB / {Math.round(status.memory.total / 1024 / 1024)}MB ({status.memory.usagePct}%)
           </div>
         </div>
       ) : null}
