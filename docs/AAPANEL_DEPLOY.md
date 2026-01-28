@@ -198,6 +198,21 @@ export POST_UPDATE_VERIFY=1
 export VERIFY_PORT=3000
 ```
 
+## 11) Monitor auto check (Cron)
+Chạy kiểm tra DB/Redis/Worker mỗi X phút và gửi Telegram khi trạng thái thay đổi:
+```bash
+export TELEGRAM_BOT_TOKEN="123456:ABC"
+export TELEGRAM_CHAT_ID="123456789"
+export MONITOR_HOST="127.0.0.1"
+export MONITOR_PORT=3000
+export MONITOR_STATE_FILE="/tmp/videoshare-monitor.state"
+```
+
+Cron gợi ý (5 phút/lần):
+```
+*/5 * * * * /www/wwwroot/videoshare/scripts/aapanel-monitor.sh >> /www/wwwroot/videoshare/logs/monitor.log 2>&1
+```
+
 Gợi ý chạy cron trong aaPanel (1 lần/ngày):
 ```
 0 4 * * * /www/wwwroot/videoshare/scripts/aapanel-update.sh >> /www/wwwroot/videoshare/logs/update.log 2>&1
