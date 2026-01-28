@@ -1,7 +1,7 @@
 "use client";
 
 import Hls from "hls.js";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SuperThanksStickerOverlay from "@/components/superthanks/SuperThanksStickerOverlay";
 import { Select } from "@/components/ui/select";
 
@@ -214,7 +214,7 @@ export default function VideoPlayer({
     return () => window.removeEventListener("videoshare:player:seek", onSeek as any);
   }, [videoId]);
 
-  function sendAnalytics(events: Array<Record<string, any>>) {
+  const sendAnalytics = useCallback((events: Array<Record<string, any>>) => {
     if (!analyticsEnabled || !videoId) return;
     fetch("/api/analytics/events", {
       method: "POST",
@@ -229,7 +229,7 @@ export default function VideoPlayer({
         })),
       }),
     }).catch(() => {});
-  }
+  }, [analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId]);
 
   // Presence ping for realtime viewers.
   useEffect(() => {

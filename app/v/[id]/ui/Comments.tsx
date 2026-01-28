@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 
 type CommentVisibility = "VISIBLE" | "HIDDEN" | "AUTHOR_ONLY" | "DELETED";
@@ -107,14 +107,14 @@ function fanClubBadge(tier: "BRONZE" | "SILVER" | "GOLD" | null | undefined) {
 }
 
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true);
     const res = await fetch(`/api/comments?videoId=${encodeURIComponent(videoId)}`, { cache: "no-store" });
     const data = await res.json();
     setComments(data.comments || []);
     setViewerFanClubTier(data.viewerFanClubTier ?? null);
     setLoading(false);
-  }
+  }, [videoId]);
 
   useEffect(() => {
     load();

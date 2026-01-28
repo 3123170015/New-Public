@@ -53,6 +53,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
           {clip.creator?.image ? (
             <img
               src={resolveMediaUrl(clip.creator.image) ?? ""}
+              alt={`${creatorName} avatar`}
               width={56}
               height={56}
               style={{ borderRadius: 999, border: "2px solid rgba(255,255,255,.35)" }}

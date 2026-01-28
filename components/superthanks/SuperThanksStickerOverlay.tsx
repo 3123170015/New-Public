@@ -50,7 +50,7 @@ export default function SuperThanksStickerOverlay({ videoId }: { videoId?: strin
   return (
     <div className="superthanks-sticker-wrap">
       <div className="superthanks-sticker" style={{ ["--st-hue" as any]: String(hue) } as any}>
-        <img src={sticker} alt="Super Thanks" />
+        <img src={sticker} alt="Super Thanks" loading="lazy" />
       </div>
     </div>
   );

@@ -41,7 +41,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
         {thumbUrl ? (
           <img
             src={thumbUrl}
-            alt=""
+            alt={isSensitive ? "Blurred video thumbnail" : "Video thumbnail"}
             style={{
               position: "absolute",
               inset: 0,

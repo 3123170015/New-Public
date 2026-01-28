@@ -41,6 +41,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
           {u.image ? (
             <img
               src={resolveMediaUrl(u.image) ?? ""}
+              alt={`${displayName} avatar`}
               width={132}
               height={132}
               style={{ borderRadius: 999, border: "3px solid rgba(255,255,255,.35)" }}
