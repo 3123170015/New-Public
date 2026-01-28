@@ -229,7 +229,7 @@ export default function VideoPlayer({
         })),
       }),
     }).catch(() => {});
-  }, [videoId, analytics?.experimentId, analytics?.variantId]);
+  }, [analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId]);
 
   // Presence ping for realtime viewers.
   useEffect(() => {
