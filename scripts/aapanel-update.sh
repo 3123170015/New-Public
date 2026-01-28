@@ -23,6 +23,97 @@ notify_telegram() {
     --data-urlencode "text=${message}" >/dev/null || true
 }
 
+fail_notify() {
+  local exit_code=$?
+  if [ "$exit_code" -ne 0 ]; then
+    notify_telegram "aaPanel update failed (exit ${exit_code}). Check logs."
+  fi
+}
+trap fail_notify EXIT
+
+backup_before_migrate() {
+  if [ "${BACKUP_BEFORE_MIGRATE:-0}" != "1" ]; then
+    return 0
+  fi
+  if ! command -v mysqldump >/dev/null 2>&1; then
+    echo "mysqldump not found; skipping backup."
+    return 0
+  fi
+
+  local export_vars
+  export_vars="$(node -e "require('dotenv').config({path:'${ROOT_DIR}/.env'});const url=process.env.DATABASE_URL;if(!url){process.exit(1)};const u=new URL(url);const esc=(s)=>String(s||'').replace(/'/g,\"'\\\\''\");console.log(\"DB_HOST='\"+esc(u.hostname)+\"'\\nDB_PORT='\"+esc(u.port||'3306')+\"'\\nDB_USER='\"+esc(u.username)+\"'\\nDB_PASS='\"+esc(u.password)+\"'\\nDB_NAME='\"+esc(u.pathname.replace(/^\\//,'')) +\"'\");" 2>/dev/null)" || {
+    echo "DATABASE_URL not available; skipping backup."
+    return 0
+  }
+
+  eval "$export_vars"
+  if [ -z "${DB_NAME:-}" ]; then
+    echo "DATABASE_URL missing database name; skipping backup."
+    return 0
+  fi
+
+  local backup_dir="${BACKUP_DIR:-${ROOT_DIR}/backups}"
+  mkdir -p "$backup_dir"
+  local ts
+  ts="$(date +%Y%m%d_%H%M%S)"
+  local backup_file="${backup_dir}/db_${DB_NAME}_${ts}.sql"
+  local pass_arg=""
+  if [ -n "${DB_PASS:-}" ]; then
+    pass_arg="-p${DB_PASS}"
+  fi
+
+  echo "Backing up DB to ${backup_file}..."
+  if ! mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" $pass_arg "$DB_NAME" > "$backup_file"; then
+    echo "Database backup failed."
+    notify_telegram "aaPanel update failed: database backup error."
+    exit 1
+  fi
+
+  if [ "${BACKUP_GZIP:-0}" = "1" ]; then
+    gzip -f "$backup_file"
+    backup_file="${backup_file}.gz"
+  fi
+
+  notify_telegram "aaPanel backup complete: $(basename "$backup_file")."
+}
+
+restart_services() {
+  if [ "${AUTO_RESTART:-0}" != "1" ]; then
+    return 0
+  fi
+
+  local restarted=0
+  local pm2_web="${PM2_WEB_NAME:-videoshare-web}"
+  local pm2_worker="${PM2_WORKER_NAME:-videoshare-worker}"
+
+  if command -v pm2 >/dev/null 2>&1; then
+    if pm2 describe "$pm2_web" >/dev/null 2>&1; then
+      pm2 restart "$pm2_web"
+      restarted=1
+    fi
+    if pm2 describe "$pm2_worker" >/dev/null 2>&1; then
+      pm2 restart "$pm2_worker"
+      restarted=1
+    fi
+  fi
+
+  if [ -n "${SYSTEMD_WEB_SERVICE:-}" ]; then
+    systemctl restart "$SYSTEMD_WEB_SERVICE"
+    restarted=1
+  fi
+  if [ -n "${SYSTEMD_WORKER_SERVICE:-}" ]; then
+    systemctl restart "$SYSTEMD_WORKER_SERVICE"
+    restarted=1
+  fi
+
+  if [ "$restarted" -eq 1 ]; then
+    notify_telegram "aaPanel update: services restarted."
+  else
+    echo "AUTO_RESTART enabled but no services detected."
+    notify_telegram "aaPanel update complete, but services not restarted (no PM2/systemd target)."
+  fi
+}
+
 LATEST_TAG="$(curl -fsSL --connect-timeout 5 --max-time 10 -H "$AUTH_HEADER" "$REPO_URL" | node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync(0,'utf8'));console.log(data.tag_name||'');")"
 LATEST_VERSION="${LATEST_TAG#v}"
 
@@ -52,8 +143,10 @@ if ! git pull --ff-only; then
   exit 1
 fi
 npm ci || npm install
+backup_before_migrate
 npm run prisma:migrate
 npm run build
 
 echo "Update complete. Restart web + worker processes (pm2/systemd)."
-notify_telegram "aaPanel update completed: ${LOCAL_VERSION} -> ${LATEST_VERSION}. Restart processes."
+notify_telegram "aaPanel update completed: ${LOCAL_VERSION} -> ${LATEST_VERSION}."
+restart_services
