@@ -93,7 +93,7 @@ export default function HlsConfigForm({ cfg }: { cfg: HlsCfg }) {
             </select>
             <div className="text-xs text-zinc-500">
               TS: tương thích rộng. fMP4: switch quality mượt hơn (ABR). Hybrid: phát ABR TS (1080/720/480)
-              + thêm một playlist fMP4 "source" (giữ nguyên độ phân giải gốc).
+              + thêm một playlist fMP4 &quot;source&quot; (giữ nguyên độ phân giải gốc).
             </div>
           </div>
 

@@ -173,7 +173,7 @@ export default function PlaylistOwnerBar({
 
       <div className="card" style={{ background: "#fff" }}>
         <div style={{ fontWeight: 800 }}>Cover image</div>
-        <div className="small muted">Upload cover (<= 2MB). R2 key immutable.</div>
+        <div className="small muted">Upload cover (&lt;= 2MB). R2 key immutable.</div>
         {coverUrl ? (
           <div className="row" style={{ marginTop: 8, gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <a className="text-sm underline" href={coverUrl} target="_blank" rel="noreferrer">Open cover</a>
