@@ -7,15 +7,17 @@ import { Select } from "@/components/ui/select";
 
 export const dynamic = "force-dynamic";
 
+type VideoReportRow = Awaited<ReturnType<typeof prisma.videoReport.findFirst>>;
+
 export default async function AdminReports() {
-  const list = await prisma.videoReport.findMany({
+  const list = (await prisma.videoReport.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,
     include: {
       video: { select: { id: true, title: true, status: true, authorId: true, author: { select: { id: true, name: true, email: true } } } },
       reporter: { select: { id: true, name: true, email: true } },
     },
-  });
+  })) as VideoReportRow[];
 
   return (
     <div className="space-y-4">

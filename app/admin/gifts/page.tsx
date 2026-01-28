@@ -2,8 +2,10 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+type GiftRow = Awaited<ReturnType<typeof prisma.gift.findFirst>>;
+
 export default async function AdminGifts() {
-  const gifts = await prisma.gift.findMany({ orderBy: [{ sort: "asc" }, { starsCost: "asc" }, { createdAt: "asc" }] });
+  const gifts = (await prisma.gift.findMany({ orderBy: [{ sort: "asc" }, { starsCost: "asc" }, { createdAt: "asc" }] })) as GiftRow[];
 
   return (
     <div style={{ display: "grid", gap: 12 }}>

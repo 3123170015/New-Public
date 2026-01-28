@@ -32,7 +32,7 @@ export default async function WebhookLogsPage({
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
-    }),
+    }) as Promise<any[]>,
     prisma.webhookAuditLog.count({ where }),
   ]);
 

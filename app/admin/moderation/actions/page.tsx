@@ -4,8 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export const dynamic = "force-dynamic";
 
+type ModerationActionRow = Awaited<ReturnType<typeof prisma.moderationAction.findFirst>>;
+
 export default async function AdminModerationActionsPage() {
-  const list = await prisma.moderationAction.findMany({
+  const list = (await prisma.moderationAction.findMany({
     orderBy: { createdAt: "desc" },
     take: 300,
     include: {
@@ -14,7 +16,7 @@ export default async function AdminModerationActionsPage() {
       video: { select: { id: true, title: true } },
       comment: { select: { id: true, content: true, videoId: true } },
     },
-  });
+  })) as ModerationActionRow[];
 
   return (
     <div className="space-y-4">

@@ -191,7 +191,7 @@ export default function VideoPlayer({
       ].join("\n"));
     }, 1000);
     return () => window.clearInterval(id);
-  }, [statsOpen, activeOrigin]);
+  }, [statsOpen, activeOrigin, p2pFlag]);
 
   // Allow external components (chapters list, etc.) to seek this player.
   useEffect(() => {
@@ -243,7 +243,7 @@ export default function VideoPlayer({
     tick();
     const id = window.setInterval(tick, 15_000);
     return () => window.clearInterval(id);
-  }, [analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId]);
+  }, [analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId, sendAnalytics]);
 
   // Exposure event (counts impressions for A/B experiments).
   useEffect(() => {
@@ -251,7 +251,7 @@ export default function VideoPlayer({
     if (exposureSentRef.current) return;
     exposureSentRef.current = true;
     sendAnalytics([{ type: "EXPOSURE" }]);
-  }, [analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId]);
+  }, [analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId, sendAnalytics]);
 
   // Attach HLS (only when src is an HLS playlist). Supports failover via `candidates`.
 useEffect(() => {
@@ -747,7 +747,7 @@ useEffect(() => {
       v.removeEventListener("pause", onPause);
       v.removeEventListener("ended", onEnded);
     };
-  }, [scrubbing, analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId]);
+  }, [scrubbing, analyticsEnabled, videoId, analytics?.experimentId, analytics?.variantId, sendAnalytics]);
 
   function computePreviewPos(valSec: number) {
     const input = rangeRef.current;

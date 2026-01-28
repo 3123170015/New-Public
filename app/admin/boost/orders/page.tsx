@@ -8,8 +8,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export const dynamic = "force-dynamic";
 
+type BoostOrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findFirst>>;
+
 export default async function AdminBoostOrders() {
-  const list = await prisma.boostOrder.findMany({
+  const list = (await prisma.boostOrder.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,
     include: {
@@ -17,7 +19,7 @@ export default async function AdminBoostOrders() {
       video: { select: { id: true, title: true } },
       plan: true,
     },
-  });
+  })) as BoostOrderRow[];
 
   return (
     <div className="space-y-4">

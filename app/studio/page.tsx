@@ -28,7 +28,7 @@ export default async function StudioPage() {
       <div className="card">
         <div className="text-xl font-extrabold">Studio</div>
         <div className="small muted mt-1">
-          Quản lý video của bạn: ẩn/xóa/đặt riêng tư hoặc chế độ "chỉ xem" (không tương tác).
+          Quản lý video của bạn: ẩn/xóa/đặt riêng tư hoặc chế độ &quot;chỉ xem&quot; (không tương tác).
         </div>
       </div>
 
@@ -43,7 +43,7 @@ export default async function StudioPage() {
               <option value="PRIVATE">Private (owner/admin)</option>
               <option value="VIOLATOR_ONLY">Chỉ xem (không tương tác)</option>
             </select>
-            <div className="small muted">"Chỉ xem" sẽ tự động tắt tương tác.</div>
+            <div className="small muted">&quot;Chỉ xem&quot; sẽ tự động tắt tương tác.</div>
           </div>
 
           <div className="space-y-1">

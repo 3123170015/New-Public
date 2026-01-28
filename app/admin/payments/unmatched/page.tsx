@@ -5,12 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import AssignUserInline from "./ui/AssignUserInline";
 
 export default async function UnmatchedInboxPage() {
-  const items = await prisma.starDeposit.findMany({
+  const items = (await prisma.starDeposit.findMany({
     where: { OR: [{ status: "UNMATCHED" }, { userId: null }] },
     include: { user: true, token: true, custodialAddress: true },
     orderBy: { createdAt: "desc" },
     take: 100,
-  });
+  })) as any[];
 
   return (
     <div className="space-y-6">

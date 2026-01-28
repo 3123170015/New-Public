@@ -15,7 +15,9 @@ export default function OfflinePage() {
       </div>
       <div className="card small muted">
         Tip: nếu bạn muốn test PWA trong môi trường dev, mở DevTools Console và chạy:
-        <pre className="mt-2 rounded-lg bg-zinc-50 p-2">localStorage.setItem("videoshare:sw:dev","1"); location.reload();</pre>
+        <pre className="mt-2 rounded-lg bg-zinc-50 p-2">
+          localStorage.setItem(&quot;videoshare:sw:dev&quot;,&quot;1&quot;); location.reload();
+        </pre>
       </div>
     </main>
   );

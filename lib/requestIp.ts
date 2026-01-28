@@ -6,3 +6,5 @@ export function getClientIp(req: Request) {
   if (xr) return xr;
   return "0.0.0.0";
 }
+
+export const getRequestIp = getClientIp;
