@@ -2,7 +2,12 @@ import IORedis from "ioredis";
 import { Queue } from "bullmq";
 import { env } from "./env";
 
-export const connection = null;
+export const connection =
+  process.env.npm_lifecycle_event === "build" || process.env.NEXT_PHASE === "phase-production-build"
+    ? null
+    : env.REDIS_URL
+    ? new IORedis(env.REDIS_URL, { maxRetriesPerRequest: null })
+    : null;
 
 // Payments queue (stars topup webhooks + reconcile)
 export const paymentsQueue = new Queue("payments", { connection: connection as any });
