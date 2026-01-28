@@ -43,7 +43,7 @@ export default function SensitiveVideoGate({
   const [revealed, setRevealed] = useState(false);
 
   if (mode === "SHOW" || revealed) {
-    return <VideoPlayer videoId={videoId} src={hlsUrl} candidates={candidates} poster={poster} mode={playerMode} storyboard={storyboard} analytics={analytics} p2pEnabled={p2pEnabled} />;
+    return <VideoPlayer videoId={videoId} src={hlsUrl} candidates={candidates} poster={poster} mode={playerMode} storyboard={storyboard as any} analytics={analytics} p2pEnabled={p2pEnabled} />;
   }
 
   const blur = mode === "BLUR";

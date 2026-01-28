@@ -1,4 +1,6 @@
-import type { PrismaClient, BoostPlanType } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
+
+type BoostPlanType = "DURATION" | "TARGET_INTERACTIONS";
 
 type BoostField = "statViews" | "statLikes" | "statShares" | "statComments" | "statStars" | "statGifts";
 

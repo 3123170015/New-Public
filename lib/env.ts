@@ -88,10 +88,6 @@ const schema = z.object({
   STARS_RISK_MAX_CREDITS_PER_USER_PER_HOUR: z.string().optional().default("8"),
   STARS_RISK_MIN_SECONDS_BETWEEN_CREDITS: z.string().optional().default("20"),
 
-  // Cloudflare smart purge (optional)
-  CLOUDFLARE_ZONE_ID: z.string().optional().default(""),
-  CLOUDFLARE_API_TOKEN: z.string().optional().default(""),
-
   // Cloudflare CDN purge (optional)
   CLOUDFLARE_ZONE_ID: z.string().optional().default(""),
   CLOUDFLARE_API_TOKEN: z.string().optional().default(""),

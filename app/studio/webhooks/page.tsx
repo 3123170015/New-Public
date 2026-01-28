@@ -6,6 +6,8 @@ import WebhooksManager from "@/components/studio/WebhooksManager";
 export const dynamic = "force-dynamic";
 
 export default async function StudioWebhooksPage() {
+  type WebhookRow = Awaited<ReturnType<typeof prisma.creatorWebhookEndpoint.findMany>>[number];
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -27,11 +29,11 @@ export default async function StudioWebhooksPage() {
       </div>
 
       <WebhooksManager
-        initial={endpoints.map((e) => ({
+        initial={(endpoints as WebhookRow[]).map((e: WebhookRow) => ({
           id: e.id,
           url: e.url,
           enabled: e.enabled,
-          events: (e.eventsCsv || "").split(",").map((x) => x.trim()).filter(Boolean),
+          events: (e.eventsCsv || "").split(",").map((x: string) => x.trim()).filter(Boolean),
           createdAt: e.createdAt.toISOString(),
           updatedAt: e.updatedAt.toISOString(),
         }))}

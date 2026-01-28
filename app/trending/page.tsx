@@ -14,6 +14,8 @@ function clamp(n: number, a: number, b: number) {
 }
 
 export default async function TrendingPage({ searchParams }: { searchParams: { days?: string } }) {
+  type TrendRow = Awaited<ReturnType<typeof prisma.videoMetricDaily.groupBy>>[number];
+  type TrendVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
   const sensitiveMode = await getSensitiveModeForUser(viewerId ?? null);
@@ -34,7 +36,7 @@ export default async function TrendingPage({ searchParams }: { searchParams: { d
     take: 200,
   });
 
-  const scored = rows.map((r) => {
+  const scored = (rows as TrendRow[]).map((r: TrendRow) => {
     const v = r._sum.views ?? 0;
     const l = r._sum.likes ?? 0;
     const s = r._sum.shares ?? 0;
@@ -46,7 +48,7 @@ export default async function TrendingPage({ searchParams }: { searchParams: { d
   });
 
   scored.sort((a, b) => b.score - a.score);
-  const topIds = scored.slice(0, 60).map((x) => x.videoId);
+  const topIds = scored.slice(0, 60).map((x: { videoId: string }) => x.videoId);
 
   const videos = await prisma.video.findMany({
     where: {
@@ -57,12 +59,12 @@ export default async function TrendingPage({ searchParams }: { searchParams: { d
     },
     select: { id: true, title: true, thumbKey: true, createdAt: true, isSensitive: true },
   });
-  const map = new Map(videos.map((v) => [v.id, v]));
+  const map = new Map((videos as TrendVideoRow[]).map((v: TrendVideoRow) => [v.id, v]));
 
   const out = scored
     .slice(0, 60)
-    .map((x) => ({ ...x, video: map.get(x.videoId) }))
-    .filter((x) => Boolean(x.video)) as any[];
+    .map((x: { videoId: string }) => ({ ...x, video: map.get(x.videoId) }))
+    .filter((x: { video?: unknown }) => Boolean(x.video)) as any[];
 
   return (
     <main>
@@ -76,7 +78,7 @@ export default async function TrendingPage({ searchParams }: { searchParams: { d
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12, marginTop: 12 }}>
-        {out.map((x, idx) => (
+        {out.map((x: { videoId: string; score: number; sums: { views: number; likes: number; comments: number; shares: number; stars: number; gifts: number }; video: any }, idx) => (
           <div key={x.videoId} className="card">
             <TrackedVideoLink href={`/v/${x.videoId}`} videoId={x.videoId} source="TRENDING" placement="trending_grid">
               <div className="small muted">#{idx + 1} • score {x.score}</div>
@@ -88,7 +90,7 @@ export default async function TrendingPage({ searchParams }: { searchParams: { d
               <div style={{ marginTop: 10, aspectRatio: "16/9", borderRadius: 14, overflow: "hidden", background: "#f3f3f3" }}>
                 <SensitiveThumb
                   src={resolveMediaUrl(x.video.thumbKey)}
-                  alt={x.video.title}
+                  alt={x.video.title ?? ""}
                   isSensitive={Boolean((x.video as any).isSensitive)}
                   mode={sensitiveMode}
                 />
