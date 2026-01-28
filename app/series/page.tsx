@@ -5,6 +5,8 @@ import { resolveMediaUrl } from "@/lib/mediaUrl";
 export const dynamic = "force-dynamic";
 
 export default async function SeriesIndexPage() {
+  type SeriesRow = Awaited<ReturnType<typeof prisma.playlist.findMany>>[number];
+
   const series = await prisma.playlist.findMany({
     where: { isSeries: true, visibility: { in: ["PUBLIC", "UNLISTED"] } },
     orderBy: { updatedAt: "desc" },
@@ -32,7 +34,7 @@ export default async function SeriesIndexPage() {
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
-          {series.map((s) => {
+          {(series as SeriesRow[]).map((s: SeriesRow) => {
             const href = s.seriesSlug ? `/series/${s.seriesSlug}` : `/p/${s.id}`;
             const cover = s.coverKey ? resolveMediaUrl(s.coverKey) : null;
             return (
@@ -45,7 +47,7 @@ export default async function SeriesIndexPage() {
                   {cover ? (
                     <div style={{ marginTop: 10, aspectRatio: "16/9", borderRadius: 14, overflow: "hidden", background: "#f3f3f3" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={cover} alt={s.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <img src={cover} alt={s.title ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     </div>
                   ) : null}
                 </Link>

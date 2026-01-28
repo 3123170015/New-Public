@@ -25,6 +25,8 @@ function parseMintedRef(s: string | null | undefined) {
 }
 
 export default async function NftExportsPage() {
+  type ExportRow = Awaited<ReturnType<typeof prisma.nftExportRequest.findMany>>[number];
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -53,7 +55,7 @@ export default async function NftExportsPage() {
         <div className="card muted">Chưa có export request nào.</div>
       ) : (
         <div className="space-y-3">
-          {reqs.map((r) => {
+          {(reqs as ExportRow[]).map((r: ExportRow) => {
             const { walletAddress, mintAddress } = parseMintedRef(r.mintedRef);
             return (
               <div key={r.id} className="card">

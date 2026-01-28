@@ -102,7 +102,7 @@ function mixFeedItems({
 }): TikTokItem[] {
   const boostedPool = [...boosted];
 
-  const raw: Array<{ kind: "video"; v: VideoRow; sponsored: boolean } | { kind: "ad"; html: string }> = [];
+  const raw: Array<{ kind: "video"; v: VideoRow; sponsored: boolean } | { kind: "ad" }> = [];
 
   // Pin a few sponsored items at the top
   for (let i = 0; i < topBoosted && boostedPool.length > 0; i++) {
@@ -119,7 +119,7 @@ function mixFeedItems({
     }
 
     if (adEnabled && everyN > 0 && normalCount % everyN === 0) {
-      raw.push({ kind: "ad", html: htmlAd });
+      raw.push({ kind: "ad" });
     }
   }
 
@@ -130,8 +130,7 @@ function mixFeedItems({
         kind: "ad",
         id: `ad-${idx}`,
         scope: "FEED",
-        html: it.html,
-      } as any;
+      };
     }
     return buildVideoItem(it.v, it.sponsored, storyboardEnabled, sensitiveMode);
   });
@@ -182,6 +181,9 @@ export default async function FeedPage() {
   boostedVideoWhere.access = allowAccess;
   if (shouldHideSensitiveInListings(sensitiveMode)) boostedVideoWhere.isSensitive = false;
 
+  type BoostOrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findMany>>[number];
+  type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+
   const [adPlacement, boostedOrders, videos] = await Promise.all([
     prisma.adPlacement.findUnique({ where: { scope: "FEED" } }),
     prisma.boostOrder.findMany({
@@ -197,10 +199,10 @@ export default async function FeedPage() {
     }),
   ]);
 
-  const boostedVideos = boostedOrders.map((o) => o.video).filter(Boolean) as any as VideoRow[];
+  const boostedVideos = (boostedOrders as BoostOrderRow[]).map((o: BoostOrderRow) => o.video).filter(Boolean) as any as VideoRow[];
   const boostedIds = new Set(boostedVideos.map((v) => v.id));
 
-  const normal = videos.filter((v: any) => !boostedIds.has(v.id)) as any as VideoRow[];
+  const normal = (videos as VideoRow[]).filter((v: VideoRow) => !boostedIds.has(v.id)) as any as VideoRow[];
 
   // Community posts (for shorts feed)
   const postsRaw = await prisma.communityPost.findMany({
@@ -215,12 +217,12 @@ export default async function FeedPage() {
       },
     },
   });
-  const postIds = postsRaw.map((p) => p.id);
+  const postIds = postsRaw.map((p: { id: string }) => p.id);
   const viewerVotes = viewerId && postIds.length
     ? await prisma.communityPollVote.findMany({ where: { userId: viewerId, postId: { in: postIds } }, select: { postId: true, optionId: true } })
     : [];
-  const voteMap = new Map(viewerVotes.map((v) => [v.postId, v.optionId]));
-  const postItems = postsRaw.map((p) => ({
+  const voteMap = new Map(viewerVotes.map((v: { postId: string; optionId: string }) => [v.postId, v.optionId]));
+  const postItems = postsRaw.map((p: { id: string; authorId: string; author?: { name?: string | null }; type: string; text: string | null; mediaUrl: string | null; linkUrl: string | null; youtubeUrl: string | null; createdAt: Date; pollOptions?: { id: string; text: string; _count: { votes: number } }[] }) => ({
     kind: "post" as const,
     id: p.id,
     authorId: p.authorId,
@@ -231,7 +233,7 @@ export default async function FeedPage() {
     linkUrl: p.linkUrl,
     youtubeUrl: p.youtubeUrl,
     createdAt: p.createdAt.toISOString(),
-    pollOptions: p.pollOptions?.map((o) => ({ id: o.id, text: o.text, votes: o._count.votes })) ?? [],
+    pollOptions: p.pollOptions?.map((o: { id: string; text: string; _count: { votes: number } }) => ({ id: o.id, text: o.text, votes: o._count.votes })) ?? [],
     viewerVotedOptionId: voteMap.get(p.id) ?? null,
   }));
 
@@ -284,14 +286,14 @@ export default async function FeedPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
         {items.map((it) => {
-          if (it.kind === "ad") {
-            return (
-              <div key={it.id} className="card">
-                <div className="small muted" style={{ marginBottom: 6 }}>Sponsored</div>
-                <div dangerouslySetInnerHTML={{ __html: it.html }} />
-              </div>
-            );
-          }
+            if (it.kind === "ad") {
+              return (
+                <div key={it.id} className="card">
+                  <div className="small muted" style={{ marginBottom: 6 }}>Sponsored</div>
+                  <div dangerouslySetInnerHTML={{ __html: htmlAd }} />
+                </div>
+              );
+            }
 
           const v: any = it;
           const href = `/v/${v.id}`;

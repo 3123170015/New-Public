@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
   // View permission gate (supports PREMIUM via DB-aware guard)
   const can = await canViewVideoDb(
-    { id: v.id, status: v.status as any, access: v.access as any, authorId: v.authorId, interactionsLocked: v.interactionsLocked ?? false },
+    { id: v.id, status: v.status as any, access: v.access as any, authorId: v.authorId },
     session as any,
   );
   if (!can) return Response.json({ ok: false, error: "FORBIDDEN" }, { status: 403 });

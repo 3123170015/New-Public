@@ -65,7 +65,7 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
   const isOwner = role === "OWNER";
 
   const videos = playlist.items
-    .map((it) => it.video)
+    .map((it: { video: any }) => it.video)
     .filter(Boolean)
     .filter((v: any) => v.status === "PUBLISHED" || isOwner || isAdmin);
 
@@ -120,7 +120,7 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
       <div className="card">
         <PlaylistItemsGrid
           playlistId={playlist.id}
-          items={playlist.items.map((it) => ({
+          items={playlist.items.map((it: { id: string; sort: number; video: any }) => ({
             id: it.id,
             sort: it.sort,
             video: it.video

@@ -5,6 +5,8 @@ import { nextLevelXp } from "@/lib/gamification/levels";
 export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage() {
+  type LeaderboardUser = Awaited<ReturnType<typeof prisma.user.findMany>>[number];
+
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
 
@@ -40,7 +42,7 @@ export default async function LeaderboardPage() {
           <div>XP</div>
           <div>Level</div>
         </div>
-        {top.map((u, idx) => (
+        {(top as LeaderboardUser[]).map((u: LeaderboardUser, idx) => (
           <a
             key={u.id}
             href={`/u/${u.id}`}

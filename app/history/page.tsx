@@ -23,6 +23,7 @@ export default async function HistoryPage() {
 
   const sensitiveMode = await getSensitiveModeForUser(uid);
 
+  type ProgressRow = Awaited<ReturnType<typeof prisma.videoProgress.findMany>>[number];
   const rows = await prisma.videoProgress.findMany({
     where: { userId: uid },
     orderBy: { updatedAt: "desc" },
@@ -30,7 +31,7 @@ export default async function HistoryPage() {
     include: { video: true },
   });
 
-  const items = rows.filter((r) => r.video && (r.video as any).status === "PUBLISHED");
+  const items = (rows as ProgressRow[]).filter((r: ProgressRow) => r.video && (r.video as any).status === "PUBLISHED");
 
   return (
     <main className="mx-auto max-w-4xl space-y-4">
@@ -52,7 +53,7 @@ export default async function HistoryPage() {
           <div className="small muted">Chưa có lịch sử xem.</div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
-            {items.map((p) => {
+            {items.map((p: ProgressRow) => {
               const v: any = p.video;
               return (
                 <div key={p.id} className="card">

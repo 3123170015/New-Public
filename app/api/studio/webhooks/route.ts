@@ -52,13 +52,15 @@ export async function GET() {
     select: { id: true, url: true, enabled: true, eventsCsv: true, createdAt: true, updatedAt: true },
   });
 
+  type WebhookRow = Awaited<ReturnType<typeof prisma.creatorWebhookEndpoint.findMany>>[number];
+
   return Response.json({
     ok: true,
-    items: rows.map((r) => ({
+    items: (rows as WebhookRow[]).map((r: WebhookRow) => ({
       id: r.id,
       url: r.url,
       enabled: r.enabled,
-      events: (r.eventsCsv || "").split(",").map((x) => x.trim()).filter(Boolean),
+      events: (r.eventsCsv || "").split(",").map((x: string) => x.trim()).filter(Boolean),
       createdAt: r.createdAt.toISOString(),
       updatedAt: r.updatedAt.toISOString(),
     })),
@@ -91,7 +93,7 @@ export async function POST(req: Request) {
       id: created.id,
       url: created.url,
       enabled: created.enabled,
-      events: (created.eventsCsv || "").split(",").map((x) => x.trim()).filter(Boolean),
+      events: (created.eventsCsv || "").split(",").map((x: string) => x.trim()).filter(Boolean),
       createdAt: created.createdAt.toISOString(),
       updatedAt: created.updatedAt.toISOString(),
       secret,

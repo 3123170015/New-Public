@@ -5,6 +5,8 @@ import { env } from "@/lib/env";
 export const dynamic = "force-dynamic";
 
 export default async function NftHomePage() {
+  type NftItemRow = Awaited<ReturnType<typeof prisma.nftItem.findMany>>[number];
+
   const items = await prisma.nftItem.findMany({
     orderBy: { createdAt: "desc" },
     take: 24,
@@ -46,7 +48,7 @@ export default async function NftHomePage() {
           <div className="small muted">Chưa có NFT nào.</div>
         ) : (
           <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
-            {items.map((it) => {
+            {(items as NftItemRow[]).map((it: NftItemRow) => {
               const img = it.imageKey ? `${env.R2_PUBLIC_BASE_URL}/${it.imageKey}` : null;
               return (
                 <div key={it.id} className="card" style={{ padding: 10 }}>

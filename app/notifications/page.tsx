@@ -30,6 +30,8 @@ function typeLabel(t: string) {
 }
 
 export default async function NotificationsPage() {
+  type NotificationRow = Awaited<ReturnType<typeof prisma.notification.findMany>>[number];
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -50,7 +52,7 @@ export default async function NotificationsPage() {
     },
   });
 
-  const unread = items.filter((x) => !x.isRead).length;
+  const unread = (items as NotificationRow[]).filter((x: NotificationRow) => !x.isRead).length;
 
   return (
     <div className="max-w-3xl space-y-4">
@@ -84,7 +86,7 @@ export default async function NotificationsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {items.map((n) => (
+          {(items as NotificationRow[]).map((n: NotificationRow) => (
             <Card key={n.id} className={n.isRead ? "" : "border-primary/40"}>
               <CardHeader>
                 <div className="flex flex-wrap items-start justify-between gap-2">

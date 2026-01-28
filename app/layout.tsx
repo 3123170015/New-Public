@@ -64,6 +64,7 @@ export default async function RootLayout({
       <body>
         {flags.oneSignal ? (
           <OneSignalInit
+            enabled
             appId={cfg.oneSignalAppId || ""}
             safariWebId={cfg.oneSignalSafariWebId || ""}
           />

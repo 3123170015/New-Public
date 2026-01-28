@@ -30,6 +30,8 @@ export default async function SearchPage({
 }: {
   searchParams: { q?: string; tag?: string; category?: string; sort?: string; page?: string };
 }) {
+  type SearchVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
   const sensitiveMode = await getSensitiveModeForUser(viewerId ?? null);
@@ -122,12 +124,12 @@ export default async function SearchPage({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((v) => (
+        {(items as SearchVideoRow[]).map((v: SearchVideoRow) => (
           <TrackedVideoLink key={v.id} href={`/v/${v.id}`} videoId={v.id} source="SEARCH" className="card block" placement="search_results">
             <div className="aspect-video overflow-hidden rounded-xl bg-zinc-100">
               <SensitiveThumb
                 src={resolveMediaUrl(v.thumbKey)}
-                alt={v.title}
+                alt={v.title ?? ""}
                 isSensitive={Boolean(v.isSensitive)}
                 mode={sensitiveMode as any}
               />

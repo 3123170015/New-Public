@@ -21,6 +21,8 @@ function pct(n: number) {
 }
 
 export default async function StudioAnalyticsPage({ searchParams }: { searchParams: { days?: string } }) {
+  type StudioVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
@@ -34,7 +36,7 @@ export default async function StudioAnalyticsPage({ searchParams }: { searchPara
     select: { id: true, title: true, createdAt: true, viewCount: true },
   });
 
-  const videoIds = videos.map((v) => v.id);
+  const videoIds = (videos as StudioVideoRow[]).map((v: StudioVideoRow) => v.id);
 
   const metrics = videoIds.length
     ? await prisma.videoMetricDaily.findMany({
@@ -170,7 +172,7 @@ export default async function StudioAnalyticsPage({ searchParams }: { searchPara
                 </tr>
               </thead>
               <tbody>
-                {sources.map((s) => (
+                {sources.map((s: { source: string; impressions: number; clicks: number; ctr: number }) => (
                   <tr key={s.source} className="border-t">
                     <td className="py-2 font-semibold">{s.source}</td>
                     <td className="py-2">{fmtNumber(s.impressions)}</td>
@@ -201,7 +203,7 @@ export default async function StudioAnalyticsPage({ searchParams }: { searchPara
                 </tr>
               </thead>
               <tbody>
-                {videos.map((v) => {
+                {(videos as StudioVideoRow[]).map((v: StudioVideoRow) => {
                   const m = byVideo.get(v.id) ?? { views: 0, uniqueViews: 0, watchSeconds: 0, completes: 0, impressions: 0, clicks: 0 };
                   const vCtr = m.impressions > 0 ? (m.clicks / m.impressions) * 100 : 0;
                   return (

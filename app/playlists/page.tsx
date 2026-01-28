@@ -6,6 +6,8 @@ import CreatePlaylistForm from "./ui/CreatePlaylistForm";
 export const dynamic = "force-dynamic";
 
 export default async function PlaylistsPage() {
+  type PlaylistRow = Awaited<ReturnType<typeof prisma.playlist.findMany>>[number];
+
   const session = await auth();
   const uid = (session?.user as any)?.id as string | undefined;
   if (!uid) {
@@ -53,7 +55,7 @@ export default async function PlaylistsPage() {
           <div className="small muted">Chưa có playlist.</div>
         ) : (
           <div className="space-y-2">
-            {playlists.map((p) => (
+            {(playlists as PlaylistRow[]).map((p: PlaylistRow) => (
               <div key={p.id} className="card" style={{ border: "1px solid #eee" }}>
                 <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
                   <div>

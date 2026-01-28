@@ -19,6 +19,10 @@ export default async function BoostPage() {
     );
   }
 
+  type BoostPlanRow = Awaited<ReturnType<typeof prisma.boostPlan.findMany>>[number];
+  type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+  type OrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findMany>>[number];
+
   const [user, videos, orders, plans] = await Promise.all([
     prisma.user.findUnique({ where: { id: uid }, select: { starBalance: true } }),
     prisma.video.findMany({
@@ -51,18 +55,18 @@ export default async function BoostPage() {
   return (
     <BoostClient
       starBalance={user?.starBalance ?? 0}
-      plans={plans.map((p) => ({
+      plans={(plans as BoostPlanRow[]).map((p: BoostPlanRow) => ({
         id: p.id,
         name: p.name,
         type: p.type,
         priceStars: p.priceStars,
         durationDays: p.durationDays,
       }))}
-      videos={videos.map((v) => ({
+      videos={(videos as VideoRow[]).map((v: VideoRow) => ({
         ...v,
         createdAt: v.createdAt.toISOString(),
       }))}
-      orders={orders.map((o) => ({
+      orders={(orders as OrderRow[]).map((o: OrderRow) => ({
         id: o.id,
         status: o.status,
         videoId: o.videoId,

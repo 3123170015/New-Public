@@ -5,6 +5,9 @@ import { env } from "@/lib/env";
 export const dynamic = "force-dynamic";
 
 export default async function NftMarketPage() {
+  type ListingRow = Awaited<ReturnType<typeof prisma.nftListing.findMany>>[number];
+  type AuctionRow = Awaited<ReturnType<typeof prisma.nftAuction.findMany>>[number];
+
   const listings = await prisma.nftListing.findMany({
     where: { status: "ACTIVE", item: { exportStatus: "NONE", marketplaceFrozen: false } },
     orderBy: { createdAt: "desc" },
@@ -59,7 +62,7 @@ export default async function NftMarketPage() {
           <div className="small muted">Chưa có listing nào.</div>
         ) : (
           <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
-            {listings.map((l) => {
+            {(listings as ListingRow[]).map((l: ListingRow) => {
               const it = l.item;
               const img = it.imageKey ? `${env.R2_PUBLIC_BASE_URL}/${it.imageKey}` : null;
               return (
@@ -93,7 +96,7 @@ export default async function NftMarketPage() {
           <div className="small muted">Chưa có auction nào.</div>
         ) : (
           <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
-            {auctions.map((a) => {
+            {(auctions as AuctionRow[]).map((a: AuctionRow) => {
               const it = a.item;
               const img = it.imageKey ? `${env.R2_PUBLIC_BASE_URL}/${it.imageKey}` : null;
               const current = a.highestBid?.amountStars ?? a.startPriceStars;
