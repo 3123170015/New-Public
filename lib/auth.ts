@@ -11,6 +11,18 @@ const credentialsSchema = z.object({
 });
 
 export const authOptions: NextAuthOptions = {
+  ...((process.env.BUILDING === "1")
+    ? {
+        callbacks: {
+          async jwt({ token }) {
+            return token;
+          },
+          async session({ session }) {
+            return session;
+          },
+        },
+      }
+    : {}),
   secret: env.AUTH_SECRET,
   session: { strategy: "jwt" },
   providers: prisma

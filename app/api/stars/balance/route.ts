@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { releaseMaturedHolds } from "@/lib/stars/holds";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = await auth();

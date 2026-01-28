@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getActiveSeasonPass } from "@/lib/seasonPass";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = await auth();

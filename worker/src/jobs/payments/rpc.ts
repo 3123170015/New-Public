@@ -5,7 +5,7 @@ export async function jsonRpc<T = any>(url: string, method: string, params: any[
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
   });
   if (!res.ok) throw new Error(`rpc_http_${res.status}`);
-  const json = await res.json().catch(() => null);
+  const json = (await res.json().catch(() => null)) as { error?: { code?: string | number; message?: string }; result?: T } | null;
   if (!json) throw new Error("rpc_invalid_json");
   if (json.error) throw new Error(`rpc_error_${json.error?.code || ""}_${json.error?.message || ""}`);
   return json.result as T;

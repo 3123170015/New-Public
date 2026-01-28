@@ -1,5 +1,7 @@
 import FraudAlertsClient from "./ui/FraudAlertsClient";
 
+export const dynamic = "force-dynamic";
+
 export default function FraudPage({
   searchParams,
 }: {

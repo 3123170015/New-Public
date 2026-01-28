@@ -1,4 +1,6 @@
 import { auth } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 import { requireAdmin } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
 import { csvResponse, toCsv } from "@/lib/payments/csv";

@@ -3,6 +3,8 @@ import { isAdAllowedForRequest } from "@/lib/userAgent";
 import { auth } from "@/lib/auth";
 import { getActiveMembershipTier } from "@/lib/membership";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   // Note: this endpoint is called from the client (so we can apply UA + bot checks).
   const session = await auth();

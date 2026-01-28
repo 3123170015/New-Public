@@ -1,6 +1,8 @@
 import { getSiteConfig } from "@/lib/siteConfig";
 import { env } from "@/lib/env";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const cfg = await getSiteConfig();
   const text = [

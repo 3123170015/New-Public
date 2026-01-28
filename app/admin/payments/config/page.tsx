@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { getOrInitPaymentConfig } from "@/lib/payments/config";
 import PaymentsConfigClient from "./ui/PaymentsConfigClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function PaymentsConfigPage() {
   const cfg = await getOrInitPaymentConfig();
   const secrets = await prisma.paymentProviderSecret.findMany({ orderBy: { updatedAt: "desc" }, take: 100 });
