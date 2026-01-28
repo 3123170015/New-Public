@@ -45,7 +45,7 @@ export default async function DepositsPage({
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
-    }),
+    }) as Promise<any[]>,
     prisma.starDeposit.count({ where }),
   ]);
 

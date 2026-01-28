@@ -14,7 +14,7 @@
 
 ## 1) Runtime & Services
 ### Node.js
-- Cài Node.js LTS (khuyến nghị 20.x)
+- Cài Node.js LTS (khuyến nghị 20.x+)
 - `npm -v` đúng theo lockfile
 
 ### MySQL
@@ -22,6 +22,10 @@
 - Tạo DB + user:
   - DB: `videoshare`
   - user: `videoshare` (grants hạn chế)
+  - Ví dụ quyền tối thiểu:
+    ```sql
+    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX ON videoshare.* TO 'videoshare'@'localhost';
+    ```
 
 ### Redis
 - Redis 6/7
@@ -79,7 +83,7 @@ Worker chạy riêng, không chạy trong web request.
 
 ### PM2
 ```bash
-pm2 start npm --name videoshare-worker -- run worker:prod
+pm2 start npm --name videoshare-worker -- run worker
 pm2 save
 ```
 

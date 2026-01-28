@@ -10,7 +10,10 @@ export default async function AdminNftContractsPage() {
   const cfg = await getSiteConfig();
   const delayHours = Number((cfg as any).nftExportContractChangeDelayHours ?? 24);
 
-  const rows = await prisma.nftChainContract.findMany({ orderBy: { chain: "asc" }, include: { pendingSetBy: { select: { id: true, name: true } } } });
+  const rows = (await prisma.nftChainContract.findMany({
+    orderBy: { chain: "asc" },
+    include: { pendingSetBy: { select: { id: true, name: true } } },
+  })) as Awaited<ReturnType<typeof prisma.nftChainContract.findFirst>>[];
   const byChain = new Map(rows.map((r) => [r.chain, r]));
 
   function placeholderForChain(chain: string) {

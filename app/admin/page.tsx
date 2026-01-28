@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+type AdminVideoRow = Awaited<ReturnType<typeof prisma.video.findFirst>>;
+
 export default async function AdminHome() {
   const [users, videos, processing] = await Promise.all([
     prisma.user.count(),
@@ -9,11 +11,11 @@ export default async function AdminHome() {
     prisma.video.count({ where: { status: "PROCESSING" } }),
   ]);
 
-  const latest = await prisma.video.findMany({
+  const latest = (await prisma.video.findMany({
     orderBy: { createdAt: "desc" },
     take: 10,
     select: { id: true, title: true, status: true, createdAt: true },
-  });
+  })) as AdminVideoRow[];
 
   return (
     <div style={{ display: "grid", gap: 12 }}>

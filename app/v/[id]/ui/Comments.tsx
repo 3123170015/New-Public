@@ -118,7 +118,7 @@ function fanClubBadge(tier: "BRONZE" | "SILVER" | "GOLD" | null | undefined) {
 
   useEffect(() => {
     load();
-  }, [videoId]);
+  }, [videoId, load]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

@@ -6,6 +6,8 @@ import { Select } from "@/components/ui/select";
 
 export const dynamic = "force-dynamic";
 
+type CommentReportRow = Awaited<ReturnType<typeof prisma.commentReport.findFirst>>;
+
 function statusColor(s: string) {
   switch (s) {
     case "OPEN":
@@ -20,22 +22,22 @@ function statusColor(s: string) {
 }
 
 export default async function AdminCommentReports() {
-  const list = await prisma.commentReport.findMany({
+  const list = (await prisma.commentReport.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,
     include: {
       comment: { select: { id: true, content: true, videoId: true, userId: true, visibility: true } },
       reporter: { select: { id: true, name: true, email: true } },
     },
-  });
+  })) as CommentReportRow[];
 
   const videos = list.length
-    ? await prisma.video.findMany({
+    ? ((await prisma.video.findMany({
         where: { id: { in: Array.from(new Set(list.map((r) => r.comment.videoId))) } },
         select: { id: true, title: true },
-      })
+      })) as any[])
     : [];
-  const videoMap = new Map(videos.map((v) => [v.id, v]));
+  const videoMap = new Map(videos.map((v: any) => [v.id, v]));
 
   return (
     <div className="space-y-4">

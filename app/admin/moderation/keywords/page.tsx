@@ -7,12 +7,14 @@ import { Input } from "@/components/ui/input";
 
 export const dynamic = "force-dynamic";
 
+type ModerationKeywordRow = Awaited<ReturnType<typeof prisma.creatorModerationSetting.findFirst>>;
+
 export default async function AdminModerationKeywordsPage() {
-  const rows = await prisma.creatorModerationSetting.findMany({
+  const rows = (await prisma.creatorModerationSetting.findMany({
     orderBy: { updatedAt: "desc" },
     take: 100,
     include: { creator: { select: { id: true, name: true, email: true } } },
-  });
+  })) as ModerationKeywordRow[];
 
   return (
     <div className="space-y-4">

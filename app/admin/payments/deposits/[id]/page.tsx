@@ -97,7 +97,7 @@ export default async function DepositDetailPage({ params }: { params: { id: stri
               </TableRow>
             </TableHeader>
             <TableBody>
-              {dep.events.map((e) => (
+              {dep.events.map((e: any) => (
                 <TableRow key={e.id}>
                   <TableCell className="whitespace-nowrap">{new Date(e.createdAt).toLocaleString()}</TableCell>
                   <TableCell className="font-mono text-xs">{e.type}</TableCell>
@@ -124,7 +124,7 @@ export default async function DepositDetailPage({ params }: { params: { id: stri
               </TableRow>
             </TableHeader>
             <TableBody>
-              {dep.webhooks.map((w) => (
+              {dep.webhooks.map((w: any) => (
                 <TableRow key={w.id}>
                   <TableCell className="whitespace-nowrap">{new Date(w.createdAt).toLocaleString()}</TableCell>
                   <TableCell>{w.provider}</TableCell>

@@ -44,7 +44,7 @@ export default async function StudioVideoChaptersPage({ params }: { params: { id
       <ChaptersEditor videoId={video.id} initial={chapters} />
 
       <div className="card small muted">
-        Tip: đặt chapter 0s cho "Intro" sẽ đẹp hơn. Hệ thống tự sort theo startSec.
+        Tip: đặt chapter 0s cho &quot;Intro&quot; sẽ đẹp hơn. Hệ thống tự sort theo startSec.
       </div>
     </div>
   );

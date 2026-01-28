@@ -2,8 +2,10 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+type AdPlacementRow = Awaited<ReturnType<typeof prisma.adPlacement.findFirst>>;
+
 export default async function AdminAds() {
-  const list = await prisma.adPlacement.findMany({ orderBy: { scope: "asc" } });
+  const list = (await prisma.adPlacement.findMany({ orderBy: { scope: "asc" } })) as AdPlacementRow[];
 
   return (
     <div style={{ display: "grid", gap: 12, maxWidth: 900 }}>

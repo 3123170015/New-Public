@@ -11,8 +11,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export const dynamic = "force-dynamic";
 
+type BoostPlanRow = Awaited<ReturnType<typeof prisma.boostPlan.findFirst>>;
+
 export default async function AdminBoostPlans() {
-  const list = await prisma.boostPlan.findMany({ orderBy: [{ sort: "asc" }, { createdAt: "desc" }] });
+  const list = (await prisma.boostPlan.findMany({ orderBy: [{ sort: "asc" }, { createdAt: "desc" }] })) as BoostPlanRow[];
 
   return (
     <div className="space-y-4">
