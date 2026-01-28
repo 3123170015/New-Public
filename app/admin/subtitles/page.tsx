@@ -2,8 +2,10 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+type SubtitleRow = Awaited<ReturnType<typeof prisma.subtitle.findMany>>[number];
+
 export default async function AdminSubtitles() {
-  const list = await prisma.subtitle.findMany({
+  const list: SubtitleRow[] = await prisma.subtitle.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,
     include: { video: { select: { title: true, id: true } } },

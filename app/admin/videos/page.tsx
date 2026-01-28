@@ -5,8 +5,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export const dynamic = "force-dynamic";
 
+type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+
 export default async function AdminVideos() {
-  const list = await prisma.video.findMany({
+  const list: VideoRow[] = await prisma.video.findMany({
     orderBy: { createdAt: "desc" },
     take: 100,
     select: {
@@ -63,7 +65,7 @@ export default async function AdminVideos() {
                     </a>
                     {Boolean((v as any).isSensitive) ? (
                       <div className="mt-1">
-                        <Badge variant="destructive">Sensitive</Badge>
+                        <Badge variant="danger">Sensitive</Badge>
                       </div>
                     ) : null}
                     <div className="text-xs text-zinc-500">{v.id}</div>

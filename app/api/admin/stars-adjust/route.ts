@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/authz";
 import { redirect } from "next/navigation";
@@ -15,7 +16,7 @@ export async function POST(req: Request) {
   if (!userId) return new Response("userId required", { status: 400 });
   if (!Number.isFinite(delta) || delta === 0) return new Response("delta invalid", { status: 400 });
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.user.update({ where: { id: userId }, data: { starBalance: { increment: delta } } });
     await tx.starTransaction.create({
       data: {

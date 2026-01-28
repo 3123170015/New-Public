@@ -2,8 +2,10 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+type UserRow = Awaited<ReturnType<typeof prisma.user.findMany>>[number];
+
 export default async function AdminUsers() {
-  const list = await prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 200 });
+  const list: UserRow[] = await prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 200 });
 
   return (
     <div className="card">

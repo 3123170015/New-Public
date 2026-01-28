@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 
 export const runtime = "nodejs";
 
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
 
   const now = new Date();
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     switch (action) {
       case "HIDE_VIDEO": {
         if (!videoId) throw new Error("videoId required");

@@ -2,7 +2,6 @@ import { auth } from "@/lib/auth";
 import { requireAdmin } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import type { PaymentProvider } from "@prisma/client";
 
 const schema = z.object({
   env: z.string().min(1).max(40),
@@ -32,13 +31,13 @@ export async function POST(req: Request) {
     where: {
       env_provider_name: {
         env: parsed.data.env,
-        provider: parsed.data.provider as PaymentProvider,
+        provider: parsed.data.provider,
         name: parsed.data.name,
       },
     },
     create: {
       env: parsed.data.env,
-      provider: parsed.data.provider as PaymentProvider,
+      provider: parsed.data.provider,
       name: parsed.data.name,
       value: parsed.data.value,
       active: parsed.data.active,

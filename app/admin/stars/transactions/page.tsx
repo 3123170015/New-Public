@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
+type StarTransactionRow = Awaited<ReturnType<typeof prisma.starTransaction.findMany>>[number];
+
 export default async function AdminStarTx({
   searchParams,
 }: {
@@ -33,7 +35,7 @@ export default async function AdminStarTx({
     if (u) where.userId = u.id;
   }
 
-  const list = await prisma.starTransaction.findMany({
+  const list: StarTransactionRow[] = await prisma.starTransaction.findMany({
     where,
     orderBy: { createdAt: "desc" },
     take,

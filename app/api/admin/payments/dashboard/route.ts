@@ -2,6 +2,9 @@ import { auth } from "@/lib/auth";
 import { requireAdmin } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+const { sql, empty } = Prisma as any;
+
+type DepositRow = Awaited<ReturnType<typeof prisma.starDeposit.findMany>>[number];
 
 const FAIL_STATUSES = new Set(["FAILED", "NEEDS_REVIEW", "UNMATCHED"]);
 const SUCCESS_STATUSES = new Set(["CONFIRMED", "CREDITED"]);
@@ -39,7 +42,7 @@ export async function GET(req: Request) {
   };
   if (chain) where.chain = chain;
 
-  const deposits = await prisma.starDeposit.findMany({
+  const deposits: DepositRow[] = await prisma.starDeposit.findMany({
     where,
     select: {
       id: true,
@@ -196,7 +199,7 @@ export async function GET(req: Request) {
     orderBy: { createdAt: "asc" },
   });
 
-  const filteredStarTx = starTx.filter((t) => {
+  const filteredStarTx = starTx.filter((t: typeof starTx[number]) => {
     if (chain && String(t.deposit?.chain || "") !== chain) return false;
     if (asset && String(t.deposit?.token?.symbol || "").toUpperCase() !== asset) return false;
     return true;
@@ -237,20 +240,20 @@ export async function GET(req: Request) {
   // Ledger audit (idempotency/double-credit/mismatch quick checks)
   const assetUpper = asset ? asset.toUpperCase() : "";
   const [creditedWithoutTx, txWithoutDeposit, doubleCreditDeposits] = await Promise.all([
-    prisma.$queryRaw<{ c: bigint }[]>(
-      Prisma.sql`
+    prisma.$queryRaw(
+      sql`
         SELECT COUNT(*) as c
         FROM StarDeposit d
         LEFT JOIN StarTransaction t ON t.depositId = d.id
         WHERE d.status = 'CREDITED'
           AND d.createdAt BETWEEN ${from} AND ${to}
-          ${chain ? Prisma.sql`AND d.chain = ${chain}` : Prisma.empty}
-          ${assetUpper ? Prisma.sql`AND EXISTS (SELECT 1 FROM StarToken tok WHERE tok.id = d.tokenId AND UPPER(tok.symbol) = ${assetUpper})` : Prisma.empty}
+          ${chain ? sql`AND d.chain = ${chain}` : empty}
+          ${assetUpper ? sql`AND EXISTS (SELECT 1 FROM StarToken tok WHERE tok.id = d.tokenId AND UPPER(tok.symbol) = ${assetUpper})` : empty}
           AND t.id IS NULL
       `,
-    ).then((rows) => Number(rows?.[0]?.c || 0)).catch(() => 0),
-    prisma.$queryRaw<{ c: bigint }[]>(
-      Prisma.sql`
+    ).then((rows: unknown) => Number((rows as { c?: bigint }[])?.[0]?.c || 0)).catch(() => 0),
+    prisma.$queryRaw(
+      sql`
         SELECT COUNT(*) as c
         FROM StarTransaction t
         LEFT JOIN StarDeposit d ON d.id = t.depositId
@@ -259,9 +262,9 @@ export async function GET(req: Request) {
           AND t.createdAt BETWEEN ${from} AND ${to}
           AND d.id IS NULL
       `,
-    ).then((rows) => Number(rows?.[0]?.c || 0)).catch(() => 0),
-    prisma.$queryRaw<{ c: bigint }[]>(
-      Prisma.sql`
+    ).then((rows: unknown) => Number((rows as { c?: bigint }[])?.[0]?.c || 0)).catch(() => 0),
+    prisma.$queryRaw(
+      sql`
         SELECT COUNT(*) as c
         FROM (
           SELECT depositId
@@ -273,7 +276,7 @@ export async function GET(req: Request) {
           HAVING COUNT(*) > 1
         ) x
       `,
-    ).then((rows) => Number(rows?.[0]?.c || 0)).catch(() => 0),
+    ).then((rows: unknown) => Number((rows as { c?: bigint }[])?.[0]?.c || 0)).catch(() => 0),
   ]);
 
   const ledgerAudit = {

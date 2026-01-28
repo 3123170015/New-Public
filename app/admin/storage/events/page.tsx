@@ -4,8 +4,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 
 export const dynamic = "force-dynamic";
 
+type StorageEventRow = Awaited<ReturnType<typeof prisma.nftEventLog.findMany>>[number];
+
 export default async function AdminStorageEvents() {
-  const rows = await prisma.nftEventLog.findMany({
+  const rows: StorageEventRow[] = await prisma.nftEventLog.findMany({
     where: { action: { startsWith: "STORAGE_" } },
     orderBy: { createdAt: "desc" },
     take: 100,

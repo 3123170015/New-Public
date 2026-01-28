@@ -1,9 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
+type UserRow = Awaited<ReturnType<typeof prisma.user.findMany>>[number];
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminStars() {
-  const users = await prisma.user.findMany({
+  const users: UserRow[] = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,
     select: { id: true, email: true, name: true, role: true, starBalance: true, createdAt: true },

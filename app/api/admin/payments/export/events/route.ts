@@ -29,19 +29,20 @@ export async function GET(req: Request) {
   if (type) where.type = type;
   if (q) where.OR = [{ message: { contains: q } }, { type: { contains: q } }, { depositId: { contains: q } }];
 
+  type DepositEventRow = Awaited<ReturnType<typeof prisma.starDepositEvent.findMany>>[number];
   const rows = await prisma.starDepositEvent.findMany({
     where,
     orderBy: { createdAt: "desc" },
     take: 50_000,
   });
 
-  const csv = toCsv(rows, [
-    { key: "createdAt", header: "createdAt", value: (r) => r.createdAt.toISOString() },
-    { key: "id", header: "eventId", value: (r) => r.id },
-    { key: "depositId", header: "depositId", value: (r) => r.depositId },
-    { key: "type", header: "type", value: (r) => r.type },
-    { key: "message", header: "message", value: (r) => r.message || "" },
-    { key: "dataJson", header: "dataJson", value: (r) => r.dataJson || "" },
+  const csv = toCsv<DepositEventRow>(rows as DepositEventRow[], [
+    { key: "createdAt", header: "createdAt", value: (r: DepositEventRow) => r.createdAt.toISOString() },
+    { key: "id", header: "eventId", value: (r: DepositEventRow) => r.id },
+    { key: "depositId", header: "depositId", value: (r: DepositEventRow) => r.depositId },
+    { key: "type", header: "type", value: (r: DepositEventRow) => r.type },
+    { key: "message", header: "message", value: (r: DepositEventRow) => r.message || "" },
+    { key: "dataJson", header: "dataJson", value: (r: DepositEventRow) => r.dataJson || "" },
   ]);
 
   return csvResponse(`deposit_events_${from.toISOString()}_${to.toISOString()}.csv`, csv);

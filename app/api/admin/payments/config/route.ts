@@ -75,14 +75,6 @@ export async function POST(req: Request) {
       referralPercent: parsed.data.referralPercent,
       referralApplyToTopups: parsed.data.referralApplyToTopups,
       referralApplyToEarnings: parsed.data.referralApplyToEarnings,
-
-      seasonPassEnabled: parsed.data.seasonPassEnabled,
-      seasonPassPriceStars: parsed.data.seasonPassPriceStars,
-
-      referralEnabled: parsed.data.referralEnabled,
-      referralPercent: parsed.data.referralPercent,
-      referralApplyToTopups: parsed.data.referralApplyToTopups,
-      referralApplyToEarnings: parsed.data.referralApplyToEarnings,
     },
     update: {
       strictMode: parsed.data.strictMode,
@@ -91,14 +83,6 @@ export async function POST(req: Request) {
       submittedStaleMinutes: parsed.data.submittedStaleMinutes,
       reconcileEveryMs: parsed.data.reconcileEveryMs,
       allowlistJson: parsed.data.allowlistJson,
-
-      seasonPassEnabled: parsed.data.seasonPassEnabled,
-      seasonPassPriceStars: parsed.data.seasonPassPriceStars,
-
-      referralEnabled: parsed.data.referralEnabled,
-      referralPercent: parsed.data.referralPercent,
-      referralApplyToTopups: parsed.data.referralApplyToTopups,
-      referralApplyToEarnings: parsed.data.referralApplyToEarnings,
 
       seasonPassEnabled: parsed.data.seasonPassEnabled,
       seasonPassPriceStars: parsed.data.seasonPassPriceStars,

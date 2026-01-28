@@ -43,6 +43,12 @@ cd /www/wwwroot/videoshare
 npm ci
 ```
 
+> Nếu `npm ci` báo lockfile không khớp hoặc thiếu resolved/integrity:
+> ```bash
+> npm install
+> ```
+> Sau đó commit lại `package-lock.json` lên repo để deployments sau dùng `npm ci`.
+
 ### Prisma
 - Generate client:
 ```bash

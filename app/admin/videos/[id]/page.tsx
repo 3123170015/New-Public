@@ -13,20 +13,25 @@ import SmartImage from "@/components/media/SmartImage";
 
 export const dynamic = "force-dynamic";
 
+type VideoTagRow = { tag: { slug: string | null; name: string } };
+type CategoryRow = { id: string; name: string };
+type SubtitleRow = { id: string; lang: string; vttKey: string | null; provider?: string | null };
+
 export default async function AdminVideoDetail({ params }: { params: { id: string } }) {
-  const [v, categories] = await Promise.all([
-    prisma.video.findUnique({
-      where: { id: params.id },
-      include: {
-        author: true,
-        category: true,
-        channel: true,
-        subtitles: true,
-        tags: { include: { tag: true } },
-      },
-    }),
-    prisma.category.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
-  ]);
+  const v = await prisma.video.findUnique({
+    where: { id: params.id },
+    include: {
+      author: true,
+      category: true,
+      channel: true,
+      subtitles: true,
+      tags: { include: { tag: true } },
+    },
+  });
+  const categories: CategoryRow[] = await prisma.category.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
 
   if (!v) {
     return (
@@ -41,7 +46,7 @@ export default async function AdminVideoDetail({ params }: { params: { id: strin
   const src = resolveMediaUrl(v.sourceKey) ?? "";
   const hls = resolveMediaUrl(v.masterM3u8Key) ?? "";
   const thumb = resolveMediaUrl(v.thumbKey) ?? "";
-  const tagsStr = v.tags
+  const tagsStr = (v.tags as VideoTagRow[])
     .map((t) => t.tag.slug || t.tag.name)
     .filter(Boolean)
     .join(", ");
@@ -241,7 +246,7 @@ export default async function AdminVideoDetail({ params }: { params: { id: strin
             <div className="text-sm text-zinc-500">None</div>
           ) : (
             <ul className="space-y-2">
-              {v.subtitles.map((s) => (
+              {(v.subtitles as SubtitleRow[]).map((s) => (
                 <li key={s.id} className="text-sm">
                   <span className="font-semibold">{s.lang}</span> —{" "}
                   <a href={resolveMediaUrl(s.vttKey) ?? "#"} className="hover:underline break-all">

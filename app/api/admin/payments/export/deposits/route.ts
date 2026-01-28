@@ -40,6 +40,7 @@ export async function GET(req: Request) {
   }
 
   // hard cap for safety
+  type DepositExportRow = Awaited<ReturnType<typeof prisma.starDeposit.findMany>>[number];
   const rows = await prisma.starDeposit.findMany({
     where,
     include: { user: true, token: true, package: true, custodialAddress: true },
@@ -47,22 +48,22 @@ export async function GET(req: Request) {
     take: 50_000,
   });
 
-  const csv = toCsv(rows, [
-    { key: "createdAt", header: "createdAt", value: (r) => r.createdAt.toISOString() },
-    { key: "id", header: "depositId", value: (r) => r.id },
-    { key: "chain", header: "chain", value: (r) => r.chain },
-    { key: "asset", header: "asset", value: (r) => r.token?.symbol || "" },
-    { key: "status", header: "status", value: (r) => r.status },
-    { key: "provider", header: "provider", value: (r) => r.provider || "" },
-    { key: "user", header: "userEmail", value: (r) => r.user?.email || "" },
-    { key: "expectedAmount", header: "expectedAmount", value: (r) => r.expectedAmount?.toString?.() ?? String(r.expectedAmount ?? "") },
-    { key: "actualAmount", header: "actualAmount", value: (r) => r.actualAmount?.toString?.() ?? String(r.actualAmount ?? "") },
-    { key: "stars", header: "stars", value: (r) => r.package?.stars ?? 0 },
-    { key: "txHash", header: "txHash", value: (r) => r.txHash || "" },
-    { key: "memo", header: "memo", value: (r) => r.memo || "" },
-    { key: "custodial", header: "custodialAddress", value: (r) => r.custodialAddress?.address || "" },
-    { key: "failureReason", header: "failureReason", value: (r) => r.failureReason || "" },
-    { key: "updatedAt", header: "updatedAt", value: (r) => r.updatedAt.toISOString() },
+  const csv = toCsv<DepositExportRow>(rows as DepositExportRow[], [
+    { key: "createdAt", header: "createdAt", value: (r: DepositExportRow) => r.createdAt.toISOString() },
+    { key: "id", header: "depositId", value: (r: DepositExportRow) => r.id },
+    { key: "chain", header: "chain", value: (r: DepositExportRow) => r.chain },
+    { key: "asset", header: "asset", value: (r: DepositExportRow) => r.token?.symbol || "" },
+    { key: "status", header: "status", value: (r: DepositExportRow) => r.status },
+    { key: "provider", header: "provider", value: (r: DepositExportRow) => r.provider || "" },
+    { key: "user", header: "userEmail", value: (r: DepositExportRow) => r.user?.email || "" },
+    { key: "expectedAmount", header: "expectedAmount", value: (r: DepositExportRow) => r.expectedAmount?.toString?.() ?? String(r.expectedAmount ?? "") },
+    { key: "actualAmount", header: "actualAmount", value: (r: DepositExportRow) => r.actualAmount?.toString?.() ?? String(r.actualAmount ?? "") },
+    { key: "stars", header: "stars", value: (r: DepositExportRow) => r.package?.stars ?? 0 },
+    { key: "txHash", header: "txHash", value: (r: DepositExportRow) => r.txHash || "" },
+    { key: "memo", header: "memo", value: (r: DepositExportRow) => r.memo || "" },
+    { key: "custodial", header: "custodialAddress", value: (r: DepositExportRow) => r.custodialAddress?.address || "" },
+    { key: "failureReason", header: "failureReason", value: (r: DepositExportRow) => r.failureReason || "" },
+    { key: "updatedAt", header: "updatedAt", value: (r: DepositExportRow) => r.updatedAt.toISOString() },
   ]);
 
   return csvResponse(`deposits_${from.toISOString()}_${to.toISOString()}.csv`, csv);

@@ -38,22 +38,23 @@ export async function GET(req: Request) {
     ];
   }
 
+  type WebhookAuditRow = Awaited<ReturnType<typeof prisma.webhookAuditLog.findMany>>[number];
   const rows = await prisma.webhookAuditLog.findMany({
     where,
     orderBy: { createdAt: "desc" },
     take: 50_000,
   });
 
-  const csv = toCsv(rows, [
-    { key: "createdAt", header: "createdAt", value: (r) => r.createdAt.toISOString() },
-    { key: "id", header: "auditId", value: (r) => r.id },
-    { key: "provider", header: "provider", value: (r) => r.provider },
-    { key: "chain", header: "chain", value: (r) => r.chain || "" },
-    { key: "endpoint", header: "endpoint", value: (r) => r.endpoint },
-    { key: "status", header: "status", value: (r) => r.status },
-    { key: "depositId", header: "depositId", value: (r) => r.depositId || "" },
-    { key: "sha256", header: "sha256", value: (r) => r.sha256 },
-    { key: "failureReason", header: "failureReason", value: (r) => r.failureReason || "" },
+  const csv = toCsv<WebhookAuditRow>(rows as WebhookAuditRow[], [
+    { key: "createdAt", header: "createdAt", value: (r: WebhookAuditRow) => r.createdAt.toISOString() },
+    { key: "id", header: "auditId", value: (r: WebhookAuditRow) => r.id },
+    { key: "provider", header: "provider", value: (r: WebhookAuditRow) => r.provider },
+    { key: "chain", header: "chain", value: (r: WebhookAuditRow) => r.chain || "" },
+    { key: "endpoint", header: "endpoint", value: (r: WebhookAuditRow) => r.endpoint },
+    { key: "status", header: "status", value: (r: WebhookAuditRow) => r.status },
+    { key: "depositId", header: "depositId", value: (r: WebhookAuditRow) => r.depositId || "" },
+    { key: "sha256", header: "sha256", value: (r: WebhookAuditRow) => r.sha256 },
+    { key: "failureReason", header: "failureReason", value: (r: WebhookAuditRow) => r.failureReason || "" },
   ]);
 
   return csvResponse(`webhook_logs_${from.toISOString()}_${to.toISOString()}.csv`, csv);

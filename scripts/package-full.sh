@@ -7,7 +7,7 @@ OUT="../videoshare-nextjs-v${VERSION}-final-full.zip"
 
 if [[ "${SKIP_BUILD:-}" != "1" ]]; then
   echo "[package-full] Installing dependencies..."
-  npm install
+  npm ci
   echo "[package-full] Building web + worker..."
   npm run build
 else
