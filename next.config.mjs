@@ -12,9 +12,11 @@ const r2Host = safeUrlHost(process.env.R2_PUBLIC_BASE_URL || "");
 const nextConfig = {
   reactStrictMode: true,
   typescript: {
-    // NOTE: This temporarily ignores type errors during build
-    // There are 494+ pre-existing TypeScript strict mode errors in the codebase
-    // that need to be addressed separately
+    // TEMPORARY: Ignoring TypeScript build errors due to 494+ pre-existing strict mode errors
+    // TODO: Create separate PR to systematically fix these errors:
+    //   - Implicit 'any' types in admin pages
+    //   - Missing type annotations throughout codebase
+    // Consider fixing module-by-module to avoid breaking changes
     ignoreBuildErrors: true,
   },
   experimental: {

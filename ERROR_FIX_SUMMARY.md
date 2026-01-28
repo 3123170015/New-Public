@@ -10,7 +10,7 @@
      - Đổi tên `app/api/og/clip/[id]/route.ts` → `route.tsx`
      - Đổi tên `app/api/og/creator/[id]/route.ts` → `route.tsx`  
      - Đổi tên `app/api/og/video/[id]/route.ts` → `route.tsx`
-     - Thêm `import React from "react"` vào cả 3 file
+     - Note: Next.js 14 tự động xử lý JSX transform, không cần import React
 
 2. **Unescaped Quotes in JSX**
    - **Vấn đề:** Nhiều component React có dấu ngoặc kép chưa được escape trong JSX

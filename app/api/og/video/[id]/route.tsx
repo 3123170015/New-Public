@@ -1,4 +1,3 @@
-import React from "react";
 import { ImageResponse } from "next/og";
 import { prisma } from "@/lib/prisma";
 import { resolveMediaUrl } from "@/lib/mediaUrl";
