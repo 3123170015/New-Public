@@ -15,8 +15,8 @@ export default function LanguageSwitchForm({
 }) {
   const selectClass =
     size === "sm"
-      ? "h-9 w-auto rounded-xl border border-zinc-200 bg-white px-2 py-1 text-sm"
-      : "w-auto rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm";
+      ? "h-9 w-auto rounded-xl border border-zinc-200 bg-white px-2 py-1 text-sm dark:border-zinc-800 dark:bg-zinc-950"
+      : "w-auto rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-950";
   const submitText = submitLabel ?? "OK";
   const selectId = `lang-select-${size}-${lang}-${hideLabel ? "footer" : "profile"}`;
 

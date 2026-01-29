@@ -78,6 +78,48 @@ export default async function AdminConfig() {
 
         <Card>
           <CardHeader>
+            <CardTitle className="text-base">Home layout</CardTitle>
+            <CardDescription>Tuỳ chỉnh sections hiển thị ở trang chủ kiểu YouTube.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="homeSectionOrder">Section order</Label>
+              <Input
+                id="homeSectionOrder"
+                name="homeSectionOrder"
+                defaultValue={(cfg as any).homeSectionOrder ?? "TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT"}
+              />
+              <div className="text-xs text-zinc-500">
+                Giá trị ví dụ: TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT,CATEGORIES
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="homeCategoryIds">Category IDs</Label>
+              <Input
+                id="homeCategoryIds"
+                name="homeCategoryIds"
+                defaultValue={(cfg as any).homeCategoryIds ?? ""}
+              />
+              <div className="text-xs text-zinc-500">
+                Danh sách categoryId cách nhau bằng dấu phẩy (để hiện section Categories).
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="homeSectionLimit">Items per section</Label>
+              <Input
+                id="homeSectionLimit"
+                name="homeSectionLimit"
+                type="number"
+                min={3}
+                max={24}
+                defaultValue={(cfg as any).homeSectionLimit ?? 12}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle className="text-base">Analytics</CardTitle>
             <CardDescription>Google Analytics / Google Tag Manager / verification.</CardDescription>
           </CardHeader>

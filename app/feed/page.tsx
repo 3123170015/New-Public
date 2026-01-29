@@ -160,16 +160,16 @@ const demoItems = ["Collector preview #1", "Collector preview #2", "Collector pr
 export default async function FeedPage() {
   if (!prisma) {
     return (
-      <main className="bg-neutral-50">
+      <main className="bg-neutral-50 dark:bg-zinc-950">
         <div className="mx-auto max-w-6xl px-3 pt-6">
           <h1 className="text-2xl font-extrabold">Collector Feed</h1>
-          <p className="text-sm text-neutral-600">Feed demo (database not configured).</p>
+          <p className="text-sm text-neutral-600 dark:text-zinc-400">Feed demo (database not configured).</p>
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {demoItems.map((label) => (
-              <div key={label} className="rounded-2xl border bg-white p-3 shadow-sm" aria-label="Demo item">
-                <div className="relative overflow-hidden rounded-xl bg-neutral-200" style={{ aspectRatio: "16/9" }} aria-hidden="true" />
+              <div key={label} className="rounded-2xl border bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70" aria-label="Demo item">
+                <div className="relative overflow-hidden rounded-xl bg-neutral-200 dark:bg-zinc-800" style={{ aspectRatio: "16/9" }} aria-hidden="true" />
                 <div className="mt-3 text-sm font-semibold">{label}</div>
-                <div className="mt-1 text-xs text-neutral-500">Verified • Limited edition</div>
+                <div className="mt-1 text-xs text-neutral-500 dark:text-zinc-400">Verified • Limited edition</div>
               </div>
             ))}
           </div>
@@ -320,17 +320,17 @@ export default async function FeedPage() {
 
   // Grid feed: show Sponsored block + mix (ads appear as cards)
   return (
-    <main className="bg-neutral-50">
+    <main className="bg-neutral-50 dark:bg-zinc-950">
       <div className="mx-auto max-w-6xl px-3 pt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-extrabold">Collector Grid</h1>
-            <p className="text-sm text-neutral-600">Modern gallery layout for professional collectors.</p>
+            <p className="text-sm text-neutral-600 dark:text-zinc-400">Modern gallery layout for professional collectors.</p>
           </div>
           <div className="flex gap-2 text-xs">
-            <span className="rounded-full border bg-white px-3 py-1">Curated</span>
-            <span className="rounded-full border bg-white px-3 py-1">Drop alerts</span>
-            <span className="rounded-full border bg-white px-3 py-1">Verified</span>
+            <span className="rounded-full border bg-white px-3 py-1 dark:border-zinc-700 dark:bg-zinc-900">Curated</span>
+            <span className="rounded-full border bg-white px-3 py-1 dark:border-zinc-700 dark:bg-zinc-900">Drop alerts</span>
+            <span className="rounded-full border bg-white px-3 py-1 dark:border-zinc-700 dark:bg-zinc-900">Verified</span>
           </div>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -347,9 +347,9 @@ export default async function FeedPage() {
             const v: any = it;
             const href = `/v/${v.id}`;
             return (
-              <div key={v.id} className="rounded-2xl border bg-white p-3 shadow-sm">
-                <TrackedVideoLink href={href} videoId={v.id} source="FEED" placement={v.sponsored ? "boosted" : "feed"}>
-                  <div className="relative overflow-hidden rounded-xl bg-neutral-100" style={{ aspectRatio: "16/9" }}>
+                <div key={v.id} className="rounded-2xl border bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70">
+                  <TrackedVideoLink href={href} videoId={v.id} source="FEED" placement={v.sponsored ? "boosted" : "feed"}>
+                  <div className="relative overflow-hidden rounded-xl bg-neutral-100 dark:bg-zinc-800" style={{ aspectRatio: "16/9" }}>
                     <SensitiveThumb
                       src={v.poster ?? null}
                       alt={v.title}
@@ -361,7 +361,7 @@ export default async function FeedPage() {
                     ) : null}
                   </div>
                   <div className="mt-3 text-sm font-semibold">{v.title}</div>
-                  <div className="mt-1 text-xs text-neutral-500">
+                  <div className="mt-1 text-xs text-neutral-500 dark:text-zinc-400">
                     {v.viewCount} views • {v.likeCount} likes • {v.commentCount} comments
                   </div>
                 </TrackedVideoLink>

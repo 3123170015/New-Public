@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { env } from "@/lib/env";
 import SensitiveThumb from "@/components/sensitive/SensitiveThumb";
 import TrackedVideoLink from "@/components/analytics/TrackedVideoLink";
 import { resolveMediaUrl } from "@/lib/mediaUrl";
 import { getSensitiveModeForUser } from "@/lib/sensitive";
 import CommunityPoll from "@/components/community/CommunityPoll";
 import { getActiveMembershipTier } from "@/lib/membership";
+import { getSiteConfig } from "@/lib/siteConfig";
 
 export const dynamic = "force-dynamic";
 
@@ -15,11 +15,23 @@ export default async function HomePage() {
   type BoostOrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findMany>>[number];
   type CommunityPostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number];
   type ProgressRow = Awaited<ReturnType<typeof prisma.videoProgress.findMany>>[number];
+  type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+  type CategoryRow = Awaited<ReturnType<typeof prisma.category.findMany>>[number];
 
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
   const isAdmin = session?.user?.role === "ADMIN";
   const sensitiveMode = await getSensitiveModeForUser(viewerId ?? null);
+  const cfg = await getSiteConfig();
+  const sectionLimit = Math.max(3, Math.min(24, Number((cfg as any).homeSectionLimit ?? 12)));
+  const sectionOrder = String((cfg as any).homeSectionOrder ?? "TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT")
+    .split(",")
+    .map((s) => s.trim().toUpperCase())
+    .filter(Boolean);
+  const categoryIds = String((cfg as any).homeCategoryIds ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   const viewerMem = {
     membershipTier: ((session?.user as any)?.membershipTier ?? "NONE") as any,
@@ -35,25 +47,44 @@ export default async function HomePage() {
         where: { status: "ACTIVE", endAt: { gt: new Date() } },
         include: { video: true },
         orderBy: { createdAt: "desc" },
-        take: 18,
+        take: Math.max(18, sectionLimit),
       });
 
   const boosted = (boostedOrders as BoostOrderRow[])
     .map((b: BoostOrderRow) => b.video)
     .filter((v) => v && v.status === "PUBLISHED")
-    .slice(0, 12);
+    .slice(0, sectionLimit);
 
-  const recentPosts = prisma
-    ? await prisma.communityPost.findMany({
-        where: { isDeleted: false },
-        orderBy: { createdAt: "desc" },
-        take: 6,
-        include: {
-          author: { select: { id: true, name: true } },
-          pollOptions: { orderBy: { sort: "asc" }, include: { _count: { select: { votes: true } } } },
-        },
-      })
-    : [];
+  const [recentPosts, trendingVideos, recentVideos, categories] = prisma
+    ? await Promise.all([
+        prisma.communityPost.findMany({
+          where: { isDeleted: false },
+          orderBy: { createdAt: "desc" },
+          take: Math.max(6, Math.min(12, sectionLimit)),
+          include: {
+            author: { select: { id: true, name: true } },
+            pollOptions: { orderBy: { sort: "asc" }, include: { _count: { select: { votes: true } } } },
+          },
+        }),
+        prisma.video.findMany({
+          where: { status: "PUBLISHED", access: "PUBLIC" },
+          orderBy: { viewCount: "desc" },
+          take: sectionLimit,
+        }),
+        prisma.video.findMany({
+          where: { status: "PUBLISHED", access: "PUBLIC" },
+          orderBy: { createdAt: "desc" },
+          take: sectionLimit,
+        }),
+        categoryIds.length
+          ? prisma.category.findMany({
+              where: { id: { in: categoryIds } },
+              orderBy: { updatedAt: "desc" },
+              take: 6,
+            })
+          : [],
+      ])
+    : [[], [], [], []];
 
   const voteMap = new Map<string, string>();
   if (viewerId && recentPosts.length && prisma) {
@@ -68,248 +99,287 @@ export default async function HomePage() {
     ? await prisma.videoProgress.findMany({
         where: { userId: viewerId },
         orderBy: { updatedAt: "desc" },
-        take: 6,
+        take: sectionLimit,
         include: { video: true },
       })
     : [];
 
+  const sections = sectionOrder.length ? sectionOrder : ["TRENDING", "BOOSTED", "CONTINUE_WATCHING", "COMMUNITY", "RECENT"];
+  const itemGrid =
+    "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+
   return (
-    <main className="mx-auto max-w-3xl space-y-4">
-      <div className="card">
-        <div className="text-xl font-extrabold">Home</div>
-        <div className="small muted mt-1">
-          Đây là trang chủ demo. Bạn có thể vào Feed để xem dạng TikTok vertical.
-        </div>
-        <ul className="small" style={{ marginTop: 10, lineHeight: 1.9 }}>
-          <li>
-            <a href="/feed">Feed</a>
-          </li>
-          <li>
-            <a href="/subscriptions">Subscriptions</a>
-          </li>
-          <li>
-            <a href="/premium">Premium</a>
-          </li>
-          <li>
-            <a href="/nft">NFT</a>
-          </li>
-          <li>
-            <a href="/studio">Studio</a>
-          </li>
-        </ul>
-      </div>
-
-      
-{viewerId ? (
-  <div className="card">
-    <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-      <div>
-        <div style={{ fontWeight: 800 }}>Continue watching</div>
-        <div className="small muted">Tiếp tục xem từ lần trước (đồng bộ đa thiết bị).</div>
-      </div>
-      <a className="small" href="/history">
-        Open history
-      </a>
-    </div>
-
-    {recentProgress.length === 0 ? (
-      <div className="small muted" style={{ marginTop: 10 }}>
-        Chưa có lịch sử xem.
-      </div>
-    ) : (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-          gap: 12,
-          marginTop: 12,
-        }}
-      >
-        {recentProgress
-          .filter((p: ProgressRow) => p.video && (p.video as any).status === "PUBLISHED")
-          .map((p: ProgressRow) => (
-            <div key={p.id} className="card">
-              <TrackedVideoLink href={`/v/${(p.video as any).id}?t=${p.seconds}`} videoId={(p.video as any).id} source="HOME" placement="continue_watching">
-                <div style={{ fontWeight: 800 }}>{(p.video as any).title}</div>
-                <div className="small muted">
-                  {p.seconds}s • updated {new Date(p.updatedAt).toLocaleString()}
-                </div>
-                <div
-                  style={{
-                    marginTop: 10,
-                    aspectRatio: "16/9",
-                    borderRadius: 14,
-                    overflow: "hidden",
-                    background: "#f3f3f3",
-                  }}
-                >
-                  <SensitiveThumb
-                    src={resolveMediaUrl((p.video as any).thumbKey)}
-                    alt={(p.video as any).title}
-                    isSensitive={Boolean((p.video as any).isSensitive)}
-                    mode={sensitiveMode}
-                  />
-                </div>
-              </TrackedVideoLink>
-              <div style={{ marginTop: 10 }}>
-                <div
-                  style={{
-                    height: 8,
-                    background: "#eee",
-                    borderRadius: 999,
-                    overflow: "hidden",
-                  }}
-                >
-                  <div
-                    style={{
-                      height: 8,
-                      width: `${Math.max(0, Math.min(100, Math.floor(((p.seconds ?? 0) / Math.max(1, ((p.video as any).durationSec ?? 600))) * 100)))}%`,
-                      background: "#111",
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-      </div>
-    )}
-  </div>
-) : null}
-
-<div className="card">
-        <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+    <main className="mx-auto max-w-6xl space-y-6">
+      <section className="lux-panel">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div style={{ fontWeight: 800 }}>Sponsored / Boosted</div>
-            <div className="small muted">Video được boost sẽ ưu tiên hiển thị chỗ dễ thấy.</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-zinc-500">Collector Hub</div>
+            <h1 className="lux-title">Luxury video gallery</h1>
+            <p className="muted mt-1 text-sm">
+              Curated drops, creator intel, and verified listings in one premium experience.
+            </p>
           </div>
-          <a className="small" href="/feed">
-            Open feed
-          </a>
+          <div className="flex flex-wrap gap-2">
+            <span className="lux-pill">Verified</span>
+            <span className="lux-pill">1/1 Drops</span>
+            <span className="lux-pill">Collector tier</span>
+            <Link className="btn btn-primary" href="/feed">
+              Open vertical feed
+            </Link>
+          </div>
         </div>
+      </section>
 
-        {hideBoostAds ? (
-          <div className="small muted" style={{ marginTop: 10 }}>
-            Bạn đang bật chế độ ẩn Boosted ads (Premium+).
-          </div>
-        ) : boosted.length === 0 ? (
-          <div className="small muted" style={{ marginTop: 10 }}>
-            Chưa có video boost.
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-              gap: 12,
-              marginTop: 12,
-            }}
-          >
-            {(boosted as { id: string; title?: string | null; thumbKey?: string | null; viewCount?: number | null; likeCount?: number | null; isSensitive?: boolean | null }[]).map((v: { id: string; title?: string | null; thumbKey?: string | null; viewCount?: number | null; likeCount?: number | null; isSensitive?: boolean | null }) => (
-              <div key={v.id} className="card" style={{ border: "1px solid #ffd7a8" }}>
-                <TrackedVideoLink href={`/v/${v.id}`} videoId={v.id} source="HOME" placement="home_boosted">
-                  <div className="small muted">Sponsored • Boosted</div>
-                  <div style={{ fontWeight: 800, marginTop: 6 }}>{v.title}</div>
-                  <div
-                    style={{
-                      marginTop: 10,
-                      aspectRatio: "16/9",
-                      borderRadius: 14,
-                      overflow: "hidden",
-                      background: "#f3f3f3",
-                    }}
-                  >
-                    <SensitiveThumb
-                      src={resolveMediaUrl(v.thumbKey)}
-                      alt={v.title ?? ""}
-                      isSensitive={Boolean((v as any).isSensitive)}
-                      mode={sensitiveMode}
-                    />
-                  </div>
-                </TrackedVideoLink>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="card">
-        <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <div style={{ fontWeight: 800 }}>Community posts</div>
-            <div className="small muted">Bài đăng cộng đồng mới nhất.</div>
-          </div>
-          <a className="small" href="/subscriptions">
-            Open subscriptions
-          </a>
-        </div>
-
-        {recentPosts.length === 0 ? (
-          <div className="small muted" style={{ marginTop: 10 }}>
-            Chưa có bài đăng.
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: 12,
-              marginTop: 12,
-            }}
-          >
-            {(recentPosts as CommunityPostRow[]).map((p: CommunityPostRow) => (
-              <div key={p.id} className="card">
-                <div className="small muted">
-                  <Link href={`/u/${p.authorId}`}>{p.author?.name ?? "Unknown"}</Link> •{" "}
-                  {new Date(p.createdAt).toLocaleString()}
+      {sections.map((section) => {
+        if (section === "CONTINUE_WATCHING" && !viewerId) {
+          return null;
+        }
+        if (section === "CONTINUE_WATCHING" && !viewerId) {
+          return null;
+        }
+        if (section === "CONTINUE_WATCHING" && viewerId) {
+          return (
+            <section key={section} className="lux-panel">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-lg font-semibold">Continue watching</div>
+                  <div className="muted text-sm">Resume across devices in collector mode.</div>
                 </div>
-                {p.text ? (
-                  <div className="small" style={{ marginTop: 8, whiteSpace: "pre-wrap" }}>
-                    {p.text}
-                  </div>
-                ) : null}
-                {p.youtubeUrl ? (
-                  <a
-                    className="small"
-                    style={{ display: "inline-block", marginTop: 8, textDecoration: "underline" }}
-                    href={p.youtubeUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    YouTube
-                  </a>
-                ) : null}
-                {p.linkUrl ? (
-                  <a
-                    className="small"
-                    style={{ display: "inline-block", marginTop: 8, textDecoration: "underline" }}
-                    href={p.linkUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Mở link
-                  </a>
-                ) : null}
-                {p.mediaUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.mediaUrl} alt="" style={{ width: "100%", borderRadius: 12, marginTop: 10 }} />
-                ) : null}
-                {p.pollOptions && p.pollOptions.length ? (
-                  <div style={{ marginTop: 10 }}>
-                    <CommunityPoll
-                      postId={p.id}
-                      options={(p.pollOptions ?? []).map((o: { id: string; text: string; _count: { votes: number } }) => ({ id: o.id, text: o.text, votes: o._count.votes }))}
-                      viewerVotedOptionId={voteMap.get(p.id) ?? null}
-                    />
-                  </div>
-                ) : null}
+                <Link className="btn btn-ghost" href="/history">
+                  Open history
+                </Link>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              {recentProgress.length === 0 ? (
+                <div className="muted mt-4 text-sm">No watch history yet.</div>
+              ) : (
+                <div className={`${itemGrid} mt-4`}>
+                  {recentProgress
+                    .filter((p: ProgressRow) => p.video && (p.video as any).status === "PUBLISHED")
+                    .map((p: ProgressRow) => (
+                      <div key={p.id} className="card">
+                        <TrackedVideoLink href={`/v/${(p.video as any).id}?t=${p.seconds}`} videoId={(p.video as any).id} source="HOME" placement="continue_watching">
+                          <div className="text-sm font-semibold">{(p.video as any).title}</div>
+                          <div className="muted text-xs">
+                            {p.seconds}s • updated {new Date(p.updatedAt).toLocaleString()}
+                          </div>
+                          <div className="mt-3 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800" style={{ aspectRatio: "16/9" }}>
+                            <SensitiveThumb
+                              src={resolveMediaUrl((p.video as any).thumbKey)}
+                              alt={(p.video as any).title}
+                              isSensitive={Boolean((p.video as any).isSensitive)}
+                              mode={sensitiveMode}
+                            />
+                          </div>
+                        </TrackedVideoLink>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </section>
+          );
+        }
+
+        if (section === "BOOSTED") {
+          return (
+            <section key={section} className="lux-panel">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-lg font-semibold">Boosted spotlight</div>
+                  <div className="muted text-sm">Premium placements for top drops.</div>
+                </div>
+                <Link className="btn btn-ghost" href="/feed">
+                  Open feed
+                </Link>
+              </div>
+              {hideBoostAds ? (
+                <div className="muted mt-4 text-sm">Boosted ads hidden (Premium+).</div>
+              ) : boosted.length === 0 ? (
+                <div className="muted mt-4 text-sm">No boosted videos yet.</div>
+              ) : (
+                <div className={`${itemGrid} mt-4`}>
+                  {(boosted as VideoRow[]).map((v: VideoRow) => (
+                    <div key={v.id} className="card border-amber-200/70 dark:border-amber-400/30">
+                      <TrackedVideoLink href={`/v/${v.id}`} videoId={v.id} source="HOME" placement="home_boosted">
+                        <div className="text-xs uppercase tracking-[0.2em] text-amber-500">Boosted</div>
+                        <div className="mt-1 text-sm font-semibold">{v.title}</div>
+                        <div className="mt-3 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800" style={{ aspectRatio: "16/9" }}>
+                          <SensitiveThumb
+                            src={resolveMediaUrl(v.thumbKey)}
+                            alt={v.title ?? ""}
+                            isSensitive={Boolean((v as any).isSensitive)}
+                            mode={sensitiveMode}
+                          />
+                        </div>
+                      </TrackedVideoLink>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        }
+
+        if (section === "TRENDING") {
+          return (
+            <section key={section} className="lux-panel">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-lg font-semibold">Trending now</div>
+                  <div className="muted text-sm">Most-viewed collector drops.</div>
+                </div>
+                <Link className="btn btn-ghost" href="/trending">
+                  View all
+                </Link>
+              </div>
+              {trendingVideos.length === 0 ? (
+                <div className="muted mt-4 text-sm">No trending videos yet.</div>
+              ) : (
+                <div className={`${itemGrid} mt-4`}>
+                  {(trendingVideos as VideoRow[]).map((v: VideoRow) => (
+                    <div key={v.id} className="card">
+                      <TrackedVideoLink href={`/v/${v.id}`} videoId={v.id} source="HOME" placement="home_trending">
+                        <div className="text-sm font-semibold">{v.title}</div>
+                        <div className="muted text-xs">{v.viewCount} views</div>
+                        <div className="mt-3 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800" style={{ aspectRatio: "16/9" }}>
+                          <SensitiveThumb
+                            src={resolveMediaUrl(v.thumbKey)}
+                            alt={v.title}
+                            isSensitive={Boolean((v as any).isSensitive)}
+                            mode={sensitiveMode}
+                          />
+                        </div>
+                      </TrackedVideoLink>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        }
+
+        if (section === "RECENT") {
+          return (
+            <section key={section} className="lux-panel">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-lg font-semibold">Recent drops</div>
+                  <div className="muted text-sm">Latest releases from verified creators.</div>
+                </div>
+                <Link className="btn btn-ghost" href="/explore">
+                  Explore
+                </Link>
+              </div>
+              {recentVideos.length === 0 ? (
+                <div className="muted mt-4 text-sm">No recent videos yet.</div>
+              ) : (
+                <div className={`${itemGrid} mt-4`}>
+                  {(recentVideos as VideoRow[]).map((v: VideoRow) => (
+                    <div key={v.id} className="card">
+                      <TrackedVideoLink href={`/v/${v.id}`} videoId={v.id} source="HOME" placement="home_recent">
+                        <div className="text-sm font-semibold">{v.title}</div>
+                        <div className="muted text-xs">{new Date(v.createdAt).toLocaleDateString()}</div>
+                        <div className="mt-3 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800" style={{ aspectRatio: "16/9" }}>
+                          <SensitiveThumb
+                            src={resolveMediaUrl(v.thumbKey)}
+                            alt={v.title}
+                            isSensitive={Boolean((v as any).isSensitive)}
+                            mode={sensitiveMode}
+                          />
+                        </div>
+                      </TrackedVideoLink>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        }
+
+        if (section === "COMMUNITY") {
+          return (
+            <section key={section} className="lux-panel">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-lg font-semibold">Community intel</div>
+                  <div className="muted text-sm">Latest collector discussions.</div>
+                </div>
+                <Link className="btn btn-ghost" href="/subscriptions">
+                  Open subscriptions
+                </Link>
+              </div>
+              {recentPosts.length === 0 ? (
+                <div className="muted mt-4 text-sm">No community posts yet.</div>
+              ) : (
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                  {(recentPosts as CommunityPostRow[]).map((p: CommunityPostRow) => (
+                    <div key={p.id} className="card">
+                      <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+                        {p.author?.name ?? "Unknown"} • {new Date(p.createdAt).toLocaleString()}
+                      </div>
+                      {p.text ? <div className="mt-2 text-sm whitespace-pre-wrap">{p.text}</div> : null}
+                      {p.youtubeUrl ? (
+                        <a className="mt-2 inline-block text-sm underline" href={p.youtubeUrl} target="_blank" rel="noreferrer">
+                          YouTube
+                        </a>
+                      ) : null}
+                      {p.linkUrl ? (
+                        <a className="mt-2 inline-block text-sm underline" href={p.linkUrl} target="_blank" rel="noreferrer">
+                          Open link
+                        </a>
+                      ) : null}
+                      {p.mediaUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={p.mediaUrl} alt="" className="mt-3 w-full rounded-xl" />
+                      ) : null}
+                      {p.pollOptions && p.pollOptions.length ? (
+                        <div className="mt-3">
+                          <CommunityPoll
+                            postId={p.id}
+                            options={(p.pollOptions ?? []).map((o: { id: string; text: string; _count: { votes: number } }) => ({ id: o.id, text: o.text, votes: o._count.votes }))}
+                            viewerVotedOptionId={voteMap.get(p.id) ?? null}
+                          />
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        }
+
+        if (section === "CATEGORIES") {
+          return (
+            <section key={section} className="lux-panel">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-lg font-semibold">Curated categories</div>
+                  <div className="muted text-sm">Showcase hand-picked verticals.</div>
+                </div>
+                <Link className="btn btn-ghost" href="/explore">
+                  Explore categories
+                </Link>
+              </div>
+              {categories.length === 0 ? (
+                <div className="muted mt-4 text-sm">No categories configured.</div>
+              ) : (
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {(categories as CategoryRow[]).map((cat: CategoryRow) => (
+                    <Link key={cat.id} href={`/category/${cat.slug}`} className="lux-pill">
+                      {cat.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        }
+
+        return null;
+      })}
 
       {isAdmin ? (
-        <div className="card small muted">Bạn đang đăng nhập bằng ADMIN.</div>
+        <div className="card text-xs text-zinc-500">Admin session active.</div>
       ) : null}
     </main>
   );

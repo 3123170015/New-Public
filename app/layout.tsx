@@ -39,11 +39,13 @@ export default async function RootLayout({
   const configured = isConfiguredEnv();
 
   const lang = await getRequestLanguage();
+  const themeScript = `(() => { try { const stored = localStorage.getItem('theme'); const cookieMatch = document.cookie.match(/(?:^|; )theme=([^;]+)/); const cookie = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null; const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; const theme = cookie || stored || (prefersDark ? 'dark' : 'light'); if (cookie) { localStorage.setItem('theme', cookie); } document.documentElement.classList.toggle('dark', theme === 'dark'); } catch {} })();`;
 
   if (!configured) {
     return (
-      <html lang={lang}>
+      <html lang={lang} suppressHydrationWarning>
         <body>
+          <script dangerouslySetInnerHTML={{ __html: themeScript }} />
           <div className="container py-6">
             <div className="card mb-4">
               <div className="text-lg font-extrabold">VideoShare</div>
@@ -65,8 +67,9 @@ export default async function RootLayout({
   const customCss = typeof (cfg as any).customCss === "string" ? (cfg as any).customCss : "";
 
   return (
-    <html lang={lang}>
+    <html lang={lang} suppressHydrationWarning>
       <body>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {flags.oneSignal ? (
           <OneSignalInit
             enabled
@@ -77,7 +80,7 @@ export default async function RootLayout({
 
         <PwaRegister />
 
-        <div className="min-h-screen bg-zinc-50">
+        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
           {/* Header */}
           <SiteHeader />
           <GlobalBannerAds scope="GLOBAL_TOP" />
