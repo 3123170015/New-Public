@@ -91,13 +91,13 @@ export default async function PremiumPage() {
           </form>
         </section>
 
-        <section className="card border-amber-200/70 dark:border-amber-400/30">
+        <section className="card card-premium-plus">
           <div className="text-lg font-extrabold">Premium+</div>
           <div className="muted mt-1 text-sm">Gói cao cấp cho sưu tầm chuyên nghiệp.</div>
           <ul className="mt-3 list-disc pl-6 text-sm">
             <li>Tất cả quyền của Premium.</li>
             <li>Có thể xem video “Premium+ only”.</li>
-            <li>Tuỳ chọn ẩn Boost ads trong feed.</li>
+            <li>Tùy chọn ẩn Boost ads trong feed.</li>
             <li>Highlight comment (badge) và có quota boost miễn phí mỗi tháng.</li>
           </ul>
 
