@@ -13,11 +13,13 @@ type StatusRes = {
   uptimeSec: number;
   load: number[];
   cpus: number;
+  cpuUsagePct: number;
   platform: string;
   release: string;
   node: string;
   configured: boolean;
   memory: { total: number; free: number; used: number; usagePct: number };
+  disk: { total: number; free: number; used: number; usagePct: number };
 };
 
 function Badge({ ok }: { ok: boolean }) {
@@ -63,7 +65,7 @@ export default function VerifyPanel() {
       const data = (await r.json()) as StatusRes;
       setStatus(data);
     } catch (e: any) {
-      setStatus({ ok: false, ts: new Date().toISOString(), uptimeSec: 0, load: [], cpus: 0, platform: "", release: "", node: "", configured: false, memory: { total: 0, free: 0, used: 0, usagePct: 0 } });
+      setStatus({ ok: false, ts: new Date().toISOString(), uptimeSec: 0, load: [], cpus: 0, cpuUsagePct: 0, platform: "", release: "", node: "", configured: false, memory: { total: 0, free: 0, used: 0, usagePct: 0 }, disk: { total: 0, free: 0, used: 0, usagePct: 0 } });
     } finally {
       setStatusLoading(false);
     }
@@ -115,13 +117,16 @@ export default function VerifyPanel() {
         <div className="card" style={{ marginTop: 12 }}>
           <b>Server status</b>
           <div className="small muted" style={{ marginTop: 6 }}>
-            {status.platform} {status.release} • Node {status.node} • CPUs {status.cpus}
+            {status.platform} {status.release} • Node {status.node} • CPUs {status.cpus} • CPU {status.cpuUsagePct}%
           </div>
           <div className="small muted" style={{ marginTop: 6 }}>
             Uptime {status.uptimeSec}s • Load {status.load.map((v) => v.toFixed(2)).join(", ") || "n/a"}
           </div>
           <div className="small muted" style={{ marginTop: 6 }}>
             Memory {Math.round(status.memory.used / 1024 / 1024)}MB / {Math.round(status.memory.total / 1024 / 1024)}MB ({status.memory.usagePct}%)
+          </div>
+          <div className="small muted" style={{ marginTop: 6 }}>
+            Disk {Math.round(status.disk.used / 1024 / 1024)}MB / {Math.round(status.disk.total / 1024 / 1024)}MB ({status.disk.usagePct}%)
           </div>
         </div>
       ) : null}

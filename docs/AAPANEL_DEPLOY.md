@@ -206,6 +206,11 @@ export TELEGRAM_CHAT_ID="123456789"
 export MONITOR_HOST="127.0.0.1"
 export MONITOR_PORT=3000
 export MONITOR_STATE_FILE="/tmp/videoshare-monitor.state"
+export MONITOR_RETRY_COUNT=3
+export MONITOR_RETRY_DELAY=2
+export MONITOR_AUTO_RESTART_WORKER=0
+export PM2_WORKER_NAME="videoshare-worker"
+export SYSTEMD_WORKER_SERVICE=""
 ```
 
 Cron gợi ý (5 phút/lần):
