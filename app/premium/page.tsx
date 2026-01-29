@@ -36,16 +36,25 @@ export default async function PremiumPage() {
   const exp = user?.membershipExpiresAt ? new Date(user.membershipExpiresAt) : null;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <div className="card">
-        <div className="text-xl font-extrabold">Premium</div>
-        <div className="small muted mt-1">
-          Premium giúp giảm quảng cáo (HTML ads) và mở khóa một số tính năng nâng cao. (Boost ads là một phần của hệ thống
-          “Boost video”.)
+    <div className="mx-auto max-w-3xl space-y-6">
+      <section className="lux-panel">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="text-xs uppercase tracking-[0.3em] text-zinc-500">Premium</div>
+            <h1 className="lux-title">Premium membership</h1>
+            <p className="muted mt-1 text-sm">
+              Trải nghiệm kiểu YouTube Premium: ít quảng cáo hơn, ưu tiên hội viên, và quyền truy cập bộ sưu tập cao cấp.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <span className="lux-pill">Ad-light</span>
+            <span className="lux-pill">Collector perks</span>
+            <span className="lux-pill">Priority access</span>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="card">
+      <section className="card">
         <div className="font-bold">Tình trạng</div>
         {!user ? (
           <div className="small muted mt-2">Bạn cần đăng nhập để mua Premium.</div>
@@ -62,38 +71,40 @@ export default async function PremiumPage() {
             </div>
           </div>
         )}
-      </div>
+      </section>
 
-      <div className="grid gap-3">
-        <div className="card">
+      <div className="grid gap-4 md:grid-cols-2">
+        <section className="card">
           <div className="text-lg font-extrabold">Premium</div>
-          <ul className="mt-2 list-disc pl-6 text-sm">
+          <div className="muted mt-1 text-sm">Gói tiêu chuẩn cho nhà sưu tầm.</div>
+          <ul className="mt-3 list-disc pl-6 text-sm">
             <li>Ẩn HTML quảng cáo (ads placements) trên web.</li>
             <li>Vẫn có thể thấy video được “Boost” (Sponsored) trong feed.</li>
             <li>Dấu tích xác nhận (verified badge) ở profile và comments.</li>
           </ul>
 
-          <form action="/api/membership/purchase" method="post" className="mt-3">
+          <form action="/api/membership/purchase" method="post" className="mt-4">
             <input type="hidden" name="tier" value="PREMIUM" />
-            <button className="btn" disabled={!user || isPremium({ membershipTier: activeTier, membershipExpiresAt: exp })}>
+            <button className="btn w-full" disabled={!user || isPremium({ membershipTier: activeTier, membershipExpiresAt: exp })}>
               Mua Premium • ⭐ {premiumPriceStars} / {premiumDays} ngày
             </button>
           </form>
-        </div>
+        </section>
 
-        <div className="card">
+        <section className="card border-amber-200/70 dark:border-amber-400/30">
           <div className="text-lg font-extrabold">Premium+</div>
-          <ul className="mt-2 list-disc pl-6 text-sm">
+          <div className="muted mt-1 text-sm">Gói cao cấp cho sưu tầm chuyên nghiệp.</div>
+          <ul className="mt-3 list-disc pl-6 text-sm">
             <li>Tất cả quyền của Premium.</li>
             <li>Có thể xem video “Premium+ only”.</li>
             <li>Tuỳ chọn ẩn Boost ads trong feed.</li>
             <li>Highlight comment (badge) và có quota boost miễn phí mỗi tháng.</li>
           </ul>
 
-          <form action="/api/membership/purchase" method="post" className="mt-3">
+          <form action="/api/membership/purchase" method="post" className="mt-4">
             <input type="hidden" name="tier" value="PREMIUM_PLUS" />
             <button
-              className="btn"
+              className="btn btn-primary w-full"
               disabled={!user || isPremiumPlus({ membershipTier: activeTier, membershipExpiresAt: exp })}
             >
               Mua Premium+ • ⭐ {premiumPlusPriceStars} / {premiumPlusDays} ngày
@@ -101,7 +112,7 @@ export default async function PremiumPage() {
           </form>
 
           {user ? (
-            <form action="/api/membership/settings" method="post" className="mt-3 grid gap-2">
+            <form action="/api/membership/settings" method="post" className="mt-4 grid gap-2">
               <input type="hidden" name="intent" value="toggleBoostAds" />
               <label className="row gap-2 text-sm">
                 <input
@@ -117,11 +128,15 @@ export default async function PremiumPage() {
               </button>
             </form>
           ) : null}
-        </div>
+        </section>
       </div>
 
       <div className="small muted">
-        Lưu ý: Premium không hoàn tiền. Nếu bạn không đủ Stars, hãy topup trong <a className="underline" href="/stars/topup">/stars/topup</a>.
+        Lưu ý: Premium không hoàn tiền. Nếu bạn không đủ Stars, hãy topup trong{" "}
+        <a className="underline" href="/stars/topup">
+          /stars/topup
+        </a>
+        .
       </div>
     </div>
   );
