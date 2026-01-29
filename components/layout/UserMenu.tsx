@@ -3,13 +3,16 @@
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
+import { t, type Language } from "@/lib/i18n";
 
 export default function UserMenu({
   name,
   userId,
+  lang,
 }: {
   name: string;
   userId?: string;
+  lang: Language;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -37,7 +40,7 @@ export default function UserMenu({
               href={`/u/${userId}`}
               onClick={() => setOpen(false)}
             >
-              Profile
+              {t(lang, "menu.profile")}
             </Link>
           ) : null}
 
@@ -46,7 +49,7 @@ export default function UserMenu({
             href="/my-channel"
             onClick={() => setOpen(false)}
           >
-            Kênh của tôi
+            {t(lang, "menu.myChannel")}
           </Link>
 
           <Link
@@ -54,7 +57,7 @@ export default function UserMenu({
             href="/notifications"
             onClick={() => setOpen(false)}
           >
-            Notifications
+            {t(lang, "menu.notifications")}
           </Link>
 
           <Link
@@ -62,7 +65,7 @@ export default function UserMenu({
             href="/settings/notifications"
             onClick={() => setOpen(false)}
           >
-            Notification settings
+            {t(lang, "menu.notificationSettings")}
           </Link>
 
           <button
@@ -70,7 +73,7 @@ export default function UserMenu({
             className="btn btn-ghost w-full justify-start"
             onClick={() => signOut({ callbackUrl: "/" })}
           >
-            Logout
+            {t(lang, "menu.logout")}
           </button>
         </div>
       ) : null}

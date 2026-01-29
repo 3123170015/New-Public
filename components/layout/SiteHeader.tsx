@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getSiteConfig } from "@/lib/siteConfig";
 import UserMenu from "./UserMenu";
+import { getRequestLanguage, t } from "@/lib/i18n";
 
 export default async function SiteHeader() {
   const session = await auth();
@@ -9,6 +10,8 @@ export default async function SiteHeader() {
   const userId = (session?.user as any)?.id as string | undefined;
 
   const site = await getSiteConfig();
+
+  const lang = await getRequestLanguage();
 
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/80 backdrop-blur">
@@ -26,61 +29,65 @@ export default async function SiteHeader() {
 
           <nav className="hidden items-center gap-2 md:flex">
             <Link className="btn btn-ghost px-3 py-2" href="/">
-              Home
+              {t(lang, "nav.home")}
             </Link>
             <Link className="btn btn-ghost px-3 py-2" href="/feed">
-              Feed
+              {t(lang, "nav.feed")}
             </Link>
             <Link className="btn btn-ghost px-3 py-2" href="/subscriptions">
-              Subscriptions
+              {t(lang, "nav.subscriptions")}
             </Link>
             {session?.user ? (
               <>
                 <Link className="btn btn-ghost px-3 py-2" href="/history">
-                  History
+                  {t(lang, "nav.history")}
                 </Link>
                 <Link className="btn btn-ghost px-3 py-2" href="/playlists">
-                  Playlists
+                  {t(lang, "nav.playlists")}
                 </Link>
               </>
             ) : null}
             <Link className="btn btn-ghost px-3 py-2" href="/trending">
-              Trending
+              {t(lang, "nav.trending")}
             </Link>
             <Link className="btn btn-ghost px-3 py-2" href="/boost">
-              Boost
+              {t(lang, "nav.boost")}
             </Link>
             <Link className="btn btn-ghost px-3 py-2" href="/nft">
-              NFT
+              {t(lang, "nav.nft")}
             </Link>
             <Link className="btn btn-ghost px-3 py-2" href="/premium">
-              Premium
+              {t(lang, "nav.premium")}
             </Link>
           </nav>
         </div>
 
         <div className="flex items-center gap-2">
           <Link className="btn btn-primary" href="/upload">
-            Upload
+            {t(lang, "nav.upload")}
           </Link>
 
           {session?.user ? (
             <Link className="btn" href="/studio">
-              Studio
+              {t(lang, "nav.studio")}
             </Link>
           ) : null}
 
           {role === "ADMIN" ? (
             <Link className="btn" href="/admin">
-              Admin
+              {t(lang, "nav.admin")}
             </Link>
           ) : null}
 
           {session?.user ? (
-            <UserMenu name={session.user.name ?? session.user.email ?? "User"} userId={userId} />
+            <UserMenu
+              name={session.user.name ?? session.user.email ?? "User"}
+              userId={userId}
+              lang={lang}
+            />
           ) : (
             <Link className="btn" href="/login">
-              Login
+              {t(lang, "nav.login")}
             </Link>
           )}
         </div>

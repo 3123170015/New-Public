@@ -14,7 +14,7 @@ async function seedAdmin() {
   const user = await prisma.user.upsert({
     where: { email },
     update: { name, passwordHash, role: "ADMIN" },
-    create: { email, name, passwordHash, role: "ADMIN" },
+    create: { email, name, passwordHash, role: "ADMIN", preferredLanguage: "vi" },
   });
 
   const grant = Number(process.env.SEED_ADMIN_STARS ?? "0");

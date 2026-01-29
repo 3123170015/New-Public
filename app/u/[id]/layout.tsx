@@ -8,6 +8,8 @@ import VerifiedBadge from "@/components/badges/VerifiedBadge";
 import SmartImage from "@/components/media/SmartImage";
 import TipCreatorButton from "@/components/tips/TipCreatorButton";
 import { getViewerFanClubTier } from "@/lib/creatorFanClub";
+import { getRequestLanguage, t } from "@/lib/i18n";
+import LanguageSwitchForm from "@/components/settings/LanguageSwitchForm";
 import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
@@ -51,9 +53,16 @@ export default async function UserLayout({
   const activeTier = getActiveMembershipTier(channelUser as any);
   const isSelf = viewerId === channelUser.id;
   const viewerFanClubTier = viewerId && !isSelf ? await getViewerFanClubTier(viewerId, channelUser.id) : null;
-  const viewerFanClubLabel = viewerFanClubTier ? (viewerFanClubTier === "BRONZE" ? "Bronze" : viewerFanClubTier === "SILVER" ? "Silver" : "Gold") : null;
+  const viewerFanClubLabel = viewerFanClubTier
+    ? viewerFanClubTier === "BRONZE"
+      ? "Bronze"
+      : viewerFanClubTier === "SILVER"
+        ? "Silver"
+        : "Gold"
+    : null;
   const sensitiveMode = isSelf ? await getSensitiveModeForUser(viewerId ?? null) : null;
   const subCount = await prisma.subscription.count({ where: { channelUserId: channelUser.id } });
+  const lang = await getRequestLanguage();
   const isSubscribed = viewerId
     ? Boolean(
         await prisma.subscription.findUnique({
@@ -92,12 +101,12 @@ export default async function UserLayout({
           ) : viewerId ? (
             <div className="flex items-center gap-2">
               <TipCreatorButton toUserId={channelUser.id} label="Tip ⭐" />
-            <form action="/api/subscriptions/toggle" method="post">
-              <input type="hidden" name="channelUserId" value={channelUser.id} />
-              <button className="btn" type="submit">
-                {isSubscribed ? "Đang theo dõi" : "Theo dõi"}
-              </button>
-            </form>
+              <form action="/api/subscriptions/toggle" method="post">
+                <input type="hidden" name="channelUserId" value={channelUser.id} />
+                <button className="btn" type="submit">
+                  {isSubscribed ? "Đang theo dõi" : "Theo dõi"}
+                </button>
+              </form>
             </div>
           ) : (
             <Link className="btn" href="/login">
@@ -138,6 +147,20 @@ export default async function UserLayout({
               Link nhanh
             </Link>
           </form>
+        </div>
+      ) : null}
+
+      {isSelf ? (
+        <div id="language" className="card">
+          <div className="font-semibold">{t(lang, "settings.language.title")}</div>
+          <div className="small muted mt-1">{t(lang, "settings.language.subtitle")}</div>
+          <div className="mt-3">
+            <LanguageSwitchForm
+              lang={lang}
+              label={t(lang, "footer.language")}
+              submitLabel={t(lang, "actions.apply")}
+            />
+          </div>
         </div>
       ) : null}
 

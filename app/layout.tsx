@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { env, flags, isConfiguredEnv } from "@/lib/env";
+import { getRequestLanguage } from "@/lib/i18n";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import GlobalBannerAds from "@/components/ads/GlobalBannerAds";
@@ -37,9 +38,11 @@ export default async function RootLayout({
 }) {
   const configured = isConfiguredEnv();
 
+  const lang = await getRequestLanguage();
+
   if (!configured) {
     return (
-      <html lang="vi">
+      <html lang={lang}>
         <body>
           <div className="container py-6">
             <div className="card mb-4">
@@ -60,7 +63,7 @@ export default async function RootLayout({
   const cfg = await getSiteConfig();
 
   return (
-    <html lang="vi">
+    <html lang={lang}>
       <body>
         {flags.oneSignal ? (
           <OneSignalInit

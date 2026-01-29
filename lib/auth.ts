@@ -34,14 +34,24 @@ export const authOptions: NextAuthOptions = {
             const parsed = credentialsSchema.safeParse(raw);
             if (!parsed.success) return null;
 
-            const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+            const user = await prisma.user.findUnique({
+              where: { email: parsed.data.email },
+              select: { id: true, email: true, name: true, image: true, role: true, passwordHash: true, preferredLanguage: true },
+            });
             if (!user?.passwordHash) return null;
 
             const ok = await compare(parsed.data.password, user.passwordHash);
             if (!ok) return null;
 
             // Keep this small; the session callback will fetch fresh membership/role from DB.
-            return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              image: user.image,
+              role: user.role,
+              preferredLanguage: user.preferredLanguage,
+            };
           },
         }),
       ]
@@ -51,6 +61,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = (user as any).role ?? "USER";
         token.uid = (user as any).id;
+        token.preferredLanguage = (user as any).preferredLanguage;
       }
       return token;
     },
@@ -62,24 +73,33 @@ export const authOptions: NextAuthOptions = {
         try {
           const u = await prisma.user.findUnique({
             where: { id: token.uid as any },
-            select: { role: true, membershipTier: true, membershipExpiresAt: true, premiumPlusHideBoostAds: true },
+            select: {
+              role: true,
+              membershipTier: true,
+              membershipExpiresAt: true,
+              premiumPlusHideBoostAds: true,
+              preferredLanguage: true,
+            },
           });
 
           (session.user as any).role = (u as any)?.role ?? (token.role as any) ?? "USER";
           (session.user as any).membershipTier = (u as any)?.membershipTier ?? "NONE";
           (session.user as any).membershipExpiresAt = (u as any)?.membershipExpiresAt ?? null;
           (session.user as any).premiumPlusHideBoostAds = Boolean((u as any)?.premiumPlusHideBoostAds ?? false);
+          (session.user as any).preferredLanguage = (u as any)?.preferredLanguage ?? null;
         } catch {
           (session.user as any).role = token.role;
           (session.user as any).membershipTier = (token as any).membershipTier ?? "NONE";
           (session.user as any).membershipExpiresAt = (token as any).membershipExpiresAt ?? null;
           (session.user as any).premiumPlusHideBoostAds = Boolean((token as any).premiumPlusHideBoostAds ?? false);
+          (session.user as any).preferredLanguage = (token as any).preferredLanguage ?? null;
         }
       } else {
         (session.user as any).role = token.role;
         (session.user as any).membershipTier = (token as any).membershipTier ?? "NONE";
         (session.user as any).membershipExpiresAt = (token as any).membershipExpiresAt ?? null;
         (session.user as any).premiumPlusHideBoostAds = Boolean((token as any).premiumPlusHideBoostAds ?? false);
+        (session.user as any).preferredLanguage = (token as any).preferredLanguage ?? null;
       }
 
       return session;

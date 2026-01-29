@@ -253,6 +253,9 @@ model User {
   // Viewer preference for sensitive videos across the site.
   sensitiveMode SensitiveMode @default(BLUR)
 
+  // UI language preference for web (matches /lib/i18n supported codes)
+  preferredLanguage String @default("vi")
+
   // Membership
   membershipTier          MembershipTier @default(NONE)
   membershipExpiresAt     DateTime?
