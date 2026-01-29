@@ -98,7 +98,7 @@ export default function TikTokVerticalFeed({
   }, [observedIds]);
 
   return (
-    <div style={{ height: showHeader ? "calc(100vh - 170px)" : "100vh", background: "#000" }}>
+    <div style={{ height: showHeader ? "calc(100vh - 170px)" : "100vh" }} className="bg-black">
       {showHeader && header ? <div style={{ height: 140 }}>{header}</div> : null}
 
       <div

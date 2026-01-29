@@ -38,6 +38,9 @@ import EarlyAccessGateClient from "./ui/EarlyAccessGateClient";
 
 export const dynamic = "force-dynamic";
 
+const demoBadges = ["Collector Edition", "Certified", "1/1 Drop"];
+const demoUpNext = ["Collector drop #1", "Collector drop #2", "Collector drop #3"];
+
 function unauthorized(): never {
   const err = new Error("Unauthorized");
   (err as any).digest = "NEXT_HTTP_ERROR;401";
@@ -102,11 +105,11 @@ export default async function VideoPage({ params, searchParams }: { params: { id
             </div>
             <div className="mt-4 space-y-2">
               <h1 className="text-2xl font-extrabold leading-tight">Demo video</h1>
-              <div className="text-sm text-neutral-600">Hệ thống chưa kết nối database (demo preview).</div>
+              <div className="text-sm text-neutral-600">Database chưa cấu hình (demo preview).</div>
               <div className="flex flex-wrap gap-2 text-xs text-neutral-500">
-                <span className="rounded-full border px-2 py-1">Collector Edition</span>
-                <span className="rounded-full border px-2 py-1">Certified</span>
-                <span className="rounded-full border px-2 py-1">1/1 Drop</span>
+                {demoBadges.map((label) => (
+                  <span key={label} className="rounded-full border px-2 py-1">{label}</span>
+                ))}
               </div>
             </div>
           </div>
@@ -128,16 +131,16 @@ export default async function VideoPage({ params, searchParams }: { params: { id
                 </div>
               </div>
               <div className="mt-4">
-                <button className="w-full rounded-xl bg-black px-3 py-2 text-sm font-semibold text-white">Collect now</button>
+                <button className="w-full rounded-xl bg-black px-3 py-2 text-sm font-semibold text-white" aria-label="Collect this item now">Collect now</button>
               </div>
             </div>
             <div className="rounded-2xl border bg-white p-4 shadow-sm">
               <div className="text-xs uppercase tracking-widest text-neutral-500">Up next</div>
               <div className="mt-3 space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="h-12 w-20 rounded-lg bg-neutral-200" />
-                    <div className="text-sm font-semibold">Collector drop #{i}</div>
+                {demoUpNext.map((label) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <div className="h-12 w-20 rounded-lg bg-neutral-200" aria-hidden="true" />
+                    <div className="text-sm font-semibold">{label}</div>
                   </div>
                 ))}
               </div>
