@@ -24,6 +24,9 @@ export async function POST(req: Request) {
   const defaultDescription = String(form.get("defaultDescription") ?? "").slice(0, 500);
   let logoUrl = String(form.get("logoUrl") ?? "").slice(0, 500) || null;
   const customCss = String(form.get("customCss") ?? "").slice(0, 20000) || null;
+  const homeSectionOrder = String(form.get("homeSectionOrder") ?? "").slice(0, 200) || "TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT";
+  const homeCategoryIds = String(form.get("homeCategoryIds") ?? "").slice(0, 500) || "";
+  const homeSectionLimit = int(form, "homeSectionLimit", 12);
 
   const gaEnabled = form.get("gaEnabled") === "on";
   const gaMeasurementId = String(form.get("gaMeasurementId") ?? "").trim() || null;
@@ -88,6 +91,9 @@ export async function POST(req: Request) {
       defaultDescription,
       logoUrl,
       customCss,
+      homeSectionOrder,
+      homeCategoryIds,
+      homeSectionLimit,
       gaEnabled,
       gaMeasurementId,
       gtmContainerId,
@@ -131,6 +137,9 @@ export async function POST(req: Request) {
       defaultDescription,
       logoUrl,
       customCss,
+      homeSectionOrder,
+      homeCategoryIds,
+      homeSectionLimit,
       gaEnabled,
       gaMeasurementId,
       gtmContainerId,

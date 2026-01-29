@@ -5,7 +5,7 @@ import { t } from "@/lib/i18nShared";
 export default async function SiteFooter() {
   const lang = await getRequestLanguage();
   return (
-    <footer className="border-t border-zinc-200/70 bg-white">
+    <footer className="border-t border-zinc-200/70 bg-white dark:border-zinc-800/70 dark:bg-zinc-950">
       <div className="container py-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="small muted">

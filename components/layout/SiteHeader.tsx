@@ -16,7 +16,7 @@ export default async function SiteHeader() {
   const lang = await getRequestLanguage();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/80 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/80 backdrop-blur dark:border-zinc-800/70 dark:bg-zinc-950/80">
       <div className="container flex items-center justify-between gap-3 py-3">
         <div className="flex items-center gap-3">
           <Link
@@ -76,6 +76,11 @@ export default async function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          <form action="/api/theme/toggle" method="post" className="flex items-center">
+            <button className="btn btn-ghost px-3 py-2" type="submit">
+              {t(lang, "nav.theme")}
+            </button>
+          </form>
           <Link className="btn btn-primary" href="/upload">
             {t(lang, "nav.upload")}
           </Link>

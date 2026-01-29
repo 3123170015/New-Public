@@ -11,11 +11,6 @@ const r2Host = safeUrlHost(process.env.R2_PUBLIC_BASE_URL || "");
 
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    // Required for `unauthorized()` in App Router to render `unauthorized.tsx`
-    // with HTTP 401 status.
-    authInterrupts: true,
-  },
   images: {
     remotePatterns: [
       ...(r2Host

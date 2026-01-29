@@ -715,6 +715,9 @@ model SiteConfig {
   defaultDescription    String   @default("VideoShare - HLS + R2")
   logoUrl               String?
   customCss             String?  @db.Text
+  homeSectionOrder      String   @default("TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT")
+  homeCategoryIds       String   @default("")
+  homeSectionLimit      Int      @default(12)
 
   gaEnabled             Boolean  @default(false)
   gaMeasurementId       String?
