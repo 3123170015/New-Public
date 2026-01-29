@@ -62,6 +62,7 @@ export default async function RootLayout({
   const { getSiteConfig } = await import("@/lib/siteConfig");
   const OneSignalInit = (await import("@/components/push/OneSignalInit")).default;
   const cfg = await getSiteConfig();
+  const customCss = typeof (cfg as any).customCss === "string" ? (cfg as any).customCss : "";
 
   return (
     <html lang={lang}>
@@ -88,6 +89,7 @@ export default async function RootLayout({
           <GlobalBannerAds scope="GLOBAL_BOTTOM" />
           <SiteFooter />
         </div>
+        {customCss ? <style data-custom-css>{customCss}</style> : null}
       </body>
     </html>
   );

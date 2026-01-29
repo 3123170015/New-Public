@@ -8,6 +8,7 @@ export const getSiteConfig = cache(async () => {
       siteName: "VideoShare",
       defaultDescription: "VideoShare - HLS + R2",
       logoUrl: null,
+      customCss: "",
       gaEnabled: false,
       gaMeasurementId: null,
       gtmContainerId: null,
@@ -67,6 +68,7 @@ export const getSiteConfig = cache(async () => {
       siteName: "VideoShare",
       defaultDescription: "VideoShare - HLS + R2",
       logoUrl: null,
+      customCss: "",
       gaEnabled: false,
       gaMeasurementId: null,
       gtmContainerId: null,
@@ -119,7 +121,13 @@ export const getSiteConfig = cache(async () => {
       updatedAt: new Date(),
     };
   }
-  return prisma.siteConfig.upsert({ where: { id: 1 }, update: {}, create: {} });
+  return prisma.siteConfig.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      customCss: "",
+    },
+  });
 });
 
 export const getHlsConfig = cache(async () => {

@@ -22,7 +22,8 @@ export async function POST(req: Request) {
   const form = await req.formData();
   const siteName = String(form.get("siteName") ?? "VideoShare").slice(0, 120);
   const defaultDescription = String(form.get("defaultDescription") ?? "").slice(0, 500);
-  const logoUrl = String(form.get("logoUrl") ?? "").slice(0, 500) || null;
+  let logoUrl = String(form.get("logoUrl") ?? "").slice(0, 500) || null;
+  const customCss = String(form.get("customCss") ?? "").slice(0, 20000) || null;
 
   const gaEnabled = form.get("gaEnabled") === "on";
   const gaMeasurementId = String(form.get("gaMeasurementId") ?? "").trim() || null;
@@ -73,12 +74,20 @@ export async function POST(req: Request) {
   // Treasury
   const treasuryUserId = String(form.get("treasuryUserId") ?? "").trim() || null;
 
+  const logoFile = form.get("themeLogoFile");
+  if (logoFile && typeof logoFile !== "string") {
+    const { uploadThemeAsset } = await import("@/lib/themeAssets");
+    const uploaded = await uploadThemeAsset(logoFile, "logo");
+    if (uploaded?.url) logoUrl = uploaded.url;
+  }
+
   await prisma.siteConfig.upsert({
     where: { id: 1 },
     update: {
       siteName,
       defaultDescription,
       logoUrl,
+      customCss,
       gaEnabled,
       gaMeasurementId,
       gtmContainerId,
@@ -121,6 +130,7 @@ export async function POST(req: Request) {
       siteName,
       defaultDescription,
       logoUrl,
+      customCss,
       gaEnabled,
       gaMeasurementId,
       gtmContainerId,
