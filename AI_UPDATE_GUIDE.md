@@ -1,4 +1,4 @@
-# AI_UPDATE_GUIDE.md — v4.16.25 — Hướng dẫn update dự án VideoShare
+# AI_UPDATE_GUIDE.md — v4.16.26 — Hướng dẫn update dự án VideoShare
 
 Mục tiêu: khi mở chat mới / giao task cho AI, AI nắm đúng:
 - kiến trúc + invariants (stack không đổi, heavy work chạy worker)
@@ -111,6 +111,6 @@ Các file được sync:
 - Added OG routes for clip/creator and daily continue-watching digest job.
 - Remember to keep docs in sync via `scripts/sync-core-docs.sh`.
 
-## v4.16.25 notes
-- Added aaPanel install/update/monitor scripts with Telegram alerts and optional auto-restart/backup.
-- Added `/api/verify/status` for health snapshot (CPU/memory/disk) and UI in `/verify`.
+## v4.16.26 notes
+- Added Theme Builder presets (theme.json + assets), Theme Manager UI `/admin/themes`, and active theme injection via CSS variables.
+- Home section order supports FEED (TikTok link) for YouTube-style homepage layout.

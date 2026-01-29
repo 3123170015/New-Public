@@ -1,4 +1,4 @@
-# ADMIN_UI.md — v4.16.25
+# ADMIN_UI.md — v4.16.26
 
 Mục tiêu: liệt kê nhanh **admin pages + admin APIs** theo đúng contract, kèm notes bảo mật (guard, pending apply, audit).
 
@@ -44,6 +44,7 @@ Mục tiêu: liệt kê nhanh **admin pages + admin APIs** theo đúng contract,
 
 ### 1.5 Site config / Ads
 - `/admin/config` → `app/admin/config/page.tsx`
+- `/admin/themes` → `app/admin/themes/page.tsx` (Theme presets manager)
 - `/admin/ads` → `app/admin/ads/page.tsx`
 
 ### 1.6 NFT (admin)
@@ -95,6 +96,7 @@ Mục tiêu: liệt kê nhanh **admin pages + admin APIs** theo đúng contract,
 ### 2.5 Site config / Ads
 - `GET/POST /api/admin/site-config` → `app/api/admin/site-config/route.ts`
 - `GET/POST /api/admin/ad-placement` → `app/api/admin/ad-placement/route.ts`
+- `GET/POST /api/admin/theme-presets` → `app/api/admin/theme-presets/route.ts`
 
 ### 2.6 NFT contracts rotation
 - `GET/POST /api/admin/nft/contracts` → `app/api/admin/nft/contracts/route.ts`

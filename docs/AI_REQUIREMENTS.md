@@ -1,6 +1,6 @@
 # AI_REQUIREMENTS.md — Checklist yêu cầu dự án VideoShare (Next.js App Router)
 
-**Current version:** v4.16.25
+**Current version:** v4.16.26
 
 > File này là checklist/contract (không phải progress). Trạng thái DONE/TODO xem `TASK_TEMPLATE_CONTINUE.md`.
 

@@ -84,6 +84,11 @@
           "file": "I18N.md"
         },
         {
+          "slug": "theme-builder",
+          "title": "Theme Builder",
+          "file": "THEME_BUILDER.md"
+        },
+        {
           "slug": "worker-ffmpeg",
           "title": "Worker / ffmpeg",
           "file": "WORKER_FFMPEG.md"

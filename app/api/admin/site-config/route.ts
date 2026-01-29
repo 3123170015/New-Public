@@ -24,7 +24,8 @@ export async function POST(req: Request) {
   const defaultDescription = String(form.get("defaultDescription") ?? "").slice(0, 500);
   let logoUrl = String(form.get("logoUrl") ?? "").slice(0, 500) || null;
   const customCss = String(form.get("customCss") ?? "").slice(0, 20000) || null;
-  const homeSectionOrder = String(form.get("homeSectionOrder") ?? "").slice(0, 200) || "TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT";
+  const activeThemeId = String(form.get("activeThemeId") ?? "").trim() || null;
+  const homeSectionOrder = String(form.get("homeSectionOrder") ?? "").slice(0, 200) || "TRENDING,FEED,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT";
   const homeCategoryIds = String(form.get("homeCategoryIds") ?? "").slice(0, 500) || "";
   const homeSectionLimit = int(form, "homeSectionLimit", 12);
 
@@ -91,6 +92,7 @@ export async function POST(req: Request) {
       defaultDescription,
       logoUrl,
       customCss,
+      activeThemeId,
       homeSectionOrder,
       homeCategoryIds,
       homeSectionLimit,
@@ -137,6 +139,7 @@ export async function POST(req: Request) {
       defaultDescription,
       logoUrl,
       customCss,
+      activeThemeId,
       homeSectionOrder,
       homeCategoryIds,
       homeSectionLimit,

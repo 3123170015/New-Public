@@ -1,3 +1,11 @@
+## 4.16.26 - 2026-01-29
+### Added
+- Theme Builder presets (theme.json + assets) with Theme Manager UI `/admin/themes`.
+- Active theme injection (CSS variables) from `SiteConfig.activeThemeId`.
+- Home section order supports FEED section for TikTok-style entry.
+
+---
+
 ## 4.16.25 - 2026-01-29
 ### Added
 - Ops automation: aaPanel install/update/monitor scripts with Telegram alerts and optional auto-restart/backup.

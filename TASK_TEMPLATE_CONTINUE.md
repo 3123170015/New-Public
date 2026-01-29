@@ -13,6 +13,7 @@ TASK REQUEST
   - Admin UI: `/admin/payments/bundles`, `/admin/payments/coupons`.
   - Manual credit/refund updated to match worker reconcile `(depositId,type)` idempotency.
 - ✅ Extra (v4.16.25): Ops automation
+- ✅ Extra (v4.16.26): Theme Builder presets + Theme Manager + runtime CSS variables
   - aaPanel install/update/monitor scripts (Telegram alerts, auto-restart).
   - `/api/verify/status` + `/verify` UI shows CPU/memory/disk snapshot.
  (v4.13.0)

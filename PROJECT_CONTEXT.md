@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md — “Tờ giấy nhớ” dự án VideoShare
 
-## Current snapshot — v4.16.25 (Jan 2026)
+## Current snapshot — v4.16.26 (Jan 2026)
 
 - **Storage redundancy**: R2 primary + optional FTP Origin (MP4) + FTP HLS (fallback playback) + Google Drive origin (deep backup). Admin `/admin/storage` dùng **pending apply 24h** + audit + notify. Worker queue `storage` chạy `apply_pending_config`, `health_scan`, `backup_origin`, `mirror_hls`, `rebuild_hls_from_drive`.
 - **HLS packaging**: Admin `/admin/hls` chọn TS / fMP4 / Hybrid; encode chạy trong worker `worker/src/jobs/encodeHls.ts`; HLS keys immutable theo `encodeId`.
@@ -10,6 +10,8 @@
 - **Player roadmap**: PeerTube vibe (hls.js ABR + stats + retry/failover + mirror switching) + R2 A/B caching plan nằm trong `TASK_TEMPLATE_CONTINUE.md`.
 - **User QoL**: `/watch-later` (resume) + `/stars/topup` UI wired to existing payments pipeline.
 - **Ops**: aaPanel install/update/monitor scripts + Telegram alerts; `/api/verify/status` health snapshot.
+- **Theme Builder**: upload theme preset (theme.json + assets) + set active preset in Admin Config, inject CSS variables at runtime.
+- **Theme Builder**: upload theme preset (theme.json + assets), set active preset in Admin Config, inject CSS variables at runtime.
 - **Growth/ARPU**:
   - **Season Pass 30d** mua bằng Stars (site-wide premium gating) + coupon discount fields in `SeasonPassPurchase`.
   - **Referral Stars**: 1–20% (admin configurable) bonus on TOPUP and EARN flows with idempotency via `ReferralBonus`.
@@ -55,7 +57,7 @@ Xem `CHATKITFULL.txt` + `AI_REQUIREMENTS.md` + `CONTRACT_CHECKLIST.md` để tr�
  - **Content reporting pipeline**: report video (`POST /api/reports/video`) + report comment (`POST /api/comments/report`) now enqueue moderation review job (`moderation:review_report`).
  - **CDN smart purge**: video publish/hide/delete/update metadata enqueue `cdn:purge_paths` (Cloudflare purge optional via `CLOUDFLARE_ZONE_ID` + `CLOUDFLARE_API_TOKEN`).
  - **Search performance**: `GET /api/search` uses MySQL FULLTEXT relevance when possible + Redis hot-query cache.
-**Current version:** v4.16.25
+**Current version:** v4.16.26
 
 > **Mục tiêu:** 1 file duy nhất tóm tắt kiến trúc, ENV, pages, flows, tips update.
 > 

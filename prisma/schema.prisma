@@ -715,7 +715,8 @@ model SiteConfig {
   defaultDescription    String   @default("VideoShare - HLS + R2")
   logoUrl               String?
   customCss             String?  @db.Text
-  homeSectionOrder      String   @default("TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT")
+  activeThemeId         String?
+  homeSectionOrder      String   @default("TRENDING,FEED,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT")
   homeCategoryIds       String   @default("")
   homeSectionLimit      Int      @default(12)
 
@@ -773,6 +774,16 @@ model SiteConfig {
 
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+}
+
+model ThemePreset {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  themeJson   Json
+  assetsJson  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model HlsConfig {

@@ -1,4 +1,4 @@
-# FEATURE_MAP.md — v4.16.25
+# FEATURE_MAP.md — v4.16.26
 
 Map nhanh: **tính năng ↔ file/folder chính**. Mục tiêu: AI/chat mới định vị code nhanh, tránh sửa nhầm chỗ / phá contract.
 
@@ -176,3 +176,10 @@ Nếu thêm feature mới: update file này + `FEATURES_AI_MAP.md` + `CHANGELOG.
   - `User.referralCode`, `User.referredById`
   - `ReferralBonus` (idempotency: unique `(sourceKind, sourceId)`)
   - Ledger: `StarTransaction.type=REFERRAL_BONUS`
+
+## 14) Theme Builder (preset)
+- Admin Config: `/admin/config` (activeThemeId + logo/custom CSS)
+- Theme Manager: `/admin/themes`
+- Preset API: `/api/admin/theme-presets`
+- DB: `ThemePreset` + `SiteConfig.activeThemeId`
+- Runtime inject: `app/layout.tsx`
