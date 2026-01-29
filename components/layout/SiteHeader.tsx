@@ -4,6 +4,7 @@ import { getSiteConfig } from "@/lib/siteConfig";
 import UserMenu from "./UserMenu";
 import { getRequestLanguage } from "@/lib/i18n";
 import { t } from "@/lib/i18nShared";
+import SmartImage from "@/components/media/SmartImage";
 
 export default async function SiteHeader() {
   const session = await auth();
@@ -22,9 +23,20 @@ export default async function SiteHeader() {
             href="/"
             className="flex items-center gap-2 font-extrabold tracking-tight hover:no-underline"
           >
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-white">
-              ▶
-            </span>
+            {site.logoUrl ? (
+              <SmartImage
+                src={site.logoUrl}
+                alt={site.siteName ?? "VideoShare"}
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-xl object-cover"
+                allowImgFallback
+              />
+            ) : (
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-white">
+                ▶
+              </span>
+            )}
             <span>{site.siteName ?? "VideoShare"}</span>
           </Link>
 

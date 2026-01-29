@@ -119,6 +119,7 @@ pm2 save
 - Admin:
   - `/admin/payments/config` mở được (ADMIN only)
   - webhooks endpoints trả 200/4xx đúng
+  - `/admin/config` → mục **Custom Design** (logo + custom CSS) hoạt động
 - Worker:
   - có log chạy queue payments/storage
   - reconcile deposit test (devnet) OK
@@ -197,6 +198,12 @@ Sau update có thể ping `/api/verify/status` để check nhanh:
 export POST_UPDATE_VERIFY=1
 export VERIFY_PORT=3000
 ```
+
+## Custom Design (logo + CSS)
+- Admin → Config → **Custom Design**
+  - Upload logo file (sẽ upload lên R2 và tự điền `Logo URL`)
+  - Nhập `Custom CSS` để override theme theo ý bạn
+- Lưu ý: cần `R2_PUBLIC_BASE_URL` để upload logo file.
 
 ## 11) Monitor auto check (Cron)
 Chạy kiểm tra DB/Redis/Worker mỗi X phút và gửi Telegram khi trạng thái thay đổi:

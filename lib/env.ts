@@ -79,6 +79,7 @@ const schema = z.object({
   TRONGRID_API_KEY: z.string().optional().default(""),
 
   DISCORD_ALERT_WEBHOOK_URL: z.string().url().optional().nullable().catch(null).default(null),
+  DEMO_HLS_URL: z.string().optional().default(""),
 
   // Creator webhooks (Task 14): strict allowlist domains, CSV (e.g. "example.com,hooks.myapp.com")
   CREATOR_WEBHOOK_ALLOWLIST: z.string().optional().default(""),

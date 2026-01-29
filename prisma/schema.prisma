@@ -714,6 +714,7 @@ model SiteConfig {
   siteName              String   @default("VideoShare")
   defaultDescription    String   @default("VideoShare - HLS + R2")
   logoUrl               String?
+  customCss             String?  @db.Text
 
   gaEnabled             Boolean  @default(false)
   gaMeasurementId       String?

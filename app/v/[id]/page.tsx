@@ -45,6 +45,9 @@ function unauthorized(): never {
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  if (!prisma) {
+    return { title: "Video" };
+  }
   const v = await prisma.video.findUnique({
     where: { id: params.id },
     select: { id: true, title: true, description: true, isSensitive: true },
@@ -84,6 +87,26 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 export default async function VideoPage({ params, searchParams }: { params: { id: string }; searchParams?: { list?: string } }) {
+  if (!prisma) {
+    const demoSrc = String(env.DEMO_HLS_URL || "").trim();
+    return (
+      <main className="mx-auto max-w-4xl px-2 pb-6">
+        <div className="flex items-start justify-between gap-4 pt-2">
+          <div>
+            <h1 className="text-2xl font-extrabold leading-tight">Demo video</h1>
+            <div className="mt-1 text-sm text-neutral-600">Hệ thống chưa kết nối database.</div>
+          </div>
+        </div>
+        <div className="mt-3">
+          {demoSrc ? (
+            <VideoPlayerClient src={demoSrc} poster="/icon.svg" mode="standard" />
+          ) : (
+            <div className="card">HLS chưa sẵn sàng.</div>
+          )}
+        </div>
+      </main>
+    );
+  }
   const v = await prisma.video.findUnique({
     where: { id: params.id },
     include: { author: true, category: true, channel: true, subtitles: true },

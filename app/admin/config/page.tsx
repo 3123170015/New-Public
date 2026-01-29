@@ -28,7 +28,7 @@ export default async function AdminConfig() {
         </CardHeader>
       </Card>
 
-      <form action="/api/admin/site-config" method="post" className="space-y-4">
+      <form action="/api/admin/site-config" method="post" className="space-y-4" encType="multipart/form-data">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Branding</CardTitle>
@@ -46,6 +46,32 @@ export default async function AdminConfig() {
             <div className="grid gap-2">
               <Label htmlFor="logoUrl">Logo URL</Label>
               <Input id="logoUrl" name="logoUrl" defaultValue={cfg.logoUrl ?? ""} />
+            </div>
+            <div className="text-xs text-zinc-500">
+              Logo hiển thị ở header. Khuyến nghị dùng URL HTTPS hoặc link R2 public. Có thể upload logo ở tab Custom Design.
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Custom Design</CardTitle>
+            <CardDescription>Tuỳ chỉnh giao diện nhanh (logo, CSS override).</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="themeLogoFile">Upload logo (tạo URL)</Label>
+              <Input id="themeLogoFile" name="themeLogoFile" type="file" accept="image/*" />
+              <div className="text-xs text-zinc-500">
+                Hệ thống sẽ upload file lên R2 và tự điền Logo URL ở trên sau khi lưu.
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="customCss">Custom CSS (optional)</Label>
+              <Textarea id="customCss" name="customCss" placeholder="/* override css */" rows={6} defaultValue={(cfg as any).customCss ?? ""} />
+            </div>
+            <div className="text-xs text-zinc-500">
+              Custom CSS sẽ được inject vào mọi trang (header/footer).
             </div>
           </CardContent>
         </Card>
