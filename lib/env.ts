@@ -7,10 +7,10 @@ import { z } from "zod";
  */
 
 const schema = z.object({
-  SITE_URL: z.string().url().optional(),
+  SITE_URL: z.string().url().optional().catch(undefined),
   DATABASE_URL: z.string().min(1).optional(),
   AUTH_SECRET: z.string().min(10).optional(),
-  NEXTAUTH_URL: z.string().url().optional(),
+  NEXTAUTH_URL: z.string().url().optional().catch(undefined),
   REDIS_URL: z.string().optional(),
 
   // Similar videos cache (Redis)
@@ -24,11 +24,11 @@ const schema = z.object({
   R2_ACCESS_KEY_ID: z.string().min(1).optional(),
   R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
   R2_BUCKET: z.string().min(1).optional(),
-  R2_PUBLIC_BASE_URL: z.string().url().optional(),
+  R2_PUBLIC_BASE_URL: z.string().url().optional().catch(undefined),
 
   // Player A/B origins (optional)
-  R2_PUBLIC_BASE_URL_A: z.string().url().optional(),
-  R2_PUBLIC_BASE_URL_B: z.string().url().optional(),
+  R2_PUBLIC_BASE_URL_A: z.string().url().optional().catch(undefined),
+  R2_PUBLIC_BASE_URL_B: z.string().url().optional().catch(undefined),
   // 0-100, percent traffic to A (rest to B). If unset, prefer A.
   R2_AB_SPLIT_PERCENT: z.coerce.number().int().min(0).max(100).optional().default(50),
 
@@ -64,11 +64,11 @@ const schema = z.object({
   PAYMENTS_TOLERANCE_BPS: z.coerce.number().int().min(0).optional().default(50),
 
   // RPC endpoints (khuyến nghị đặt riêng theo chain)
-  SOLANA_RPC_URL: z.string().url().optional().nullable().default(null),
-  EVM_RPC_URL_ETHEREUM: z.string().url().optional().nullable().default(null),
-  EVM_RPC_URL_POLYGON: z.string().url().optional().nullable().default(null),
-  EVM_RPC_URL_BSC: z.string().url().optional().nullable().default(null),
-  EVM_RPC_URL_BASE: z.string().url().optional().nullable().default(null),
+  SOLANA_RPC_URL: z.string().url().optional().nullable().catch(null).default(null),
+  EVM_RPC_URL_ETHEREUM: z.string().url().optional().nullable().catch(null).default(null),
+  EVM_RPC_URL_POLYGON: z.string().url().optional().nullable().catch(null).default(null),
+  EVM_RPC_URL_BSC: z.string().url().optional().nullable().catch(null).default(null),
+  EVM_RPC_URL_BASE: z.string().url().optional().nullable().catch(null).default(null),
 
   // Webhook provider secrets (fallback nếu không dùng DB-config)
   ALCHEMY_WEBHOOK_SIGNING_KEY: z.string().optional().default(""),
@@ -78,7 +78,7 @@ const schema = z.object({
   TRONGRID_API_URL: z.string().url().optional().nullable().default("https://api.trongrid.io"),
   TRONGRID_API_KEY: z.string().optional().default(""),
 
-  DISCORD_ALERT_WEBHOOK_URL: z.string().url().optional().nullable().default(null),
+  DISCORD_ALERT_WEBHOOK_URL: z.string().url().optional().nullable().catch(null).default(null),
 
   // Creator webhooks (Task 14): strict allowlist domains, CSV (e.g. "example.com,hooks.myapp.com")
   CREATOR_WEBHOOK_ALLOWLIST: z.string().optional().default(""),
@@ -97,7 +97,7 @@ const schema = z.object({
   NFT_STORAGE_PROVIDER: z.enum(["NFT_STORAGE", "LIGHTHOUSE"]).optional().default("NFT_STORAGE"),
   NFT_STORAGE_API_KEY: z.string().optional().default(""),
   LIGHTHOUSE_API_KEY: z.string().optional().default(""),
-  IPFS_GATEWAY_BASE_URL: z.string().url().optional().default("https://ipfs.io/ipfs"),
+  IPFS_GATEWAY_BASE_URL: z.string().url().optional().catch(undefined).default("https://ipfs.io/ipfs"),
 });
 
 export type Env = z.infer<typeof schema>;

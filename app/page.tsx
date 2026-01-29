@@ -29,7 +29,7 @@ export default async function HomePage() {
   const isPPlus = activeTier === "PREMIUM_PLUS";
   const hideBoostAds = isPPlus && Boolean((session?.user as any)?.premiumPlusHideBoostAds);
 
-  const boostedOrders = hideBoostAds
+  const boostedOrders = hideBoostAds || !prisma
     ? []
     : await prisma.boostOrder.findMany({
         where: { status: "ACTIVE", endAt: { gt: new Date() } },
@@ -43,18 +43,20 @@ export default async function HomePage() {
     .filter((v) => v && v.status === "PUBLISHED")
     .slice(0, 12);
 
-  const recentPosts = await prisma.communityPost.findMany({
-    where: { isDeleted: false },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-    include: {
-      author: { select: { id: true, name: true } },
-      pollOptions: { orderBy: { sort: "asc" }, include: { _count: { select: { votes: true } } } },
-    },
-  });
+  const recentPosts = prisma
+    ? await prisma.communityPost.findMany({
+        where: { isDeleted: false },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+        include: {
+          author: { select: { id: true, name: true } },
+          pollOptions: { orderBy: { sort: "asc" }, include: { _count: { select: { votes: true } } } },
+        },
+      })
+    : [];
 
   const voteMap = new Map<string, string>();
-  if (viewerId && recentPosts.length) {
+  if (viewerId && recentPosts.length && prisma) {
     const votes = await prisma.communityPollVote.findMany({
       where: { userId: viewerId, postId: { in: (recentPosts as CommunityPostRow[]).map((p: CommunityPostRow) => p.id) } },
       select: { postId: true, optionId: true },
@@ -62,12 +64,14 @@ export default async function HomePage() {
     for (const v of votes) voteMap.set(v.postId, v.optionId);
   }
 
-  const recentProgress = viewerId ? await prisma.videoProgress.findMany({
-    where: { userId: viewerId },
-    orderBy: { updatedAt: "desc" },
-    take: 6,
-    include: { video: true },
-  }) : [];
+  const recentProgress = viewerId && prisma
+    ? await prisma.videoProgress.findMany({
+        where: { userId: viewerId },
+        orderBy: { updatedAt: "desc" },
+        take: 6,
+        include: { video: true },
+      })
+    : [];
 
   return (
     <main className="mx-auto max-w-3xl space-y-4">
