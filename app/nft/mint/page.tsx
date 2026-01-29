@@ -12,7 +12,7 @@ export default async function NftMintPage() {
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");
 
-  const tier = getActiveMembershipTier((session.user as any) ?? {} as any);
+  const tier = getActiveMembershipTier((session?.user as any) ?? ({} as any));
   const cfg = await getSiteConfig();
 
   if (tier !== "PREMIUM_PLUS") {
@@ -36,22 +36,26 @@ export default async function NftMintPage() {
   type MintedRow = Awaited<ReturnType<typeof prisma.nftItem.findMany>>[number];
   type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
 
-  const minted = await prisma.nftItem.findMany({
-    where: { videoId: { not: null }, collection: { creatorId: userId } },
-    select: { videoId: true },
-  });
+  const minted = prisma
+    ? await prisma.nftItem.findMany({
+        where: { videoId: { not: null }, collection: { creatorId: userId } },
+        select: { videoId: true },
+      })
+    : [];
   const mintedIds = new Set((minted as MintedRow[]).map((m: MintedRow) => m.videoId!).filter(Boolean));
 
-  const videos = await prisma.video.findMany({
-    where: {
-      authorId: userId,
-      status: "PUBLISHED",
-      id: { notIn: Array.from(mintedIds) },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-    select: { id: true, title: true, description: true, thumbKey: true },
-  });
+  const videos = prisma
+    ? await prisma.video.findMany({
+        where: {
+          authorId: userId,
+          status: "PUBLISHED",
+          id: { notIn: Array.from(mintedIds) },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        select: { id: true, title: true, description: true, thumbKey: true },
+      })
+    : [];
 
   return (
     <main className="mx-auto max-w-3xl space-y-4">

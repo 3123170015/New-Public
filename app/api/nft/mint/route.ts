@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const tier = getActiveMembershipTier((session.user as any) ?? {} as any);
+  const tier = getActiveMembershipTier((session?.user as any) ?? ({} as any));
   if (tier !== "PREMIUM_PLUS") {
     return Response.json({ error: "Premium+ required" }, { status: 403 });
   }
