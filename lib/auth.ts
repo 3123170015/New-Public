@@ -1,4 +1,5 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import { env } from "./env";
@@ -108,4 +109,14 @@ export const authOptions: NextAuthOptions = {
   pages: { signIn: "/login" },
 };
 
-export const { handlers, auth } = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export const handlers = { GET: handler, POST: handler };
+
+export async function auth() {
+  try {
+    return await getServerSession(authOptions);
+  } catch {
+    return null;
+  }
+}
