@@ -79,6 +79,11 @@
           "file": "AAPANEL_DEPLOY.md"
         },
         {
+          "slug": "ui-language",
+          "title": "UI Language (i18n)",
+          "file": "I18N.md"
+        },
+        {
           "slug": "worker-ffmpeg",
           "title": "Worker / ffmpeg",
           "file": "WORKER_FFMPEG.md"

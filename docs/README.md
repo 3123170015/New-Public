@@ -12,6 +12,7 @@
 - Payments ops: **Fraud Radar** admin page `/admin/payments/fraud` (FraudAlert triage: OPEN/ACKED/RESOLVED).
 - Notifications: weekly digest + **daily continue-watching digest** (in-app, optional).
 - Ops: aaPanel install/update/monitor scripts, Telegram alerts, `/api/verify/status` health snapshot.
+- Localization: basic UI language selector (vi/en/zh/id/ms) in member settings + footer (cookie + account preference).
 VideoShare là nền tảng chia sẻ video: **Upload → Worker (ffmpeg) → HLS → Playback**, kèm **Stars/Payments**, **Studio**, và lớp tính năng **NFT-gated / Membership**.
 
 > **Nếu bạn là AI/chat mới:** copy/paste nguyên `CHATKITFULL.txt` vào chat trước, rồi mới bắt đầu làm task.
