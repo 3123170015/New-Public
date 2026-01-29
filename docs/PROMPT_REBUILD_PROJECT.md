@@ -1,4 +1,4 @@
-Current Version: 4.16.20
+Current Version: 4.16.25
 
 ## v4.16.x additions (Storage + HLS + Trust & Safety)
 - Storage redundancy: Admin `/admin/storage` (verify + test upload + pending apply 24h + audit) + worker queue `storage` (apply_pending_config, health_scan, backup_origin, mirror_hls, rebuild_hls_from_drive).
@@ -23,7 +23,7 @@ Current Version: 4.16.20
 
 > Dùng file này làm **prompt gốc** khi mở chat mới để AI có thể **rebuild toàn bộ dự án VideoShare Next.js từ đầu** đúng stack/contract.
 
-**Target version:** v4.16.22
+**Target version:** v4.16.25
 
 ---
 

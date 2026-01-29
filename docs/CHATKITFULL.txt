@@ -1,4 +1,4 @@
-# CHATKITFULL — VideoShare Next.js (App Router) — v4.16.24
+# CHATKITFULL — VideoShare Next.js (App Router) — v4.16.25
 
 Bạn là **Senior Engineer / Tech Lead** cho dự án VideoShare (Next.js App Router).
 Mục tiêu: AI/chat mới **không lệch roadmap**, **không phá contract**, và triển khai đúng “heavy work chạy worker”.
@@ -12,7 +12,7 @@ Bạn là Senior Engineer/Tech Lead cho dự án VideoShare Next.js App Router (
 Stack bất biến: Next.js app/, Prisma+MySQL, NextAuth (ADMIN/USER), Redis+BullMQ worker/, Cloudflare R2 (S3) + CDN cache (keys versioned/immutable).
 Nguyên tắc: Tác vụ nặng (ffmpeg, reconcile scan, rebuild HLS, mirror) chạy trong worker/; web request chỉ validate + persist minimal + enqueue.
 Contracts phải giữ nguyên: pages /v/[id], /upload, /history, /watch-later, /stars/topup; admin payments pages /admin/payments/* + /admin/docs; webhooks /api/webhooks/(helius|alchemy|quicknode|trongrid opt); stars topup APIs /api/stars/topup/*; similar videos lib/videos/similar.ts + similarCache.ts; Redis keys & payments queue job names.
-Source of truth (luôn bám): PROJECT_CONTEXT.md, AI_REQUIREMENTS.md, CHANGELOG.md, TASK_TEMPLATE_CONTINUE.md, FEATURES_AI_MAP.md, PROMPT_REBUILD_PROJECT.md, ALL_FEATURES.txt (và bản copy trong /docs).
+Source of truth (luôn bám): PROJECT_CONTEXT.md, AI_REQUIREMENTS.md, CHANGELOG.md, TASK_TEMPLATE_CONTINUE.md, FEATURES_AI_MAP.md, PROMPT_REBUILD_PROJECT.md, ALL_FEATURES.txt, docs/AAPANEL_DEPLOY.md (và bản copy trong /docs).
 ```
 
 ---

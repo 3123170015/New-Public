@@ -1,6 +1,6 @@
-# VideoShare Next.js (App Router) — v4.16.24
+# VideoShare Next.js (App Router) — v4.16.25
 
-## Current status (v4.16.24)
+## Current status (v4.16.25)
 
 - Storage redundancy (R2 primary + optional FTP Origin/HLS + Google Drive origin) with **24h delayed apply** and audit feed.
 - Admin HLS packaging modes: **TS**, **fMP4**, **Hybrid**.
@@ -11,6 +11,7 @@
 - Share Cards (OpenGraph images): video/clip/creator routes under `/api/og/*`.
 - Payments ops: **Fraud Radar** admin page `/admin/payments/fraud` (FraudAlert triage: OPEN/ACKED/RESOLVED).
 - Notifications: weekly digest + **daily continue-watching digest** (in-app, optional).
+- Ops: aaPanel install/update/monitor scripts, Telegram alerts, `/api/verify/status` health snapshot.
 VideoShare là nền tảng chia sẻ video: **Upload → Worker (ffmpeg) → HLS → Playback**, kèm **Stars/Payments**, **Studio**, và lớp tính năng **NFT-gated / Membership**.
 
 > **Nếu bạn là AI/chat mới:** copy/paste nguyên `CHATKITFULL.txt` vào chat trước, rồi mới bắt đầu làm task.
@@ -25,6 +26,7 @@ Khi mở chat mới hoặc cập nhật dự án, đọc theo thứ tự (có b�
 6) `FEATURES_AI_MAP.md`
 7) `PROMPT_REBUILD_PROJECT.md`
 8) `ALL_FEATURES.txt`
+9) `docs/AAPANEL_DEPLOY.md`
 
 ## Stack & architecture (không được phá)
 - Next.js App Router (`app/`) + TypeScript
@@ -44,7 +46,7 @@ Khi mở chat mới hoặc cập nhật dự án, đọc theo thứ tự (có b�
 - Similar: `lib/videos/similar.ts` + `lib/videos/similarCache.ts`
 - Worker/Queues (payments) + Redis keys contracts phải giữ nguyên.
 
-## What’s new (v4.16.x → v4.16.24)
+## What’s new (v4.16.x → v4.16.25)
 ### Storage redundancy + tự phục hồi HLS (v4.16.6+)
 - **R2 primary** + tuỳ chọn **FTP Origin (MP4 gốc)** + **FTP HLS (mirror HLS + fallback playback)**.
 - **Google Drive origin** (Service Account JSON): deep backup để **rebuild HLS** nếu R2 + FTP HLS đều hỏng.
@@ -52,6 +54,9 @@ Khi mở chat mới hoặc cập nhật dự án, đọc theo thứ tự (có b�
   - `/admin/storage`: config + verify + test upload + **pending apply sau 24h**
   - `/admin/storage/events`: audit feed
 - Worker queue `storage`: repeatables `apply_pending_config`, `health_scan`; jobs `backup_origin`, `mirror_hls`, `rebuild_hls_from_drive`.
+### Ops automation (v4.16.25)
+- aaPanel install/update/monitor scripts with Telegram alerts + optional auto-restart/backup.
+- `/api/verify/status` health snapshot (CPU/memory/disk) + `/verify` UI.
 
 ### HLS packaging (Admin `/admin/hls`) (v4.16.9+)
 Admin có 3 mode:
@@ -100,6 +105,7 @@ npm run package:full
 - `docs/FEATURE_MAP.md`: map tính năng ↔ file/folder
 - `docs/ENV.md`: env keys quan trọng
 - `docs/AAPANEL_DEPLOY.md`: deploy VPS aaPanel
+- `scripts/aapanel-monitor.sh`: cron check DB/Redis/Worker + Telegram alert
 
 ---
 Nếu bạn là AI/assistant mới trong dự án: mở `CHATKITFULL.txt` và dán vào chat mới để bootstrap bối cảnh đầy đủ.

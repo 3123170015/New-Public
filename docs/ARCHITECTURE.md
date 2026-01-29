@@ -1,4 +1,4 @@
-# ARCHITECTURE.md — v4.16.22
+# ARCHITECTURE.md — v4.16.25
 
 Tài liệu này mô tả kiến trúc tổng thể VideoShare, các “luồng xương sống” và các invariants không được phá.
 
@@ -17,6 +17,7 @@ Tài liệu này mô tả kiến trúc tổng thể VideoShare, các “luồng 
 - `worker/` — jobs, queue registration, ffmpeg pipeline, background scans
 - `prisma/` — schema + seed
 - `docs/` — docs mirror (root sync)
+- `scripts/aapanel-*.sh` — aaPanel deploy/update/monitor helpers
 
 ## 3) Invariants (không thương lượng)
 ### 3.1 Heavy work chạy worker
@@ -145,3 +146,6 @@ Ba mode:
   - Referral bonus: `ReferralBonus` unique `(sourceKind, sourceId)` để chống double-credit.
 - Premium gating:
   - `SeasonPass` active (endsAt > now) được xem/interact premium (site-wide), vẫn tôn trọng block/banned/owner rules ở `canViewVideo`.
+## Ops / health checks
+- `/verify` UI + `/api/verify/status` endpoint (CPU/memory/disk snapshot)
+- aaPanel monitor script (`scripts/aapanel-monitor.sh`) for DB/Redis/Worker checks + Telegram alerts

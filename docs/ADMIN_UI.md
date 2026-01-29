@@ -1,4 +1,4 @@
-# ADMIN_UI.md — v4.16.22
+# ADMIN_UI.md — v4.16.25
 
 Mục tiêu: liệt kê nhanh **admin pages + admin APIs** theo đúng contract, kèm notes bảo mật (guard, pending apply, audit).
 
@@ -132,3 +132,7 @@ Nếu thêm trang admin mới: update file này + `docs/docs.nav.json` (nếu c�
 - Referrals:
   - `GET /api/referrals/me`
   - `POST /api/referrals/claim`
+
+## Ops / Verify
+- `/verify` (system checks UI)
+- `/api/verify/status` (CPU/memory/disk snapshot)

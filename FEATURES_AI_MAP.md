@@ -1,9 +1,9 @@
-# FEATURES_AI_MAP.md — v4.16.22
+# FEATURES_AI_MAP.md — v4.16.25
 
 > Mục tiêu: giúp AI (khi mở chat mới) tìm đúng file/entrypoint nhanh nhất.
 > File này map theo **code hiện có** trong repo (không phải wishlist).
 
-**Current version:** v4.16.22
+**Current version:** v4.16.25
 
 ---
 
@@ -110,4 +110,5 @@
 - Queue registration: `lib/queues.ts`, `worker/src/index.ts`
 - Core docs sync: `scripts/sync-core-docs.sh`
 - Contract-check: `scripts/contract-check.sh`
-
+- Monitor script: `scripts/aapanel-monitor.sh` (DB/Redis/Worker checks + Telegram alerts)
+- Health status: `/api/verify/status` + `/verify` UI

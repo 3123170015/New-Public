@@ -155,7 +155,7 @@ pm2 save
 ---
 Nếu bạn muốn, mình có thể thêm `docs/OPS_RUNBOOK.md` (SRE-lite) để quy định rotate keys, backups, và incident playbook.
 ## 10) Update tự động (GitHub releases)
-Nếu repo có tag release (vd `v4.16.24`), có thể chạy script update:
+Nếu repo có tag release (vd `v4.16.25`), có thể chạy script update:
 ```bash
 bash scripts/aapanel-update.sh --yes
 ```

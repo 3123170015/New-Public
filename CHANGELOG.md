@@ -1,3 +1,11 @@
+## 4.16.25 - 2026-01-29
+### Added
+- Ops automation: aaPanel install/update/monitor scripts with Telegram alerts and optional auto-restart/backup.
+- Health status: `/api/verify/status` endpoint + `/verify` UI shows CPU/memory/disk.
+- Monitor: retry/backoff health checks + worker auto-restart support.
+
+---
+
 ## 4.16.24 - 2026-01-28
 ### Added
 - Admin (Payments):

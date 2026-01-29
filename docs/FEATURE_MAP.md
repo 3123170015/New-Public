@@ -1,4 +1,4 @@
-# FEATURE_MAP.md — v4.16.22
+# FEATURE_MAP.md — v4.16.25
 
 Map nhanh: **tính năng ↔ file/folder chính**. Mục tiêu: AI/chat mới định vị code nhanh, tránh sửa nhầm chỗ / phá contract.
 
@@ -127,6 +127,11 @@ Map nhanh: **tính năng ↔ file/folder chính**. Mục tiêu: AI/chat mới đ
 - UI: `app/nft/*`, `app/studio/clips/*`, `app/studio/membership/*`
 - APIs: `app/api/nft/*`
 - Worker queue `nft`: `worker/src/jobs/nft/*`
+
+## 13) Ops / Health checks
+- `/verify` → `app/verify/page.tsx` (system checks UI)
+- `/api/verify/status` → `app/api/verify/status/route.ts` (CPU/memory/disk snapshot)
+- aaPanel monitor: `scripts/aapanel-monitor.sh`
 
 ---
 Nếu thêm feature mới: update file này + `FEATURES_AI_MAP.md` + `CHANGELOG.md`, và sync core docs.

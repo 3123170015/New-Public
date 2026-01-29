@@ -12,6 +12,9 @@ TASK REQUEST
   - Coupons: TOPUP coupon adds bonus stars; Season Pass coupon discounts price; redemptions are recorded.
   - Admin UI: `/admin/payments/bundles`, `/admin/payments/coupons`.
   - Manual credit/refund updated to match worker reconcile `(depositId,type)` idempotency.
+- ✅ Extra (v4.16.25): Ops automation
+  - aaPanel install/update/monitor scripts (Telegram alerts, auto-restart).
+  - `/api/verify/status` + `/verify` UI shows CPU/memory/disk snapshot.
  (v4.13.0)
 - ✅ Task 1: Sensitive videos (SHOW/BLUR/HIDE), PeerTube-like gate + blur thumbnails + OG warning; admin/user settings; bulk actions; violator-only + interactions lock.
 - ✅ Task 2: Premium/Premium+ (pay in stars) + badge; Premium hides non-boost ads; Premium+ can optionally hide boost ads + free boost quota tracking + comment highlight.
@@ -330,4 +333,3 @@ DONE:
 - TODO: **AI highlight detector** (worker) gợi ý đoạn 15–60s để tạo clip nhanh (opt-in).
 - TODO: **Collab revenue split tracking** (ledger templates) cho series collab + minh bạch doanh thu.
 - TODO: **Supporter CRM-lite**: export “top fans” + tags + gửi “drops/coupons” mục tiêu (in-app notifications).
-

@@ -1,4 +1,4 @@
-# AI_UPDATE_GUIDE.md — v4.16.24 — Hướng dẫn update dự án VideoShare
+# AI_UPDATE_GUIDE.md — v4.16.25 — Hướng dẫn update dự án VideoShare
 
 Mục tiêu: khi mở chat mới / giao task cho AI, AI nắm đúng:
 - kiến trúc + invariants (stack không đổi, heavy work chạy worker)
@@ -18,7 +18,7 @@ Stack bất biến: Prisma+MySQL, NextAuth (ADMIN/USER), Redis+BullMQ worker/, C
 Quy tắc: heavy work chạy worker/, web request chỉ enqueue.
 Contracts: /v/[id], /upload, /history, /watch-later, /stars/topup; admin payments /admin/payments/* + /admin/docs; webhooks /api/webhooks/(helius|alchemy|quicknode|trongrid opt); stars topup /api/stars/topup/*; similar lib/videos/similar.ts + similarCache.ts; payments queue jobs + Redis keys giữ nguyên.
 Roadmap v4.16.x: Storage redundancy (/admin/storage + 24h delayed apply + worker storage queue), HLS packaging (/admin/hls TS/fMP4/Hybrid), Player roadmap PeerTube vibe (Phase 1→3) trong TASK_TEMPLATE_CONTINUE.md, Growth/Monetization: Season Pass 30d + Referral Stars (1–20%), ARPU: Bundles (topup bonus) + Coupons (topup bonus / season pass discount).
-Source of truth: PROJECT_CONTEXT.md, AI_REQUIREMENTS.md, CHANGELOG.md, TASK_TEMPLATE_CONTINUE.md, FEATURES_AI_MAP.md, PROMPT_REBUILD_PROJECT.md, ALL_FEATURES.txt (và /docs copy).
+Source of truth: PROJECT_CONTEXT.md, AI_REQUIREMENTS.md, CHANGELOG.md, TASK_TEMPLATE_CONTINUE.md, FEATURES_AI_MAP.md, PROMPT_REBUILD_PROJECT.md, ALL_FEATURES.txt, docs/AAPANEL_DEPLOY.md (và /docs copy).
 ```
 
 ---
@@ -32,6 +32,7 @@ Source of truth: PROJECT_CONTEXT.md, AI_REQUIREMENTS.md, CHANGELOG.md, TASK_TEMP
 6) `FEATURES_AI_MAP.md` + `docs/FEATURE_MAP.md`
 7) `PROMPT_REBUILD_PROJECT.md`
 8) `ALL_FEATURES.txt`
+9) `docs/AAPANEL_DEPLOY.md`
 
 ---
 
@@ -87,6 +88,7 @@ Các file được sync:
 - `FEATURES_AI_MAP.md`
 - `PROMPT_REBUILD_PROJECT.md`
 - `ALL_FEATURES.txt`
+- `docs/AAPANEL_DEPLOY.md`
 - `CONTRACT_CHECKLIST.md`
 - `CHATKITFULL.txt`
 
@@ -108,3 +110,7 @@ Các file được sync:
 ## v4.16.20 notes
 - Added OG routes for clip/creator and daily continue-watching digest job.
 - Remember to keep docs in sync via `scripts/sync-core-docs.sh`.
+
+## v4.16.25 notes
+- Added aaPanel install/update/monitor scripts with Telegram alerts and optional auto-restart/backup.
+- Added `/api/verify/status` for health snapshot (CPU/memory/disk) and UI in `/verify`.

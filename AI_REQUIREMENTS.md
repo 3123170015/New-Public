@@ -1,6 +1,6 @@
 # AI_REQUIREMENTS.md — Checklist yêu cầu dự án VideoShare (Next.js App Router)
 
-**Current version:** v4.16.24
+**Current version:** v4.16.25
 
 > File này là checklist/contract (không phải progress). Trạng thái DONE/TODO xem `TASK_TEMPLATE_CONTINUE.md`.
 
@@ -41,6 +41,7 @@
 - Không đổi routes/jobs/Redis keys trong `CONTRACT_CHECKLIST.md`.
 - Trước khi release: chạy `bash scripts/contract-check.sh`.
 - Hoàn tất task: bump version + update `CHANGELOG.md` + sync docs core (root + `/docs`) + export ZIP slim.
+- Ops: nếu thêm scripts/health checks, update `docs/AAPANEL_DEPLOY.md` + `/verify` status endpoints.
 
 ---
 
