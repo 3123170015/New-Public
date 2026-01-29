@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   }
   if (!user) return Response.json({ error: "User not found" }, { status: 404 });
 
-  const tier = getActiveMembershipTier(session?.user as any);
+  const tier = getActiveMembershipTier((session?.user as any) ?? ({} as any));
   const isPremiumPlus = tier === "PREMIUM_PLUS";
   const freeQuota = Math.max(0, Number(cfg.premiumPlusFreeBoostsPerMonth ?? 0));
 

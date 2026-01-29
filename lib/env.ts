@@ -20,10 +20,10 @@ const schema = z.object({
   UPLOAD_MAX_BYTES: z.coerce.number().int().positive().optional().default(2147483648),
   UPLOAD_PART_BYTES: z.coerce.number().int().positive().optional().default(209715200),
 
-  R2_ACCOUNT_ID: z.string().min(1).optional(),
-  R2_ACCESS_KEY_ID: z.string().min(1).optional(),
-  R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
-  R2_BUCKET: z.string().min(1).optional(),
+  R2_ACCOUNT_ID: z.string().min(1).optional().catch(undefined),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional().catch(undefined),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional().catch(undefined),
+  R2_BUCKET: z.string().min(1).optional().catch(undefined),
   R2_PUBLIC_BASE_URL: z.string().url().optional().catch(undefined),
 
   // Player A/B origins (optional)

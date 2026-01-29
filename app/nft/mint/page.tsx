@@ -33,29 +33,38 @@ export default async function NftMintPage() {
     );
   }
 
-  type MintedRow = Awaited<ReturnType<typeof prisma.nftItem.findMany>>[number];
-  type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+  type MintedRow = Awaited<ReturnType<NonNullable<typeof prisma>["nftItem"]["findMany"]>>[number];
+  type VideoRow = Awaited<ReturnType<NonNullable<typeof prisma>["video"]["findMany"]>>[number];
 
-  const minted = prisma
-    ? await prisma.nftItem.findMany({
-        where: { videoId: { not: null }, collection: { creatorId: userId } },
-        select: { videoId: true },
-      })
-    : [];
+  if (!prisma) {
+    return (
+      <main className="mx-auto max-w-2xl space-y-4">
+        <div className="card">
+          <div className="text-sm font-semibold">Mint NFT</div>
+          <div className="small muted" style={{ marginTop: 8 }}>
+            Hệ thống chưa kết nối database. Vui lòng thử lại sau.
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  const minted = await prisma.nftItem.findMany({
+    where: { videoId: { not: null }, collection: { creatorId: userId } },
+    select: { videoId: true },
+  });
   const mintedIds = new Set((minted as MintedRow[]).map((m: MintedRow) => m.videoId!).filter(Boolean));
 
-  const videos = prisma
-    ? await prisma.video.findMany({
-        where: {
-          authorId: userId,
-          status: "PUBLISHED",
-          id: { notIn: Array.from(mintedIds) },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 50,
-        select: { id: true, title: true, description: true, thumbKey: true },
-      })
-    : [];
+  const videos = await prisma.video.findMany({
+    where: {
+      authorId: userId,
+      status: "PUBLISHED",
+      id: { notIn: Array.from(mintedIds) },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+    select: { id: true, title: true, description: true, thumbKey: true },
+  });
 
   return (
     <main className="mx-auto max-w-3xl space-y-4">

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { env } from "@/lib/env";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function escapeXml(s: string) {
   return s
@@ -22,22 +23,26 @@ function baseUrl(req: Request) {
 
 export async function GET(req: Request) {
   const base = baseUrl(req);
-  const site = await prisma.siteConfig.findFirst({ where: { id: 1 }, select: { siteName: true, defaultDescription: true } });
+  const site = prisma
+    ? await prisma.siteConfig.findFirst({ where: { id: 1 }, select: { siteName: true, defaultDescription: true } })
+    : null;
 
-  type RssVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
-  const videos = await prisma.video.findMany({
-    where: { status: "PUBLISHED", access: "PUBLIC", isSensitive: false },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      createdAt: true,
-      updatedAt: true,
-      author: { select: { id: true, name: true, username: true } },
-    },
-  });
+  type RssVideoRow = Awaited<ReturnType<NonNullable<typeof prisma>["video"]["findMany"]>>[number];
+  const videos = prisma
+    ? await prisma.video.findMany({
+        where: { status: "PUBLISHED", access: "PUBLIC", isSensitive: false },
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          createdAt: true,
+          updatedAt: true,
+          author: { select: { id: true, name: true, username: true } },
+        },
+      })
+    : [];
 
   const channelTitle = site?.siteName ?? "VideoShare";
   const channelDesc = site?.defaultDescription ?? "VideoShare";
