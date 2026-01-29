@@ -105,7 +105,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
             </div>
             <div className="mt-4 space-y-2">
               <h1 className="text-2xl font-extrabold leading-tight">Demo video</h1>
-              <div className="text-sm text-neutral-600">Database chưa cấu hình (demo preview).</div>
+              <div className="text-sm text-neutral-600">Database not configured (demo preview).</div>
               <div className="flex flex-wrap gap-2 text-xs text-neutral-500">
                 {demoBadges.map((label) => (
                   <span key={label} className="rounded-full border px-2 py-1">{label}</span>
