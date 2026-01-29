@@ -9,7 +9,8 @@ export const getSiteConfig = cache(async () => {
       defaultDescription: "VideoShare - HLS + R2",
       logoUrl: null,
       customCss: "",
-      homeSectionOrder: "TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT",
+      activeThemeId: null,
+      homeSectionOrder: "TRENDING,FEED,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT",
       homeCategoryIds: "",
       homeSectionLimit: 12,
       gaEnabled: false,
@@ -71,6 +72,13 @@ export const getSiteConfig = cache(async () => {
       customCss: "",
     },
   });
+});
+
+export const getActiveThemePreset = cache(async () => {
+  if (!prisma) return null;
+  const cfg = await prisma.siteConfig.findUnique({ where: { id: 1 } });
+  if (!cfg?.activeThemeId) return null;
+  return prisma.themePreset.findUnique({ where: { id: cfg.activeThemeId } });
 });
 
 export const getHlsConfig = cache(async () => {

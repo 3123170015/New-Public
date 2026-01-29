@@ -1,4 +1,4 @@
-# CHATKITFULL — VideoShare Next.js (App Router) — v4.16.25
+# CHATKITFULL — VideoShare Next.js (App Router) — v4.16.26
 
 Bạn là **Senior Engineer / Tech Lead** cho dự án VideoShare (Next.js App Router).
 Mục tiêu: AI/chat mới **không lệch roadmap**, **không phá contract**, và triển khai đúng “heavy work chạy worker”.

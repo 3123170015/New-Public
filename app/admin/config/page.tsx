@@ -56,9 +56,16 @@ export default async function AdminConfig() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Custom Design</CardTitle>
-            <CardDescription>Tuỳ chỉnh giao diện nhanh (logo, CSS override).</CardDescription>
+            <CardDescription>Tuỳ chỉnh giao diện nhanh (logo, CSS override, theme preset).</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="activeThemeId">Theme preset ID (optional)</Label>
+              <Input id="activeThemeId" name="activeThemeId" defaultValue={(cfg as any).activeThemeId ?? ""} />
+              <div className="text-xs text-zinc-500">
+                Nhập ID của theme preset đã upload để áp dụng toàn site.
+              </div>
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="themeLogoFile">Upload logo (tạo URL)</Label>
               <Input id="themeLogoFile" name="themeLogoFile" type="file" accept="image/*" />
@@ -87,10 +94,10 @@ export default async function AdminConfig() {
               <Input
                 id="homeSectionOrder"
                 name="homeSectionOrder"
-                defaultValue={(cfg as any).homeSectionOrder ?? "TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT"}
+                defaultValue={(cfg as any).homeSectionOrder ?? "TRENDING,FEED,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT"}
               />
               <div className="text-xs text-zinc-500">
-                Giá trị ví dụ: TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT,CATEGORIES
+                Giá trị ví dụ: TRENDING,FEED,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT,CATEGORIES
               </div>
             </div>
             <div className="grid gap-2">
@@ -379,6 +386,43 @@ export default async function AdminConfig() {
             <Separator />
             <div className="flex items-center justify-end gap-2">
               <Button type="submit">Save</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+
+      <form action="/api/admin/theme-presets" method="post" encType="multipart/form-data" className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Theme Builder (preset upload)</CardTitle>
+            <CardDescription>Upload theme.json + assets (logo/background). Không upload code.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="themePresetName">Preset name</Label>
+              <Input id="themePresetName" name="name" />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="themePresetDesc">Description</Label>
+              <Textarea id="themePresetDesc" name="description" rows={3} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="themePresetJson">theme.json</Label>
+              <Input id="themePresetJson" name="themeJson" type="file" accept="application/json" />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="themePresetLogo">Logo asset</Label>
+              <Input id="themePresetLogo" name="logoFile" type="file" accept="image/*" />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="themePresetBg">Background asset</Label>
+              <Input id="themePresetBg" name="backgroundFile" type="file" accept="image/*" />
+            </div>
+            <div className="text-xs text-zinc-500">
+              Upload sẽ tạo Theme Preset mới. Copy ID từ response JSON và set Active Theme ở trên.
+            </div>
+            <div>
+              <Button type="submit">Upload preset</Button>
             </div>
           </CardContent>
         </Card>

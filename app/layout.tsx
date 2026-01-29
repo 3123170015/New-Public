@@ -65,6 +65,17 @@ export default async function RootLayout({
   const OneSignalInit = (await import("@/components/push/OneSignalInit")).default;
   const cfg = await getSiteConfig();
   const customCss = typeof (cfg as any).customCss === "string" ? (cfg as any).customCss : "";
+  const { getActiveThemePreset } = await import("@/lib/siteConfig");
+  const activeTheme = await getActiveThemePreset();
+  const themeVars = (() => {
+    const json = activeTheme?.themeJson as Record<string, string> | undefined;
+    if (!json) return "";
+    const vars = Object.entries(json)
+      .filter(([key, value]) => typeof key === "string" && typeof value === "string")
+      .map(([key, value]) => `--${key}:${value};`)
+      .join("");
+    return vars ? `:root{${vars}}` : "";
+  })();
 
   return (
     <html lang={lang} suppressHydrationWarning>
@@ -92,6 +103,7 @@ export default async function RootLayout({
           <GlobalBannerAds scope="GLOBAL_BOTTOM" />
           <SiteFooter />
         </div>
+        {themeVars ? <style data-theme-vars>{themeVars}</style> : null}
         {customCss ? <style data-custom-css>{customCss}</style> : null}
       </body>
     </html>

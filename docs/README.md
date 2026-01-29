@@ -1,6 +1,6 @@
-# VideoShare Next.js (App Router) — v4.16.25
+# VideoShare Next.js (App Router) — v4.16.26
 
-## Current status (v4.16.25)
+## Current status (v4.16.26)
 
 - Storage redundancy (R2 primary + optional FTP Origin/HLS + Google Drive origin) with **24h delayed apply** and audit feed.
 - Admin HLS packaging modes: **TS**, **fMP4**, **Hybrid**.
@@ -12,6 +12,7 @@
 - Payments ops: **Fraud Radar** admin page `/admin/payments/fraud` (FraudAlert triage: OPEN/ACKED/RESOLVED).
 - Notifications: weekly digest + **daily continue-watching digest** (in-app, optional).
 - Ops: aaPanel install/update/monitor scripts, Telegram alerts, `/api/verify/status` health snapshot.
+- Theme Builder: upload theme preset (theme.json + assets), set active via Admin Config, inject CSS variables at runtime.
 - Localization: basic UI language selector (vi/en/zh/id/ms) in member settings + footer (cookie + account preference).
 VideoShare là nền tảng chia sẻ video: **Upload → Worker (ffmpeg) → HLS → Playback**, kèm **Stars/Payments**, **Studio**, và lớp tính năng **NFT-gated / Membership**.
 
@@ -47,7 +48,7 @@ Khi mở chat mới hoặc cập nhật dự án, đọc theo thứ tự (có b�
 - Similar: `lib/videos/similar.ts` + `lib/videos/similarCache.ts`
 - Worker/Queues (payments) + Redis keys contracts phải giữ nguyên.
 
-## What’s new (v4.16.x → v4.16.25)
+## What’s new (v4.16.x → v4.16.26)
 ### Storage redundancy + tự phục hồi HLS (v4.16.6+)
 - **R2 primary** + tuỳ chọn **FTP Origin (MP4 gốc)** + **FTP HLS (mirror HLS + fallback playback)**.
 - **Google Drive origin** (Service Account JSON): deep backup để **rebuild HLS** nếu R2 + FTP HLS đều hỏng.
@@ -55,6 +56,10 @@ Khi mở chat mới hoặc cập nhật dự án, đọc theo thứ tự (có b�
   - `/admin/storage`: config + verify + test upload + **pending apply sau 24h**
   - `/admin/storage/events`: audit feed
 - Worker queue `storage`: repeatables `apply_pending_config`, `health_scan`; jobs `backup_origin`, `mirror_hls`, `rebuild_hls_from_drive`.
+### Theme Builder (v4.16.26)
+- Upload theme preset (theme.json + assets) via Admin Config.
+- Active preset stored in `SiteConfig.activeThemeId`, injected as CSS variables at runtime.
+
 ### Ops automation (v4.16.25)
 - aaPanel install/update/monitor scripts with Telegram alerts + optional auto-restart/backup.
 - `/api/verify/status` health snapshot (CPU/memory/disk) + `/verify` UI.

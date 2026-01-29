@@ -8,6 +8,7 @@ const LINKS: Array<{ href: string; label: string }> = [
   { href: "/admin/nft/contracts", label: "NFT contracts" },
   { href: "/admin/nft/events", label: "NFT events" },
   { href: "/admin/config", label: "Config" },
+  { href: "/admin/themes", label: "Theme presets" },
   { href: "/admin/ads", label: "Ads" },
   { href: "/admin/hls", label: "HLS" },
   { href: "/admin/storage", label: "Storage" },

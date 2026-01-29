@@ -23,7 +23,7 @@ Current Version: 4.16.25
 
 > Dùng file này làm **prompt gốc** khi mở chat mới để AI có thể **rebuild toàn bộ dự án VideoShare Next.js từ đầu** đúng stack/contract.
 
-**Target version:** v4.16.25
+**Target version:** v4.16.26
 
 ---
 

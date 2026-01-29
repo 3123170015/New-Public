@@ -24,7 +24,7 @@ export default async function HomePage() {
   const sensitiveMode = await getSensitiveModeForUser(viewerId ?? null);
   const cfg = await getSiteConfig();
   const sectionLimit = Math.max(3, Math.min(24, Number((cfg as any).homeSectionLimit ?? 12)));
-  const sectionOrder = String((cfg as any).homeSectionOrder ?? "TRENDING,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT")
+  const sectionOrder = String((cfg as any).homeSectionOrder ?? "TRENDING,FEED,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT")
     .split(",")
     .map((s) => s.trim().toUpperCase())
     .filter(Boolean);
@@ -104,7 +104,7 @@ export default async function HomePage() {
       })
     : [];
 
-  const sections = sectionOrder.length ? sectionOrder : ["TRENDING", "BOOSTED", "CONTINUE_WATCHING", "COMMUNITY", "RECENT"];
+  const sections = sectionOrder.length ? sectionOrder : ["TRENDING", "FEED", "BOOSTED", "CONTINUE_WATCHING", "COMMUNITY", "RECENT"];
   const itemGrid =
     "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
 
@@ -131,9 +131,6 @@ export default async function HomePage() {
       </section>
 
       {sections.map((section) => {
-        if (section === "CONTINUE_WATCHING" && !viewerId) {
-          return null;
-        }
         if (section === "CONTINUE_WATCHING" && !viewerId) {
           return null;
         }
@@ -219,6 +216,40 @@ export default async function HomePage() {
           );
         }
 
+        if (section === "FEED") {
+          return (
+            <section key={section} className="lux-panel">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-lg font-semibold">Creator feed</div>
+                  <div className="muted text-sm">Swipe the TikTok-style vertical feed.</div>
+                </div>
+                <Link className="btn btn-primary" href="/feed">
+                  Open feed
+                </Link>
+              </div>
+              <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+                <div className="card">
+                  <div className="text-sm font-semibold">Collector highlights</div>
+                  <div className="muted text-xs">Premium clips and vertical reels.</div>
+                  <div className="mt-3 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800" style={{ aspectRatio: "16/9" }}>
+                    <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.3em] text-zinc-400">
+                      Feed preview
+                    </div>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="text-sm font-semibold">Why collectors love it</div>
+                  <ul className="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+                    <li>• Full-screen vertical playback</li>
+                    <li>• Swipe-to-next discovery</li>
+                    <li>• Integrated NFT drops</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+          );
+        }
         if (section === "TRENDING") {
           return (
             <section key={section} className="lux-panel">

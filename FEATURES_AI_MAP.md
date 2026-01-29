@@ -1,9 +1,9 @@
-# FEATURES_AI_MAP.md — v4.16.25
+# FEATURES_AI_MAP.md — v4.16.26
 
 > Mục tiêu: giúp AI (khi mở chat mới) tìm đúng file/entrypoint nhanh nhất.
 > File này map theo **code hiện có** trong repo (không phải wishlist).
 
-**Current version:** v4.16.25
+**Current version:** v4.16.26
 
 ---
 
@@ -112,3 +112,10 @@
 - Contract-check: `scripts/contract-check.sh`
 - Monitor script: `scripts/aapanel-monitor.sh` (DB/Redis/Worker checks + Telegram alerts)
 - Health status: `/api/verify/status` + `/verify` UI
+
+## 4) Theme Builder (preset)
+- Admin config: `/admin/config` (activeThemeId)
+- Theme Manager: `/admin/themes`
+- Preset API: `POST/GET /api/admin/theme-presets`
+- Storage: `ThemePreset` model + `SiteConfig.activeThemeId`
+- Runtime: `app/layout.tsx` inject CSS variables

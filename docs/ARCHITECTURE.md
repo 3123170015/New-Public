@@ -1,4 +1,4 @@
-# ARCHITECTURE.md — v4.16.25
+# ARCHITECTURE.md — v4.16.26
 
 Tài liệu này mô tả kiến trúc tổng thể VideoShare, các “luồng xương sống” và các invariants không được phá.
 
