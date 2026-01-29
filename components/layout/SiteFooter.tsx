@@ -1,5 +1,6 @@
 import LanguageSwitchForm from "@/components/settings/LanguageSwitchForm";
-import { getRequestLanguage, t } from "@/lib/i18n";
+import { getRequestLanguage } from "@/lib/i18n";
+import { t } from "@/lib/i18nShared";
 
 export default async function SiteFooter() {
   const lang = await getRequestLanguage();

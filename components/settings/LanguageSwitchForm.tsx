@@ -1,4 +1,4 @@
-import { SUPPORTED_LANGUAGES, type Language } from "@/lib/i18n";
+import { SUPPORTED_LANGUAGES, type Language } from "@/lib/i18nShared";
 
 export default function LanguageSwitchForm({
   lang,

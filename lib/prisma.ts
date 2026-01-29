@@ -6,6 +6,7 @@ declare global {
 }
 
 function createPrismaClient() {
+  if (!process.env.DATABASE_URL || process.env.BUILDING === "1") return null;
   try {
     return new PrismaClient({
       log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],

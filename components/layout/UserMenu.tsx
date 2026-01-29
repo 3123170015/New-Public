@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
-import { t, type Language } from "@/lib/i18n";
+import { t, type Language } from "@/lib/i18nShared";
 
 export default function UserMenu({
   name,

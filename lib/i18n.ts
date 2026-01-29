@@ -1,171 +1,17 @@
 import "server-only";
 import { cookies, headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import {
+  DEFAULT_LANGUAGE,
+  normalizeLanguage,
+  SUPPORTED_LANGUAGES,
+  type Language,
+  t,
+  isLanguageSupported,
+} from "@/lib/i18nShared";
 
-export const SUPPORTED_LANGUAGES = {
-  vi: { label: "Tiếng Việt", native: "Tiếng Việt" },
-  en: { label: "English", native: "English" },
-  zh: { label: "中文", native: "中文" },
-  id: { label: "Bahasa Indonesia", native: "Bahasa Indonesia" },
-  ms: { label: "Bahasa Melayu", native: "Bahasa Melayu" },
-} as const;
-
-export type Language = keyof typeof SUPPORTED_LANGUAGES;
-
-export const DEFAULT_LANGUAGE: Language = "vi";
-
-export function isLanguageSupported(input?: string | null): input is Language {
-  return Boolean(input && Object.prototype.hasOwnProperty.call(SUPPORTED_LANGUAGES, input));
-}
-
-const translations: Record<Language, Record<string, string>> = {
-  vi: {
-    "nav.home": "Trang chủ",
-    "nav.feed": "Feed",
-    "nav.subscriptions": "Theo dõi",
-    "nav.history": "Lịch sử",
-    "nav.playlists": "Playlists",
-    "nav.trending": "Xu hướng",
-    "nav.boost": "Boost",
-    "nav.nft": "NFT",
-    "nav.premium": "Premium",
-    "nav.upload": "Upload",
-    "nav.studio": "Studio",
-    "nav.admin": "Admin",
-    "nav.login": "Đăng nhập",
-    "footer.sitemap": "Sitemap",
-    "footer.robots": "Robots",
-    "footer.llms": "LLMs",
-    "footer.language": "Ngôn ngữ",
-    "menu.profile": "Hồ sơ",
-    "menu.myChannel": "Kênh của tôi",
-    "menu.notifications": "Thông báo",
-    "menu.notificationSettings": "Cài đặt thông báo",
-    "menu.logout": "Đăng xuất",
-    "settings.language.title": "Ngôn ngữ giao diện",
-    "settings.language.subtitle": "Chọn ngôn ngữ hiển thị cho tài khoản của bạn.",
-    "actions.apply": "Áp dụng",
-  },
-  en: {
-    "nav.home": "Home",
-    "nav.feed": "Feed",
-    "nav.subscriptions": "Subscriptions",
-    "nav.history": "History",
-    "nav.playlists": "Playlists",
-    "nav.trending": "Trending",
-    "nav.boost": "Boost",
-    "nav.nft": "NFT",
-    "nav.premium": "Premium",
-    "nav.upload": "Upload",
-    "nav.studio": "Studio",
-    "nav.admin": "Admin",
-    "nav.login": "Login",
-    "footer.sitemap": "Sitemap",
-    "footer.robots": "Robots",
-    "footer.llms": "LLMs",
-    "footer.language": "Language",
-    "menu.profile": "Profile",
-    "menu.myChannel": "My channel",
-    "menu.notifications": "Notifications",
-    "menu.notificationSettings": "Notification settings",
-    "menu.logout": "Logout",
-    "settings.language.title": "Interface language",
-    "settings.language.subtitle": "Choose the display language for your account.",
-    "actions.apply": "Apply",
-  },
-  zh: {
-    "nav.home": "首页",
-    "nav.feed": "动态",
-    "nav.subscriptions": "订阅",
-    "nav.history": "历史记录",
-    "nav.playlists": "播放列表",
-    "nav.trending": "趋势",
-    "nav.boost": "推广",
-    "nav.nft": "NFT",
-    "nav.premium": "高级",
-    "nav.upload": "上传",
-    "nav.studio": "工作室",
-    "nav.admin": "管理",
-    "nav.login": "登录",
-    "footer.sitemap": "网站地图",
-    "footer.robots": "Robots",
-    "footer.llms": "LLMs",
-    "footer.language": "语言",
-    "menu.profile": "个人资料",
-    "menu.myChannel": "我的频道",
-    "menu.notifications": "通知",
-    "menu.notificationSettings": "通知设置",
-    "menu.logout": "退出",
-    "settings.language.title": "界面语言",
-    "settings.language.subtitle": "选择账户的显示语言。",
-    "actions.apply": "应用",
-  },
-  id: {
-    "nav.home": "Beranda",
-    "nav.feed": "Feed",
-    "nav.subscriptions": "Langganan",
-    "nav.history": "Riwayat",
-    "nav.playlists": "Daftar putar",
-    "nav.trending": "Tren",
-    "nav.boost": "Boost",
-    "nav.nft": "NFT",
-    "nav.premium": "Premium",
-    "nav.upload": "Unggah",
-    "nav.studio": "Studio",
-    "nav.admin": "Admin",
-    "nav.login": "Masuk",
-    "footer.sitemap": "Peta situs",
-    "footer.robots": "Robots",
-    "footer.llms": "LLMs",
-    "footer.language": "Bahasa",
-    "menu.profile": "Profil",
-    "menu.myChannel": "Channel saya",
-    "menu.notifications": "Notifikasi",
-    "menu.notificationSettings": "Pengaturan notifikasi",
-    "menu.logout": "Keluar",
-    "settings.language.title": "Bahasa antarmuka",
-    "settings.language.subtitle": "Pilih bahasa tampilan untuk akun Anda.",
-    "actions.apply": "Terapkan",
-  },
-  ms: {
-    "nav.home": "Laman utama",
-    "nav.feed": "Feed",
-    "nav.subscriptions": "Langganan",
-    "nav.history": "Sejarah",
-    "nav.playlists": "Senarai main",
-    "nav.trending": "Trend",
-    "nav.boost": "Boost",
-    "nav.nft": "NFT",
-    "nav.premium": "Premium",
-    "nav.upload": "Muat naik",
-    "nav.studio": "Studio",
-    "nav.admin": "Admin",
-    "nav.login": "Log masuk",
-    "footer.sitemap": "Peta laman",
-    "footer.robots": "Robots",
-    "footer.llms": "LLMs",
-    "footer.language": "Bahasa",
-    "menu.profile": "Profil",
-    "menu.myChannel": "Saluran saya",
-    "menu.notifications": "Notifikasi",
-    "menu.notificationSettings": "Tetapan notifikasi",
-    "menu.logout": "Log keluar",
-    "settings.language.title": "Bahasa antara muka",
-    "settings.language.subtitle": "Pilih bahasa paparan untuk akaun anda.",
-    "actions.apply": "Gunakan",
-  },
-};
-
-export function normalizeLanguage(input?: string | null): Language {
-  const raw = String(input || "").trim().toLowerCase();
-  if (!raw) return DEFAULT_LANGUAGE;
-  if (raw.startsWith("vi")) return "vi";
-  if (raw.startsWith("en")) return "en";
-  if (raw.startsWith("zh")) return "zh";
-  if (raw.startsWith("id") || raw.startsWith("in")) return "id";
-  if (raw.startsWith("ms")) return "ms";
-  return DEFAULT_LANGUAGE;
-}
+export { DEFAULT_LANGUAGE, normalizeLanguage, SUPPORTED_LANGUAGES, t, isLanguageSupported };
+export type { Language };
 
 export async function getRequestLanguage(): Promise<Language> {
   const cookieLang = cookies().get("lang")?.value;
@@ -184,9 +30,4 @@ export async function getRequestLanguage(): Promise<Language> {
   if (!headerLang) return DEFAULT_LANGUAGE;
   const first = headerLang.split(",")[0];
   return normalizeLanguage(first);
-}
-
-export function t(lang: Language, key: string) {
-  const bucket = translations[lang] ?? translations[DEFAULT_LANGUAGE];
-  return bucket[key] ?? translations[DEFAULT_LANGUAGE][key] ?? key;
 }

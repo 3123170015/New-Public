@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { isLanguageSupported, normalizeLanguage } from "@/lib/i18n";
+import { isLanguageSupported, normalizeLanguage } from "@/lib/i18nShared";
 import { cookies, headers } from "next/headers";
 
 export async function POST(req: Request) {

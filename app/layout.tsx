@@ -58,6 +58,7 @@ export default async function RootLayout({
     );
   }
 
+
   const { getSiteConfig } = await import("@/lib/siteConfig");
   const OneSignalInit = (await import("@/components/push/OneSignalInit")).default;
   const cfg = await getSiteConfig();
