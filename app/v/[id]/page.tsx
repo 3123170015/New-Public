@@ -90,19 +90,59 @@ export default async function VideoPage({ params, searchParams }: { params: { id
   if (!prisma) {
     const demoSrc = String(env.DEMO_HLS_URL || "").trim();
     return (
-      <main className="mx-auto max-w-4xl px-2 pb-6">
-        <div className="flex items-start justify-between gap-4 pt-2">
+      <main className="mx-auto max-w-6xl px-2 pb-6">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-6 pt-2">
           <div>
-            <h1 className="text-2xl font-extrabold leading-tight">Demo video</h1>
-            <div className="mt-1 text-sm text-neutral-600">Hệ thống chưa kết nối database.</div>
+            <div className="rounded-2xl border bg-black/90 p-3 shadow-sm">
+              {demoSrc ? (
+                <VideoPlayerClient src={demoSrc} poster="/icon.svg" mode="standard" />
+              ) : (
+                <div className="card">HLS chưa sẵn sàng.</div>
+              )}
+            </div>
+            <div className="mt-4 space-y-2">
+              <h1 className="text-2xl font-extrabold leading-tight">Demo video</h1>
+              <div className="text-sm text-neutral-600">Hệ thống chưa kết nối database (demo preview).</div>
+              <div className="flex flex-wrap gap-2 text-xs text-neutral-500">
+                <span className="rounded-full border px-2 py-1">Collector Edition</span>
+                <span className="rounded-full border px-2 py-1">Certified</span>
+                <span className="rounded-full border px-2 py-1">1/1 Drop</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="mt-3">
-          {demoSrc ? (
-            <VideoPlayerClient src={demoSrc} poster="/icon.svg" mode="standard" />
-          ) : (
-            <div className="card">HLS chưa sẵn sàng.</div>
-          )}
+          <aside className="space-y-4">
+            <div className="rounded-2xl border bg-white p-4 shadow-sm">
+              <div className="text-xs uppercase tracking-widest text-neutral-500">Collector Intel</div>
+              <div className="mt-3 space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-500">Views</span>
+                  <span className="font-semibold">12,430</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-500">Bid activity</span>
+                  <span className="font-semibold">Hot</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-500">Floor</span>
+                  <span className="font-semibold">2,150 ★</span>
+                </div>
+              </div>
+              <div className="mt-4">
+                <button className="w-full rounded-xl bg-black px-3 py-2 text-sm font-semibold text-white">Collect now</button>
+              </div>
+            </div>
+            <div className="rounded-2xl border bg-white p-4 shadow-sm">
+              <div className="text-xs uppercase tracking-widest text-neutral-500">Up next</div>
+              <div className="mt-3 space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="h-12 w-20 rounded-lg bg-neutral-200" />
+                    <div className="text-sm font-semibold">Collector drop #{i}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
         </div>
       </main>
     );

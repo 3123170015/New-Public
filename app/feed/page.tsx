@@ -156,6 +156,25 @@ function mixFeedItems({
 }
 
 export default async function FeedPage() {
+  if (!prisma) {
+    return (
+      <main className="bg-neutral-50">
+        <div className="mx-auto max-w-6xl px-3 pt-6">
+          <h1 className="text-2xl font-extrabold">Collector Feed</h1>
+          <p className="text-sm text-neutral-600">Feed demo (chưa cấu hình database).</p>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="rounded-2xl border bg-white p-3 shadow-sm">
+                <div className="relative overflow-hidden rounded-xl bg-neutral-200" style={{ aspectRatio: "16/9" }} />
+                <div className="mt-3 text-sm font-semibold">Collector preview #{i}</div>
+                <div className="mt-1 text-xs text-neutral-500">Verified • Limited edition</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+    );
+  }
   const cfg = await getSiteConfig();
   const tikTok = Boolean((cfg as any).feedTikTokEnabled);
   const storyboardEnabled = Boolean((cfg as any).storyboardEnabled);
@@ -270,55 +289,84 @@ export default async function FeedPage() {
 
   if (tikTok) {
     return (
-      <main>
-        <h1>Feed</h1>
-        <p className="muted small">TikTok vertical mode (bật/tắt trong /admin/config). Ads slot mix: HTML ads ↔ boosted video.</p>
-        <TikTokVerticalFeed items={items} />
+      <main className="bg-black text-white">
+        <div className="mx-auto max-w-6xl px-3 pt-4">
+          <h1 className="text-2xl font-extrabold">Collector Feed</h1>
+          <p className="text-sm text-white/70">Vertical showcase for collector-grade drops.</p>
+        </div>
+        <TikTokVerticalFeed
+          items={items}
+          showHeader
+          header={(
+            <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-3">
+              <div>
+                <div className="text-xs uppercase tracking-[0.3em] text-white/60">Featured drops</div>
+                <div className="text-lg font-semibold">Curated for professional collectors</div>
+              </div>
+              <div className="flex gap-2">
+                <span className="rounded-full border border-white/20 px-3 py-1 text-xs">Live</span>
+                <span className="rounded-full border border-white/20 px-3 py-1 text-xs">1/1</span>
+                <span className="rounded-full border border-white/20 px-3 py-1 text-xs">Verified</span>
+              </div>
+            </div>
+          )}
+          sensitiveMode={sensitiveMode}
+        />
       </main>
     );
   }
 
   // Grid feed: show Sponsored block + mix (ads appear as cards)
   return (
-    <main>
-      <h1>Feed</h1>
-      <p className="muted small">Grid list. Có thể bật TikTok vertical trong /admin/config.</p>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
-        {items.map((it) => {
+    <main className="bg-neutral-50">
+      <div className="mx-auto max-w-6xl px-3 pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-extrabold">Collector Grid</h1>
+            <p className="text-sm text-neutral-600">Sưu tập curated theo phong cách gallery hiện đại.</p>
+          </div>
+          <div className="flex gap-2 text-xs">
+            <span className="rounded-full border bg-white px-3 py-1">Curated</span>
+            <span className="rounded-full border bg-white px-3 py-1">Drop alerts</span>
+            <span className="rounded-full border bg-white px-3 py-1">Verified</span>
+          </div>
+        </div>
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((it) => {
             if (it.kind === "ad") {
               return (
-                <div key={it.id} className="card">
-                  <div className="small muted" style={{ marginBottom: 6 }}>Sponsored</div>
-                  <div dangerouslySetInnerHTML={{ __html: htmlAd }} />
+                <div key={it.id} className="rounded-2xl border bg-white p-4 shadow-sm">
+                  <div className="text-xs uppercase tracking-widest text-neutral-500">Sponsored</div>
+                  <div className="mt-3" dangerouslySetInnerHTML={{ __html: htmlAd }} />
                 </div>
               );
             }
 
-          const v: any = it;
-          const href = `/v/${v.id}`;
-          return (
-            <div key={v.id} className="card" style={v.sponsored ? { border: "1px solid #ffd7a8" } : undefined}>
-              <TrackedVideoLink href={href} videoId={v.id} source="FEED" placement={v.sponsored ? "boosted" : "feed"}>
-                <div style={{ aspectRatio: "16/9", borderRadius: 14, overflow: "hidden", background: "#f3f3f3" }}>
-                  <SensitiveThumb
-                    src={v.poster ?? null}
-                    alt={v.title}
-                    isSensitive={Boolean(v.isSensitive)}
-                    mode={sensitiveMode}
-                  />
-                </div>
-                <div style={{ marginTop: 10, fontWeight: 800 }}>
-                  {v.sponsored ? <span className="small muted">Sponsored • Boosted • </span> : null}
-                  {v.title}
-                </div>
-                <div className="small muted">
-                  {v.viewCount} views • {v.likeCount} likes • {v.commentCount} comments • {v.shareCount} shares
-                </div>
-              </TrackedVideoLink>
-            </div>
-          );
-        })}
+            const v: any = it;
+            const href = `/v/${v.id}`;
+            return (
+              <div key={v.id} className="rounded-2xl border bg-white p-3 shadow-sm">
+                <TrackedVideoLink href={href} videoId={v.id} source="FEED" placement={v.sponsored ? "boosted" : "feed"}>
+                  <div className="relative overflow-hidden rounded-xl bg-neutral-100" style={{ aspectRatio: "16/9" }}>
+                    <SensitiveThumb
+                      src={v.poster ?? null}
+                      alt={v.title}
+                      isSensitive={Boolean(v.isSensitive)}
+                      mode={sensitiveMode}
+                    />
+                    {v.sponsored ? (
+                      <div className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-1 text-[10px] text-white">Sponsored</div>
+                    ) : null}
+                  </div>
+                  <div className="mt-3 text-sm font-semibold">{v.title}</div>
+                  <div className="mt-1 text-xs text-neutral-500">
+                    {v.viewCount} views • {v.likeCount} likes • {v.commentCount} comments
+                  </div>
+                </TrackedVideoLink>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </main>
   );

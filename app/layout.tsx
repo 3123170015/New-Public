@@ -78,6 +78,9 @@ export default async function RootLayout({
         <PwaRegister />
 
         <div className="min-h-screen bg-zinc-50">
+          <style>{`
+            .tiktok-scroll::-webkit-scrollbar { display: none; }
+          `}</style>
           {/* Header */}
           <SiteHeader />
           <GlobalBannerAds scope="GLOBAL_TOP" />

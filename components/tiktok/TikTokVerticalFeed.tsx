@@ -98,7 +98,7 @@ export default function TikTokVerticalFeed({
   }, [observedIds]);
 
   return (
-    <div style={{ height: showHeader ? "calc(100vh - 170px)" : "100vh" }}>
+    <div style={{ height: showHeader ? "calc(100vh - 170px)" : "100vh", background: "#000" }}>
       {showHeader && header ? <div style={{ height: 140 }}>{header}</div> : null}
 
       <div
@@ -107,7 +107,9 @@ export default function TikTokVerticalFeed({
           height: showHeader ? "calc(100vh - 210px)" : "100vh",
           overflowY: "scroll",
           scrollSnapType: "y mandatory",
+          scrollbarWidth: "none",
         }}
+        className="tiktok-scroll"
       >
         {items.map((it, idx) => {
           if (it.kind === "ad") {
