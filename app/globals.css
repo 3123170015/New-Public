@@ -71,6 +71,10 @@
   hr {
     @apply my-3 border-0 border-t border-zinc-200;
   }
+
+  .tiktok-scroll::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* =============================

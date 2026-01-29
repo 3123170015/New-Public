@@ -156,17 +156,18 @@ function mixFeedItems({
 }
 
 export default async function FeedPage() {
+  const demoItems = ["Collector preview #1", "Collector preview #2", "Collector preview #3", "Collector preview #4", "Collector preview #5", "Collector preview #6"];
   if (!prisma) {
     return (
       <main className="bg-neutral-50">
         <div className="mx-auto max-w-6xl px-3 pt-6">
           <h1 className="text-2xl font-extrabold">Collector Feed</h1>
-          <p className="text-sm text-neutral-600">Feed demo (chưa cấu hình database).</p>
+          <p className="text-sm text-neutral-600">Feed demo (database chưa cấu hình).</p>
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="rounded-2xl border bg-white p-3 shadow-sm">
-                <div className="relative overflow-hidden rounded-xl bg-neutral-200" style={{ aspectRatio: "16/9" }} />
-                <div className="mt-3 text-sm font-semibold">Collector preview #{i}</div>
+            {demoItems.map((label) => (
+              <div key={label} className="rounded-2xl border bg-white p-3 shadow-sm">
+                <div className="relative overflow-hidden rounded-xl bg-neutral-200" style={{ aspectRatio: "16/9" }} aria-hidden="true" />
+                <div className="mt-3 text-sm font-semibold">{label}</div>
                 <div className="mt-1 text-xs text-neutral-500">Verified • Limited edition</div>
               </div>
             ))}
@@ -300,7 +301,7 @@ export default async function FeedPage() {
           header={(
             <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-3">
               <div>
-                <div className="text-xs uppercase tracking-[0.3em] text-white/60">Featured drops</div>
+                <div className="text-xs uppercase tracking-widest text-white/60">Featured drops</div>
                 <div className="text-lg font-semibold">Curated for professional collectors</div>
               </div>
               <div className="flex gap-2">
@@ -323,13 +324,13 @@ export default async function FeedPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-extrabold">Collector Grid</h1>
-            <p className="text-sm text-neutral-600">Sưu tập curated theo phong cách gallery hiện đại.</p>
+            <p className="text-sm text-neutral-600">Modern gallery layout for professional collectors.</p>
           </div>
-          <div className="flex gap-2 text-xs">
-            <span className="rounded-full border bg-white px-3 py-1">Curated</span>
-            <span className="rounded-full border bg-white px-3 py-1">Drop alerts</span>
-            <span className="rounded-full border bg-white px-3 py-1">Verified</span>
-          </div>
+            <div className="flex gap-2 text-xs">
+              <span className="rounded-full border bg-white px-3 py-1">Curated</span>
+              <span className="rounded-full border bg-white px-3 py-1">Drop alerts</span>
+              <span className="rounded-full border bg-white px-3 py-1">Verified</span>
+            </div>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((it) => {
@@ -347,10 +348,10 @@ export default async function FeedPage() {
             return (
               <div key={v.id} className="rounded-2xl border bg-white p-3 shadow-sm">
                 <TrackedVideoLink href={href} videoId={v.id} source="FEED" placement={v.sponsored ? "boosted" : "feed"}>
-                  <div className="relative overflow-hidden rounded-xl bg-neutral-100" style={{ aspectRatio: "16/9" }}>
-                    <SensitiveThumb
-                      src={v.poster ?? null}
-                      alt={v.title}
+              <div className="relative overflow-hidden rounded-xl bg-neutral-100" style={{ aspectRatio: "16/9" }} aria-hidden="true">
+                <SensitiveThumb
+                  src={v.poster ?? null}
+                  alt={v.title}
                       isSensitive={Boolean(v.isSensitive)}
                       mode={sensitiveMode}
                     />
