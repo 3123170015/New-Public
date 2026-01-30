@@ -26,7 +26,7 @@ async function seedAdmin() {
 }
 
 async function seedConfigs() {
-  await prisma.siteConfig.upsert({ where: { id: 1 }, update: {}, create: {} });
+  const config = await prisma.siteConfig.upsert({ where: { id: 1 }, update: {}, create: {} });
 
   await prisma.hlsConfig.upsert({
     where: { id: 1 },
@@ -44,6 +44,32 @@ async function seedConfigs() {
         null,
         2
       ),
+    },
+  });
+
+  return config;
+}
+
+async function seedThemePreset() {
+  const name = process.env.SEED_THEME_NAME ?? "Luxury Noir";
+  const existing = await prisma.themePreset.findFirst({ where: { name } });
+  if (existing) return existing;
+
+  return prisma.themePreset.create({
+    data: {
+      name,
+      description: "Default luxury preset (dark + light tokens).",
+      themeJson: {
+        "theme-primary": "#0f172a",
+        "theme-primary-foreground": "#f8fafc",
+        "theme-background": "#f8fafc",
+        "theme-foreground": "#0f172a",
+        "theme-card": "#ffffff",
+        "theme-border": "#e4e4e7",
+        "theme-accent": "#b45309",
+        "theme-accent-foreground": "#fff7ed",
+      } as any,
+      assetsJson: null,
     },
   });
 }
@@ -219,7 +245,11 @@ async function seedNftContracts() {
 
 async function main() {
   const { user, password } = await seedAdmin();
-  await seedConfigs();
+  const cfg = await seedConfigs();
+  const themePreset = await seedThemePreset();
+  if (!cfg.activeThemeId && themePreset?.id) {
+    await prisma.siteConfig.update({ where: { id: cfg.id }, data: { activeThemeId: themePreset.id } });
+  }
   await seedAdPlacements();
   await seedBoostPlans();
   await seedGifts();
