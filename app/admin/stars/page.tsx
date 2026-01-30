@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/prisma";
 
-type UserRow = Awaited<ReturnType<typeof prisma.user.findMany>>[number];
+type UserRow = {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: string;
+  starBalance: number;
+  createdAt: Date;
+};
 
 export const dynamic = "force-dynamic";
 

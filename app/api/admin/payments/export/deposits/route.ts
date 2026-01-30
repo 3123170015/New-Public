@@ -42,7 +42,12 @@ export async function GET(req: Request) {
   }
 
   // hard cap for safety
-  type DepositExportRow = Awaited<ReturnType<typeof prisma.starDeposit.findMany>>[number];
+  type DepositExportRow = Awaited<ReturnType<typeof prisma.starDeposit.findMany>>[number] & {
+    user?: { email: string | null } | null;
+    token?: { symbol: string } | null;
+    package?: { stars: number } | null;
+    custodialAddress?: { address: string } | null;
+  };
   const rows = await prisma.starDeposit.findMany({
     where,
     include: { user: true, token: true, package: true, custodialAddress: true },

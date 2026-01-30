@@ -6,7 +6,10 @@ import { Select } from "@/components/ui/select";
 
 export const dynamic = "force-dynamic";
 
-type CommentReportRow = Awaited<ReturnType<typeof prisma.commentReport.findFirst>>;
+type CommentReportRow = NonNullable<Awaited<ReturnType<typeof prisma.commentReport.findFirst>>> & {
+  comment: { id: string; content: string; videoId: string; userId: string | null; visibility: string };
+  reporter: { id: string; name: string | null; email: string | null } | null;
+};
 
 function statusColor(s: string) {
   switch (s) {
@@ -31,9 +34,10 @@ export default async function AdminCommentReports() {
     },
   })) as CommentReportRow[];
 
-  const videos = list.length
+  const videoIds = Array.from(new Set(list.map((r) => r.comment?.videoId).filter(Boolean))) as string[];
+  const videos = videoIds.length
     ? ((await prisma.video.findMany({
-        where: { id: { in: Array.from(new Set(list.map((r) => r.comment.videoId))) } },
+        where: { id: { in: videoIds } },
         select: { id: true, title: true },
       })) as any[])
     : [];

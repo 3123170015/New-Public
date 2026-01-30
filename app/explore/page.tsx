@@ -14,11 +14,11 @@ export default async function ExplorePage() {
       select: { id: true, name: true, slug: true, _count: { select: { videoTags: true } } },
     }).catch(async () => {
       // Prisma older version might not support orderBy by relation count; fallback to raw-ish query via groupBy
-      type TagCountRow = Awaited<ReturnType<typeof prisma.videoTag.groupBy>>[number];
+      type TagCountRow = Awaited<ReturnType<typeof prisma.videoTag.groupBy>>[number] & { _count?: { tagId: number } };
       const rows = await prisma.videoTag.groupBy({ by: ["tagId"], _count: { tagId: true }, orderBy: { _count: { tagId: "desc" } }, take: 50 });
       const ids = (rows as TagCountRow[]).map((r: TagCountRow) => r.tagId);
       const list = await prisma.tag.findMany({ where: { id: { in: ids } }, select: { id: true, name: true, slug: true } });
-      const map = new Map((rows as TagCountRow[]).map((r: TagCountRow) => [r.tagId, r._count.tagId]));
+      const map = new Map((rows as TagCountRow[]).map((r: TagCountRow) => [r.tagId, r._count?.tagId ?? 0]));
       return list.map((t: { id: string }) => ({ ...t, _count: { videoTags: map.get(t.id) ?? 0 } }));
     }),
   ]);

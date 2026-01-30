@@ -5,7 +5,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export const dynamic = "force-dynamic";
 
-type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+type VideoRow = {
+  id: string;
+  title: string;
+  status: string;
+  isSensitive: boolean;
+  createdAt: Date;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  shareCount: number;
+  starCount: number;
+  giftCount: number;
+};
 
 export default async function AdminVideos() {
   const list: VideoRow[] = await prisma.video.findMany({

@@ -46,16 +46,14 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
 
     if (mode === "MARKETPLACE_ONLY" || mode === "BOTH") {
       // Ensure a collection
-      let col = await tx.nftCollection.findFirst({ where: { ownerId: userId, title: "Clip Highlights" } });
+      let col = await tx.nftCollection.findFirst({ where: { creatorId: userId, title: "Clip Highlights" } });
       if (!col) {
         col = await tx.nftCollection.create({
           data: {
-            ownerId: userId,
+            creatorId: userId,
             title: "Clip Highlights",
             description: "Auto-generated from clips",
-            coverImageKey: null,
-            chain: "SOLANA" as any,
-            metadataStrategy: "INTERNAL" as any,
+            imageKey: null,
           } as any,
         });
       }
@@ -66,7 +64,7 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
         ? await tx.nftItem.update({
             where: { id: existing.id },
             data: {
-              title: clip.title ?? `Clip ${clip.id}`,
+              name: clip.title ?? `Clip ${clip.id}`,
               description: `Clip from video: ${clip.video.title}`,
               imageKey: clip.outputKey,
             } as any,
@@ -75,11 +73,9 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
             data: {
               collectionId: col.id,
               ownerId: userId,
-              title: clip.title ?? `Clip ${clip.id}`,
+              name: clip.title ?? `Clip ${clip.id}`,
               description: `Clip from video: ${clip.video.title}`,
               imageKey: clip.outputKey,
-              chain: "SOLANA" as any,
-              metadataStrategy: "INTERNAL" as any,
               clipId: clip.id,
             } as any,
           });

@@ -81,7 +81,12 @@ export async function GET(req: Request) {
     where.authorId = authorId;
   }
 
-  type PublicVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+  type PublicVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number] & {
+    author?: { id: string; name: string | null; username: string | null; image: string | null } | null;
+    channel?: { id: string; name: string; slug: string } | null;
+    category?: { id: string; name: string; slug: string } | null;
+    tags?: { tag: { slug: string; name: string } }[];
+  };
   const items = await prisma.video.findMany({
     where,
     orderBy: pickOrderBy(sort),

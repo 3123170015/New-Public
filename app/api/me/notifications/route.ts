@@ -13,7 +13,9 @@ export async function GET(req: Request) {
   const takeRaw = Number(url.searchParams.get("take") ?? 50);
   const take = Math.min(200, Math.max(1, Number.isFinite(takeRaw) ? takeRaw : 50));
 
-  type NotificationRow = Awaited<ReturnType<typeof prisma.notification.findMany>>[number];
+  type NotificationRow = Awaited<ReturnType<typeof prisma.notification.findMany>>[number] & {
+    actor?: { id: string; name: string | null } | null;
+  };
   const items = await prisma.notification.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },

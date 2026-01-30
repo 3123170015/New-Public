@@ -6,7 +6,20 @@ export const dynamic = "force-dynamic";
 
 const { sql, empty } = Prisma as any;
 
-type DepositRow = Awaited<ReturnType<typeof prisma.starDeposit.findMany>>[number];
+type DepositRow = {
+  id: string;
+  chain: string;
+  status: string;
+  provider: string | null;
+  failureReason: string | null;
+  createdAt: Date;
+  creditedAt: Date | null;
+  expectedAmount: Prisma.Decimal | null;
+  actualAmount: Prisma.Decimal | null;
+  token: { symbol: string } | null;
+  user: { id: string; email: string | null } | null;
+  package: { stars: number } | null;
+};
 
 const FAIL_STATUSES = new Set(["FAILED", "NEEDS_REVIEW", "UNMATCHED"]);
 const SUCCESS_STATUSES = new Set(["CONFIRMED", "CREDITED"]);

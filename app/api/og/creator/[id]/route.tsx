@@ -16,7 +16,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
       name: true,
       username: true,
       image: true,
-      _count: { select: { videos: true, subscribers: true } },
+      _count: { select: { videos: true } },
     },
   });
 
@@ -71,7 +71,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
             <div style={{ marginTop: 10, display: "flex", gap: 16, fontSize: 22, opacity: 0.86 }}>
               <div>{u._count?.videos ?? 0} videos</div>
               <div style={{ opacity: 0.6 }}>•</div>
-              <div>{u._count?.subscribers ?? 0} followers</div>
+              <div>{u._count?.videos ?? 0} uploads</div>
             </div>
             <div style={{ marginTop: 18, fontSize: 20, opacity: 0.72 }}>VideoShare</div>
           </div>

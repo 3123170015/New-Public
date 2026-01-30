@@ -2,7 +2,9 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type SubtitleRow = Awaited<ReturnType<typeof prisma.subtitle.findMany>>[number];
+type SubtitleRow = Awaited<ReturnType<typeof prisma.subtitle.findMany>>[number] & {
+  video?: { id: string; title: string } | null;
+};
 
 export default async function AdminSubtitles() {
   const list: SubtitleRow[] = await prisma.subtitle.findMany({
@@ -26,7 +28,9 @@ export default async function AdminSubtitles() {
         <tbody>
           {list.map((s) => (
             <tr key={s.id} style={{ borderTop: "1px solid #eee" }}>
-              <td><a href={`/admin/videos/${s.videoId}`}>{s.video.title}</a></td>
+              <td>
+                <a href={`/admin/videos/${s.videoId}`}>{s.video?.title ?? s.videoId}</a>
+              </td>
               <td>{s.lang}</td>
               <td>{s.provider}</td>
               <td className="small muted">{new Date(s.createdAt).toLocaleString()}</td>

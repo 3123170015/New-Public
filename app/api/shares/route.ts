@@ -29,7 +29,6 @@ export async function POST(req: Request) {
     return Response.json({ error: "Interactions disabled" }, { status: 403 });
   }
 
-  await prisma.share.create({ data: { userId, videoId } });
   await prisma.video.update({ where: { id: videoId }, data: { shareCount: { increment: 1 } } });
   const updated = await prisma.video.findUnique({ where: { id: videoId }, select: { shareCount: true } });
   return Response.json({ shareCount: updated?.shareCount ?? 0 });

@@ -55,7 +55,10 @@ export async function GET(req: Request) {
   const topSupporterUserId = grouped?.[0]?.userId ?? null;
   const topSupporterStars = grouped?.[0]?._sum?.superThanksStars ?? 0;
 
-  type CommentRow = Awaited<ReturnType<typeof prisma.comment.findMany>>[number];
+  type CommentRow = Awaited<ReturnType<typeof prisma.comment.findMany>>[number] & {
+    user?: { name: string | null; id: string; membershipTier: string | null; membershipExpiresAt: Date | null } | null;
+    starTx?: { note: string | null } | null;
+  };
   const comments = await prisma.comment.findMany({
     where: {
       videoId,

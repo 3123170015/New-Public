@@ -2,7 +2,9 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type NftEventLogRow = Awaited<ReturnType<typeof prisma.nftEventLog.findFirst>>;
+type NftEventLogRow = NonNullable<Awaited<ReturnType<typeof prisma.nftEventLog.findFirst>>> & {
+  actor?: { id: string; name: string | null } | null;
+};
 
 export default async function AdminNftEventsPage() {
   const logs = (await prisma.nftEventLog.findMany({

@@ -23,12 +23,13 @@ export async function GET(req: Request) {
 
   // trending score: weights tuned for shorts
   const scored = (rows as MetricRow[]).map((r: MetricRow) => {
-    const v = r._sum.views ?? 0;
-    const l = r._sum.likes ?? 0;
-    const s = r._sum.shares ?? 0;
-    const c = r._sum.comments ?? 0;
-    const st = r._sum.stars ?? 0;
-    const g = r._sum.gifts ?? 0;
+    const sum = r._sum ?? {};
+    const v = sum.views ?? 0;
+    const l = sum.likes ?? 0;
+    const s = sum.shares ?? 0;
+    const c = sum.comments ?? 0;
+    const st = sum.stars ?? 0;
+    const g = sum.gifts ?? 0;
     const score = v * 1 + l * 18 + s * 28 + c * 20 + st * 2 + g * 12;
     return { videoId: r.videoId, score, sums: { views: v, likes: l, shares: s, comments: c, stars: st, gifts: g } };
   });

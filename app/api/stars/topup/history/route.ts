@@ -7,7 +7,10 @@ export async function GET() {
   const session = await auth();
   if (!session?.user) return Response.json({ ok: false, error: "UNAUTHENTICATED" }, { status: 401 });
   const userId = (session.user as any).id as string;
-  type DepositRow = Awaited<ReturnType<typeof prisma.starDeposit.findMany>>[number];
+  type DepositRow = Awaited<ReturnType<typeof prisma.starDeposit.findMany>>[number] & {
+    token?: { symbol: string } | null;
+    package?: { stars: number } | null;
+  };
   const deposits = await prisma.starDeposit.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },

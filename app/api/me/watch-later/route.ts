@@ -8,7 +8,9 @@ export async function GET() {
   if (!session?.user) return Response.json({ ok: false, error: "UNAUTHENTICATED" }, { status: 401 });
   const userId = (session.user as any).id as string;
 
-  type WatchLaterRow = Awaited<ReturnType<typeof prisma.watchLaterItem.findMany>>[number];
+  type WatchLaterRow = Awaited<ReturnType<typeof prisma.watchLaterItem.findMany>>[number] & {
+    video?: { status: string; title: string; thumbKey: string | null; isSensitive: boolean; durationSec: number | null } | null;
+  };
   const items = await prisma.watchLaterItem.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },

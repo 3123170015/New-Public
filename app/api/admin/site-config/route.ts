@@ -72,7 +72,7 @@ export async function POST(req: Request) {
   const nftPremiumUnlockEnabled = form.get("nftPremiumUnlockEnabled") === "on";
   const creatorPassEnabled = form.get("creatorPassEnabled") === "on";
   const achievementBadgesEnabled = form.get("achievementBadgesEnabled") === "on";
-  const clipNftMarketplaceMode = String(form.get("clipNftMarketplaceMode") ?? "SEPARATE_ONLY").slice(0, 40);
+  const clipNftMarketplaceMode = String(form.get("clipNftMarketplaceMode") ?? "SEPARATE_ONLY").slice(0, 40) as any;
   const clipNftOnChainMintEnabled = form.get("clipNftOnChainMintEnabled") === "on";
 
   // Treasury

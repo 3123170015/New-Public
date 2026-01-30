@@ -3,15 +3,16 @@ import { requireAdmin } from "@/lib/authz";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+const PROVIDERS = ["ALCHEMY", "QUICKNODE", "HELIUS", "TRONGRID", "MANUAL"] as const;
+type Provider = (typeof PROVIDERS)[number];
+
 const schema = z.object({
   env: z.string().min(1).max(40),
-  provider: z.string().min(1),
+  provider: z.enum(PROVIDERS),
   name: z.string().min(1).max(80),
   value: z.string().min(1).max(20_000),
   active: z.boolean().optional().default(true),
 });
-
-const PROVIDERS = new Set(["ALCHEMY", "QUICKNODE", "HELIUS", "TRONGRID", "MANUAL"]);
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -25,19 +26,19 @@ export async function POST(req: Request) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return Response.json({ error: "INVALID_BODY", details: parsed.error.flatten() }, { status: 400 });
 
-  if (!PROVIDERS.has(parsed.data.provider)) return Response.json({ error: "INVALID_PROVIDER" }, { status: 400 });
+  const provider = parsed.data.provider as Provider;
 
   const row = await prisma.paymentProviderSecret.upsert({
     where: {
       env_provider_name: {
         env: parsed.data.env,
-        provider: parsed.data.provider,
+        provider,
         name: parsed.data.name,
       },
     },
     create: {
       env: parsed.data.env,
-      provider: parsed.data.provider,
+      provider,
       name: parsed.data.name,
       value: parsed.data.value,
       active: parsed.data.active,

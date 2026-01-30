@@ -99,7 +99,7 @@ export async function POST(req: Request) {
         data: {
           userId: plan.userId,
           type: "CREATOR_MEMBERSHIP",
-          actorId: userId,
+          actorUserId: userId,
           title: "Có người join Fan Club",
           body: `Bạn nhận ${plan.starsPrice}⭐ từ gói: ${plan.title}`,
           url: `/studio/membership`,

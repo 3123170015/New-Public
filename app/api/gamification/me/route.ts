@@ -36,7 +36,9 @@ export async function GET() {
     return Response.json({ ok: false, error: "USER_NOT_FOUND" }, { status: 404 });
   }
 
-  type BadgeRow = Awaited<ReturnType<typeof prisma.userBadge.findMany>>[number];
+  type BadgeRow = Awaited<ReturnType<typeof prisma.userBadge.findMany>>[number] & {
+    badge?: { key: string; name: string; description: string | null; icon: string | null } | null;
+  };
   type TaskRow = Awaited<ReturnType<typeof prisma.dailyTaskProgress.findMany>>[number];
 
   return Response.json({
@@ -48,13 +50,15 @@ export async function GET() {
       level: user.level,
       nextLevelXp: nextLevelXp(user.level),
     },
-    badges: (badges as BadgeRow[]).map((b: BadgeRow) => ({
-      key: b.badge.key,
-      name: b.badge.name,
-      description: b.badge.description,
-      icon: b.badge.icon,
-      earnedAt: b.earnedAt.toISOString(),
-    })),
+    badges: (badges as BadgeRow[])
+      .filter((b) => b.badge)
+      .map((b: BadgeRow) => ({
+        key: b.badge!.key,
+        name: b.badge!.name,
+        description: b.badge!.description,
+        icon: b.badge!.icon,
+        earnedAt: b.earnedAt.toISOString(),
+      })),
     dailyTasks: (todayTasks as TaskRow[]).map((t: TaskRow) => ({
       key: t.key,
       progress: t.progress,

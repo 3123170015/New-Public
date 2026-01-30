@@ -4,7 +4,9 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 
 export const dynamic = "force-dynamic";
 
-type StorageEventRow = Awaited<ReturnType<typeof prisma.nftEventLog.findMany>>[number];
+type StorageEventRow = Awaited<ReturnType<typeof prisma.nftEventLog.findMany>>[number] & {
+  actor?: { id: string; email: string | null; name: string | null } | null;
+};
 
 export default async function AdminStorageEvents() {
   const rows: StorageEventRow[] = await prisma.nftEventLog.findMany({

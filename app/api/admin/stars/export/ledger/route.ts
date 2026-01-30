@@ -40,7 +40,10 @@ export async function GET(req: Request) {
     if (u) where.userId = u.id;
   }
 
-  type StarLedgerRow = Awaited<ReturnType<typeof prisma.starTransaction.findMany>>[number];
+  type StarLedgerRow = Awaited<ReturnType<typeof prisma.starTransaction.findMany>>[number] & {
+    user?: { id: string; email: string | null } | null;
+    video?: { id: string; title: string } | null;
+  };
   const rows = await prisma.starTransaction.findMany({
     where,
     orderBy: { createdAt: "desc" },

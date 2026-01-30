@@ -7,7 +7,11 @@ import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
-type StarTransactionRow = Awaited<ReturnType<typeof prisma.starTransaction.findMany>>[number];
+type StarTransactionRow = Awaited<ReturnType<typeof prisma.starTransaction.findMany>>[number] & {
+  user?: { id: string; email: string | null; name: string | null } | null;
+  video?: { id: string; title: string } | null;
+  gift?: { name: string; icon: string | null; starsCost: number } | null;
+};
 
 export default async function AdminStarTx({
   searchParams,

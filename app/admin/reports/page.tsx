@@ -7,7 +7,10 @@ import { Select } from "@/components/ui/select";
 
 export const dynamic = "force-dynamic";
 
-type VideoReportRow = Awaited<ReturnType<typeof prisma.videoReport.findFirst>>;
+type VideoReportRow = NonNullable<Awaited<ReturnType<typeof prisma.videoReport.findFirst>>> & {
+  video: { id: string; title: string; status: string; authorId: string | null; author: { id: string; name: string | null; email: string | null } | null };
+  reporter: { id: string; name: string | null; email: string | null } | null;
+};
 
 export default async function AdminReports() {
   const list = (await prisma.videoReport.findMany({

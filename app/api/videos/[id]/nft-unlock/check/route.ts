@@ -22,7 +22,9 @@ export async function POST(req: Request, ctx: { params: { id: string } }) {
   const gates = await prisma.videoNftGate.findMany({ where: { videoId, enabled: true } });
   if (gates.length === 0) return Response.json({ ok: false, message: "NO_NFT_GATE" }, { status: 400 });
 
-  type WalletRow = Awaited<ReturnType<typeof prisma.userWallet.findMany>>[number];
+  type WalletRow = Awaited<ReturnType<typeof prisma.userWallet.findMany>>[number] & {
+    assets: { assetKey: string; balance: number }[];
+  };
   const wallets = await prisma.userWallet.findMany({
     where: { userId: viewerId, verifiedAt: { not: null } },
     select: { chain: true, address: true, assets: { select: { assetKey: true, balance: true } } },

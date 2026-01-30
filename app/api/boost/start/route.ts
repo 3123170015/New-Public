@@ -90,7 +90,7 @@ export async function POST(req: Request) {
           planId,
           status: "ACTIVE",
           startAt: now,
-          endAt: new Date(now.getTime() + plan.durationHours * 60 * 60 * 1000),
+          endAt: new Date(now.getTime() + (plan.durationDays ?? 1) * 24 * 60 * 60 * 1000),
           priceStars: chargeStars,
           baseViews: video.viewCount,
           baseLikes: video.likeCount,

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type AdminVideoRow = Awaited<ReturnType<typeof prisma.video.findFirst>>;
+type AdminVideoRow = NonNullable<Awaited<ReturnType<typeof prisma.video.findFirst>>>;
 
 export default async function AdminHome() {
   const [users, videos, processing] = await Promise.all([
