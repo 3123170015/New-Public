@@ -70,6 +70,7 @@ EVM RPC URLs (`EVM_RPC_URL_*`) vẫn dùng chung với payments và cũng dùng 
 - `ONESIGNAL_ENABLED`, `ONESIGNAL_APP_ID`, `ONESIGNAL_SAFARI_WEB_ID`
 - `SUBTITLES_AUTO_ENABLED`, `OPENAI_API_KEY`, `OPENAI_TRANSCRIBE_MODEL`
 - `CLAMAV_ENABLED`, `CLAMAV_HOST`, `CLAMAV_PORT`
+- `ALLOW_PUBLIC_SIGNUP` — bật/tắt trang đăng ký `/register` (default true)
 
 ## External sync (ApiSource seed) (optional)
 - `SEED_PEERTUBE_OWNER_EMAIL` — nếu set, worker sync sẽ gán các video đồng bộ (prefix `peertube3`) cho user này (để “chủ kênh” có thể xoá video trong UI).

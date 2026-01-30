@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { getSiteConfig } from "@/lib/siteConfig";
 import UserMenu from "./UserMenu";
 import { getRequestLanguage } from "@/lib/i18n";
+import { flags } from "@/lib/env";
 import { t } from "@/lib/i18nShared";
 import SmartImage from "@/components/media/SmartImage";
 
@@ -104,9 +105,16 @@ export default async function SiteHeader() {
               lang={lang}
             />
           ) : (
-            <Link className="btn" href="/login">
-              {t(lang, "nav.login")}
-            </Link>
+            <div className="flex items-center gap-2">
+              {flags.allowPublicSignup ? (
+                <Link className="btn btn-ghost px-3 py-2" href="/register">
+                  {t(lang, "nav.register")}
+                </Link>
+              ) : null}
+              <Link className="btn" href="/login">
+                {t(lang, "nav.login")}
+              </Link>
+            </div>
           )}
         </div>
       </div>

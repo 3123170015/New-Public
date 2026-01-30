@@ -65,7 +65,10 @@ export default function LoginPage() {
 
             <Button type="submit">Sign in</Button>
 
-            <div className="small muted">
+            <div className="small muted flex items-center justify-between">
+              <Link href="/register" className="underline">
+                Chưa có tài khoản? Đăng ký
+              </Link>
               <Link href="/" className="underline">
                 ← Quay lại Home
               </Link>
