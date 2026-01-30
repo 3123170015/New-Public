@@ -1,10 +1,16 @@
+import type { ModerationAction } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
-type ModerationActionRow = Awaited<ReturnType<typeof prisma.moderationAction.findFirst>>;
+type ModerationActionRow = ModerationAction & {
+  actor: { id: string; name: string | null; email: string | null } | null;
+  target: { id: string; name: string | null; email: string | null; strikeCount: number; mutedUntil: Date | null; bannedAt: Date | null } | null;
+  video: { id: string; title: string } | null;
+  comment: { id: string; content: string; videoId: string } | null;
+};
 
 export default async function AdminModerationActionsPage() {
   const list = (await prisma.moderationAction.findMany({
