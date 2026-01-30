@@ -4,7 +4,14 @@ export const dynamic = "force-dynamic";
 
 export default async function ExplorePage() {
   type CategoryRow = Awaited<ReturnType<typeof prisma.category.findMany>>[number];
-  type TagRow = Awaited<ReturnType<typeof prisma.tag.findMany>>[number];
+  type TagRow = {
+    id: string;
+    name: string;
+    slug: string;
+    _count?: {
+      videoTags: number;
+    };
+  };
 
   const [categories, tags] = await Promise.all([
     prisma.category.findMany({ orderBy: { name: "asc" }, take: 50 }),
