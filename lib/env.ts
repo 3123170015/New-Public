@@ -8,8 +8,8 @@ import { z } from "zod";
 
 const schema = z.object({
   SITE_URL: z.string().url().optional().catch(undefined),
-  DATABASE_URL: z.string().min(1).optional(),
-  AUTH_SECRET: z.string().min(10).optional(),
+  DATABASE_URL: z.string().min(1).optional().catch(undefined),
+  AUTH_SECRET: z.string().min(10).optional().catch(undefined),
   NEXTAUTH_URL: z.string().url().optional().catch(undefined),
   REDIS_URL: z.string().optional(),
 
