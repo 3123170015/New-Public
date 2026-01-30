@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 
 export default async function SubscriptionFeedPage() {
   type SubscriptionRow = Awaited<ReturnType<typeof prisma.subscription.findMany>>[number];
-  type PostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number];
-  type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+  type PostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number] & { pollOptions?: { id: string; text: string; votes: { userId: string; id: string }[] }[]; author?: { name?: string | null } | null };
+  type VideoRow = { id: string; createdAt: Date; title: string; durationSec: number; thumbKey: string | null; author?: { id: string; name: string | null } | null };
 
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
@@ -83,8 +83,8 @@ export default async function SubscriptionFeedPage() {
   const viewerVotes = new Map<string, string>();
   for (const p of posts as PostRow[]) {
     if (p.type === "POLL") {
-      const voted = p.pollOptions.flatMap((o: { votes: { userId: string }[] }) => o.votes).find((v: { userId: string }) => v.userId === userId);
-      if (voted) viewerVotes.set(p.id, voted.id); // we store voteId? Actually need optionId; We'll compute later.
+      const voted = (p.pollOptions ?? []).flatMap((o: { votes: { userId: string }[] }) => o.votes).find((v: { userId: string }) => v.userId === userId);
+      if (voted) viewerVotes.set(p.id, "1");
     }
   }
 
@@ -102,12 +102,12 @@ export default async function SubscriptionFeedPage() {
         ) : (
           <div className="space-y-3">
     {(posts as PostRow[]).map((p: PostRow) => {
-              const options = p.pollOptions.map((o: { id: string; text: string; votes: unknown[] }) => ({
-                id: o.id,
-                text: o.text,
-                votes: o.votes.length,
-              }));
-              const myOpt = p.pollOptions.find((o: { id: string; votes: { userId: string }[] }) => o.votes.some((v: { userId: string }) => v.userId === userId))?.id ?? null;
+            const options = (p.pollOptions ?? []).map((o: { id: string; text: string; votes: unknown[] }) => ({
+              id: o.id,
+              text: o.text,
+              votes: o.votes.length,
+            }));
+            const myOpt = (p.pollOptions ?? []).find((o: { id: string; votes: { userId: string }[] }) => o.votes.some((v: { userId: string }) => v.userId === userId))?.id ?? null;
               return (
                 <div key={p.id} className="card">
                   <div className="small muted">

@@ -33,16 +33,18 @@ export default async function TrendingPage({ searchParams }: { searchParams: { d
     by: ["videoId"],
     where: { day: { gte: since } },
     _sum: { views: true, likes: true, shares: true, comments: true, stars: true, gifts: true },
+    orderBy: { _sum: { views: "desc" } },
     take: 200,
   });
 
   const scored = (rows as TrendRow[]).map((r: TrendRow) => {
-    const v = r._sum.views ?? 0;
-    const l = r._sum.likes ?? 0;
-    const s = r._sum.shares ?? 0;
-    const c = r._sum.comments ?? 0;
-    const st = r._sum.stars ?? 0;
-    const g = r._sum.gifts ?? 0;
+    const sums = (r as any)._sum || {};
+    const v = sums.views ?? 0;
+    const l = sums.likes ?? 0;
+    const s = sums.shares ?? 0;
+    const c = sums.comments ?? 0;
+    const st = sums.stars ?? 0;
+    const g = sums.gifts ?? 0;
     const score = v * 1 + l * 18 + s * 28 + c * 20 + st * 2 + g * 12;
     return { videoId: r.videoId, score, sums: { views: v, likes: l, shares: s, comments: c, stars: st, gifts: g } };
   });

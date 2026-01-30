@@ -30,7 +30,7 @@ function typeLabel(t: string) {
 }
 
 export default async function NotificationsPage() {
-  type NotificationRow = Awaited<ReturnType<typeof prisma.notification.findMany>>[number];
+  type NotificationRow = { id: string; type: string; title: string; body: string | null; url: string | null; isRead: boolean; createdAt: Date; actor?: { id: string; name: string | null } | null };
 
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;

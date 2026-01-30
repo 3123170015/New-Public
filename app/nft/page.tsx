@@ -6,7 +6,7 @@ import SmartImage from "@/components/media/SmartImage";
 export const dynamic = "force-dynamic";
 
 export default async function NftHomePage() {
-  type NftItemRow = Awaited<ReturnType<typeof prisma.nftItem.findMany>>[number];
+  type NftItemRow = Awaited<ReturnType<typeof prisma.nftItem.findMany>>[number] & { collection?: { creatorId: string; creator?: { name?: string | null } | null } | null; owner?: { name?: string | null } | null };
 
   const items = prisma
     ? await prisma.nftItem.findMany({
@@ -96,9 +96,13 @@ export default async function NftHomePage() {
                   <div className="mt-3 text-sm font-semibold line-clamp-2">{it.name}</div>
                   <div className="muted text-xs">
                     by{" "}
-                    <Link className="underline" href={`/u/${it.collection.creatorId}`}>
-                      {it.collection.creator?.name || "Unknown"}
-                    </Link>
+                    {it.collection ? (
+                      <Link className="underline" href={`/u/${it.collection.creatorId}`}>
+                        {it.collection.creator?.name || "Unknown"}
+                      </Link>
+                    ) : (
+                      "Unknown"
+                    )}
                   </div>
                   <div className="muted text-xs">
                     Owner:{" "}

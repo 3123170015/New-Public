@@ -6,8 +6,8 @@ import SmartImage from "@/components/media/SmartImage";
 export const dynamic = "force-dynamic";
 
 export default async function NftMarketPage() {
-  type ListingRow = Awaited<ReturnType<typeof prisma.nftListing.findMany>>[number];
-  type AuctionRow = Awaited<ReturnType<typeof prisma.nftAuction.findMany>>[number];
+  type ListingRow = Awaited<ReturnType<typeof prisma.nftListing.findMany>>[number] & { item?: { id: string; name: string; imageKey: string | null; videoId: string | null } | null; seller?: { name: string | null } | null };
+  type AuctionRow = Awaited<ReturnType<typeof prisma.nftAuction.findMany>>[number] & { item?: { id: string; name: string; imageKey: string | null; videoId: string | null } | null; seller?: { name: string | null } | null; highestBid?: { amountStars: number } | null };
 
   const [listings, auctions] = prisma
     ? await Promise.all([
@@ -83,6 +83,7 @@ export default async function NftMarketPage() {
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {(listings as ListingRow[]).map((l: ListingRow) => {
               const it = l.item;
+              if (!it) return null;
               const img = it.imageKey ? `${env.R2_PUBLIC_BASE_URL}/${it.imageKey}` : null;
               return (
                 <Link key={l.id} href={`/nft/items/${it.id}`} className="card">
@@ -121,6 +122,7 @@ export default async function NftMarketPage() {
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {(auctions as AuctionRow[]).map((a: AuctionRow) => {
               const it = a.item;
+              if (!it) return null;
               const img = it.imageKey ? `${env.R2_PUBLIC_BASE_URL}/${it.imageKey}` : null;
               const current = a.highestBid?.amountStars ?? a.startPriceStars;
               return (

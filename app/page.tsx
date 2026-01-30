@@ -12,9 +12,9 @@ import { getSiteConfig } from "@/lib/siteConfig";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  type BoostOrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findMany>>[number];
-  type CommunityPostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number];
-  type ProgressRow = Awaited<ReturnType<typeof prisma.videoProgress.findMany>>[number];
+  type BoostOrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findMany>>[number] & { video?: { status?: string | null } | null };
+  type CommunityPostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number] & { author?: { name?: string | null } | null; pollOptions?: { id: string; text: string; _count: { votes: number } }[] };
+  type ProgressRow = Awaited<ReturnType<typeof prisma.videoProgress.findMany>>[number] & { video?: { id?: string | null; status?: string | null } | null };
   type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
   type CategoryRow = Awaited<ReturnType<typeof prisma.category.findMany>>[number];
 

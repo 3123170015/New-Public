@@ -202,7 +202,7 @@ export default async function FeedPage() {
   boostedVideoWhere.access = allowAccess;
   if (shouldHideSensitiveInListings(sensitiveMode)) boostedVideoWhere.isSensitive = false;
 
-  type BoostOrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findMany>>[number];
+  type BoostOrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findMany>>[number] & { video?: VideoRow | null };
   type VideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
 
   const [adPlacement, boostedOrders, videos] = await Promise.all([

@@ -24,7 +24,7 @@ export default async function UserVideosPage({ params }: { params: { id: string 
     membershipExpiresAt: (session?.user as any)?.membershipExpiresAt ? new Date(((session?.user as any).membershipExpiresAt) as any) : null,
   };
   const activeTier = getActiveMembershipTier(viewerMem);
-  const allowAccess = activeTier === "PREMIUM_PLUS" ? ({ in: ["PUBLIC", "PREMIUM_PLUS"] } as const) : ("PUBLIC" as const);
+  const allowAccess = activeTier === "PREMIUM_PLUS" ? ({ in: ["PUBLIC", "PREMIUM_PLUS"] } as any) : ("PUBLIC" as const);
 
   const videos = await prisma.video.findMany({
     where: {

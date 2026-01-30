@@ -6,7 +6,7 @@ import CreatePlaylistForm from "./ui/CreatePlaylistForm";
 export const dynamic = "force-dynamic";
 
 export default async function PlaylistsPage() {
-  type PlaylistRow = Awaited<ReturnType<typeof prisma.playlist.findMany>>[number];
+  type PlaylistRow = { id: string; title: string; description: string | null; visibility: string; updatedAt: Date; _count: { items: number } };
 
   const session = await auth();
   const uid = (session?.user as any)?.id as string | undefined;

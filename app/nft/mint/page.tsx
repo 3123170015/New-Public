@@ -71,7 +71,7 @@ export default async function NftMintPage() {
       <div className="card">
         <div className="text-sm font-semibold">Mint NFT từ video</div>
         <div className="small muted" style={{ marginTop: 8 }}>
-          Phí mint: <b>{cfg.nftMintFeeStars}</b> stars / NFT.
+          Phí mint: <b>{cfg.nftItemMintFeeStars}</b> stars / NFT.
         </div>
         <div className="small muted" style={{ marginTop: 4 }}>
           NFT sẽ được tạo dưới dạng &quot;internal&quot; trong hệ thống (không export on-chain ở bản này).

@@ -25,7 +25,7 @@ function parseMintedRef(s: string | null | undefined) {
 }
 
 export default async function NftExportsPage() {
-  type ExportRow = Awaited<ReturnType<typeof prisma.nftExportRequest.findMany>>[number];
+  type ExportRow = Awaited<ReturnType<typeof prisma.nftExportRequest.findMany>>[number] & { item?: { name?: string | null } | null };
 
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;

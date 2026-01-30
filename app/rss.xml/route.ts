@@ -27,7 +27,7 @@ export async function GET(req: Request) {
     ? await prisma.siteConfig.findFirst({ where: { id: 1 }, select: { siteName: true, defaultDescription: true } })
     : null;
 
-  type RssVideoRow = Awaited<ReturnType<NonNullable<typeof prisma>["video"]["findMany"]>>[number];
+  type RssVideoRow = { id: string; title: string; description: string | null; createdAt: Date; updatedAt: Date; author?: { name?: string | null; username?: string | null } | null };
   const videos = prisma
     ? await prisma.video.findMany({
         where: { status: "PUBLISHED", access: "PUBLIC", isSensitive: false },

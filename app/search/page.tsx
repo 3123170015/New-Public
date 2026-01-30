@@ -30,7 +30,7 @@ export default async function SearchPage({
 }: {
   searchParams: { q?: string; tag?: string; category?: string; sort?: string; page?: string };
 }) {
-  type SearchVideoRow = Awaited<ReturnType<typeof prisma.video.findMany>>[number];
+  type SearchVideoRow = { id: string; createdAt: Date; title: string; isSensitive: boolean; thumbKey: string | null; viewCount: number; likeCount: number; category?: { name: string; slug: string } | null; channel?: { name: string; slug: string } | null };
 
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;

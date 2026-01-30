@@ -16,8 +16,8 @@ export default async function StudioVideoAnalyticsPage({ params }: { params: { i
   type DailyMetricRow = Awaited<ReturnType<typeof prisma.videoMetricDaily.findMany>>[number];
   type HourlyMetricRow = Awaited<ReturnType<typeof prisma.videoMetricHourly.findMany>>[number];
   type CountryRow = Awaited<ReturnType<typeof prisma.videoAudienceCountryDaily.findMany>>[number];
-  type ExperimentRow = NonNullable<Awaited<ReturnType<typeof prisma.videoExperiment.findFirst>>>;
-  type VariantRow = NonNullable<ExperimentRow["variants"]>[number];
+  type ExperimentRow = { id: string; status: string; variants?: { id: string; name: string; exposures: number; views: number; watchSeconds: number; completes: number }[] } | null;
+  type VariantRow = { id: string; name: string; exposures: number; views: number; watchSeconds: number; completes: number };
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");

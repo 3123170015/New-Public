@@ -5,7 +5,7 @@ import TopupClient from "./TopupClient";
 export const dynamic = "force-dynamic";
 
 export default async function StarsTopupPage() {
-  type TopupPackageRow = Awaited<ReturnType<typeof prisma.starTopupPackage.findMany>>[number];
+  type TopupPackageRow = Awaited<ReturnType<typeof prisma.starTopupPackage.findMany>>[number] & { token?: { symbol?: string | null } | null };
 
   const session = await auth();
   const uid = (session?.user as any)?.id as string | undefined;

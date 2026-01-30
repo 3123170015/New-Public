@@ -9,7 +9,7 @@ function fmt(n: number) {
 }
 
 export default async function StudioRevenuePage() {
-  type TipRow = Awaited<ReturnType<typeof prisma.creatorTip.findMany>>[number];
+  type TipRow = Awaited<ReturnType<typeof prisma.creatorTip.findMany>>[number] & { fromUser?: { name?: string | null } | null };
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) redirect("/login");

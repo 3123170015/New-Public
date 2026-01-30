@@ -183,7 +183,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
       const untilIso = new Date((v as any).earlyAccessUntil as any).toISOString();
       const plans = v.authorId
         ? await prisma.creatorMembershipPlan.findMany({
-            where: { creatorId: v.authorId, status: "ACTIVE" },
+            where: { userId: v.authorId, isActive: true },
             orderBy: [{ tier: "asc" }, { priceStars: "asc" }],
             take: 10,
           })

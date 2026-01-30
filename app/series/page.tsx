@@ -5,7 +5,7 @@ import { resolveMediaUrl } from "@/lib/mediaUrl";
 export const dynamic = "force-dynamic";
 
 export default async function SeriesIndexPage() {
-  type SeriesRow = Awaited<ReturnType<typeof prisma.playlist.findMany>>[number];
+  type SeriesRow = { id: string; title: string; coverKey: string | null; seriesSlug: string | null; owner?: { name?: string | null; username?: string | null } | null; _count: { items: number } };
 
   const series = await prisma.playlist.findMany({
     where: { isSeries: true, visibility: { in: ["PUBLIC", "UNLISTED"] } },

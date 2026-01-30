@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 export const dynamic = "force-dynamic";
 
 export default async function StudioClipsPage() {
-  type ClipRow = Awaited<ReturnType<typeof prisma.clip.findMany>>[number];
+  type ClipRow = Awaited<ReturnType<typeof prisma.clip.findMany>>[number] & { nftItems?: any[]; clipNft?: any; video?: { title?: string | null } };
 
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
@@ -64,12 +64,12 @@ export default async function StudioClipsPage() {
                   <div>
                     <div className="font-semibold">{c.title ?? "Untitled clip"}</div>
                     <div className="text-xs text-muted-foreground">
-                      Video: {c.video.title} · {c.startSec}s–{c.endSec}s · status={c.status}
+                      Video: {c.video?.title ?? "Untitled"} · {c.startSec}s–{c.endSec}s · status={c.status}
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="secondary">ClipNFT: {clipNft ? clipNft.status : "—"}</Badge>
-                    <Badge variant="secondary">Marketplace: {c.nftItems.length ? "✅" : "—"}</Badge>
+                    <Badge variant="secondary">Marketplace: {(c.nftItems?.length ?? 0) ? "✅" : "—"}</Badge>
                     {clipNft?.status === "MINTED" && clipNft.mintAddress ? (
                       <Badge variant="secondary">Minted: {String(clipNft.mintAddress).slice(0, 6)}…</Badge>
                     ) : null}

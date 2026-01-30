@@ -6,7 +6,7 @@ import { env } from "@/lib/env";
 export const dynamic = "force-dynamic";
 
 export default async function UserNftsPage({ params }: { params: { id: string } }) {
-  type UserNftRow = Awaited<ReturnType<typeof prisma.nftItem.findMany>>[number];
+  type UserNftRow = Awaited<ReturnType<typeof prisma.nftItem.findMany>>[number] & { collection?: { title?: string | null } | null; video?: { id: string; title: string } | null };
 
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;

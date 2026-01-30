@@ -23,7 +23,7 @@ export default async function HistoryPage() {
 
   const sensitiveMode = await getSensitiveModeForUser(uid);
 
-  type ProgressRow = Awaited<ReturnType<typeof prisma.videoProgress.findMany>>[number];
+  type ProgressRow = Awaited<ReturnType<typeof prisma.videoProgress.findMany>>[number] & { video?: { status?: string | null } | null };
   const rows = await prisma.videoProgress.findMany({
     where: { userId: uid },
     orderBy: { updatedAt: "desc" },

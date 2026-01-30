@@ -6,7 +6,7 @@ import CommunityPoll from "@/components/community/CommunityPoll";
 export const dynamic = "force-dynamic";
 
 export default async function CommunityPage({ params }: { params: { id: string } }) {
-  type CommunityPostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number];
+  type CommunityPostRow = Awaited<ReturnType<typeof prisma.communityPost.findMany>>[number] & { author?: { name?: string | null } | null; pollOptions?: { id: string; text: string; votes?: unknown[] }[] };
 
   const session = await auth();
   const viewerId = (session?.user as any)?.id as string | undefined;
