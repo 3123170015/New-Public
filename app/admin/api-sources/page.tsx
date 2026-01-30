@@ -1,11 +1,14 @@
+import type { ApiSource } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type ApiSourceRow = Awaited<ReturnType<typeof prisma.apiSource.findFirst>>;
+type ApiSourceRow = ApiSource;
 
 export default async function AdminApiSources() {
-  const list = (await prisma.apiSource.findMany({ orderBy: { createdAt: "desc" } })) as ApiSourceRow[];
+  const list = prisma
+    ? ((await prisma.apiSource.findMany({ orderBy: { createdAt: "desc" } })) as ApiSourceRow[])
+    : [];
 
   return (
     <div style={{ display: "grid", gap: 12, maxWidth: 980 }}>

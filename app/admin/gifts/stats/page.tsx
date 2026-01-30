@@ -1,8 +1,13 @@
+import type { Gift } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type GiftStatsRow = Awaited<ReturnType<typeof prisma.starTransaction.groupBy>>[number];
+type GiftStatsRow = {
+  giftId: string | null;
+  _sum: { stars: number | null; quantity: number | null };
+  _count: { _all: number };
+};
 
 export default async function GiftsStats() {
   const rows = (await prisma.starTransaction.groupBy({
@@ -12,13 +17,13 @@ export default async function GiftsStats() {
     _count: { _all: true },
     orderBy: { _sum: { stars: "desc" } },
     take: 50,
-  })) as GiftStatsRow[];
+  })) as unknown as GiftStatsRow[];
 
   const giftIds = rows.map((r) => r.giftId!).filter(Boolean);
   const gifts = (await prisma.gift.findMany({
     where: { id: { in: giftIds } },
     select: { id: true, name: true, icon: true, starsCost: true, active: true },
-  })) as Awaited<ReturnType<typeof prisma.gift.findFirst>>[];
+  })) as Gift[];
   const map = new Map(gifts.map((g) => [g.id, g]));
 
   return (

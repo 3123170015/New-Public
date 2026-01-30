@@ -263,8 +263,8 @@ model User {
   premiumPlusHideBoostAds Boolean @default(false)
 
   // Optional: use a minted NFT as avatar
-  avatarNftItemId String?
-  avatarNftItem   NftItem? @relation("UserAvatarNft", fields: [avatarNftItemId], references: [id], onDelete: SetNull)
+  avatarNftItemId String? @unique
+  avatarNftItem   NftItem? @relation("UserAvatarNftItem", fields: [avatarNftItemId], references: [id], onDelete: SetNull)
 
   // Wallet linking / NFT gating
   wallets      UserWallet[]
@@ -273,11 +273,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  videos   Video[]
-  likes    Like[]
-  comments Comment[]
-  progress VideoProgress[]
-  videoUnlocks VideoUnlock[]
+  videos   Video[] @relation("UserVideos")
+  likes    Like[] @relation("UserLikes")
+  comments Comment[] @relation("UserComments")
+  progress VideoProgress[] @relation("UserVideoProgress")
+  watchLaterItems WatchLaterItem[] @relation("UserWatchLaterItems")
+  videoUnlocks VideoUnlock[] @relation("UserVideoUnlocks")
 
   // Playlists
   playlists Playlist[]
@@ -303,6 +304,7 @@ model User {
   // Season Pass (site-wide)
   seasonPass SeasonPass?
   seasonPassPurchases SeasonPassPurchase[]
+  couponRedemptions CouponRedemption[] @relation("CouponRedemptionUser")
 
   fraudAlerts FraudAlert[] @relation("FraudAlertUser")
   fraudAlertsAcked FraudAlert[] @relation("FraudAlertAckBy")
@@ -334,6 +336,7 @@ model User {
   subscriptionsOut Subscription[] @relation("SubscriptionsOut")
   subscriptionsIn  Subscription[] @relation("SubscriptionsIn")
   communityPosts   CommunityPost[]
+  communityPollVotes CommunityPollVote[] @relation("CommunityPollVoteUser")
 
   // NFT
   nftCollections    NftCollection[] @relation("NftCollectionCreator")
@@ -344,6 +347,8 @@ model User {
   nftSalesBought    NftSale[] @relation("NftSaleBuyer")
   nftSalesSold      NftSale[] @relation("NftSaleSeller")
   nftExportRequests NftExportRequest[]
+  nftGateRules      NftGateRule[]
+  creatorPassConfig CreatorPassConfig?
   premiumUsage      PremiumBenefitUsage[]
 
   // Analytics / Experiments
@@ -373,6 +378,11 @@ model User {
   creatorMembershipsAsCreator CreatorMembership[] @relation("CreatorMembershipCreator")
   creatorMembershipPurchases CreatorMembershipPurchase[] @relation("CreatorMembershipPurchaser")
   creatorMembershipPurchasesAsCreator CreatorMembershipPurchase[] @relation("CreatorMembershipPurchaseCreator")
+
+  apiSources ApiSource[] @relation("ApiSourceOwner")
+  pendingNftChainContracts NftChainContract[] @relation("NftChainContractPendingSetBy")
+  pendingStorageEndpointConfigs StorageEndpointConfig[] @relation("StorageEndpointConfigPendingSetBy")
+  storageSecretsCreated StorageSecret[] @relation("StorageSecretCreatedBy")
 
   // Moderation actions audit
   moderationActionsAsActor ModerationAction[] @relation("ModerationActor")
@@ -409,6 +419,7 @@ model Channel {
   updatedAt   DateTime @updatedAt
 
   videos      Video[]
+  apiSources  ApiSource[] @relation("ApiSourceChannel")
 }
 
 model Category {
@@ -508,7 +519,7 @@ model Video {
   embedUrl      String?     @unique
 
   authorId      String?
-  author        User?       @relation(fields: [authorId], references: [id])
+  author        User?       @relation("UserVideos", fields: [authorId], references: [id])
 
   deletedAt     DateTime?
   deletedById   String?
@@ -524,12 +535,17 @@ model Video {
 
   clips Clip[]
   moderationActions ModerationAction[]
-  comments      Comment[]
-  likes         Like[]
-  progress      VideoProgress[]
-  unlocks       VideoUnlock[]
+  comments      Comment[] @relation("VideoComments")
+  likes         Like[] @relation("VideoLikes")
+  progress      VideoProgress[] @relation("VideoProgress")
+  watchLaterItems WatchLaterItem[] @relation("VideoWatchLaterItems")
+  unlocks       VideoUnlock[] @relation("VideoUnlocks")
+  videoAssets   VideoAsset[] @relation("VideoAssets")
+  nftGateRules  VideoNftGate[] @relation("VideoNftGates")
   tags          VideoTag[]
   starTx        StarTransaction[]
+  nftItems      NftItem[] @relation("VideoNftItems")
+  videoTrafficSources VideoTrafficSourceDaily[]
   chapters      VideoChapter[]
   playlistItems PlaylistItem[]
 
@@ -546,14 +562,14 @@ model Video {
   // Prisma will map this to a MySQL FULLTEXT index.
   @@fulltext([title, description])
 
-// Reports / Boost / Metrics
-reports      VideoReport[]
-boostOrders  BoostOrder[]
-metricsDaily VideoMetricDaily[]
-metricsHourly VideoMetricHourly[]
-audienceDaily VideoAudienceCountryDaily[]
-retentionDaily VideoRetentionDaily[]
-experiments VideoExperiment[]
+  // Reports / Boost / Metrics
+  reports      VideoReport[] @relation("VideoReports")
+  boostOrders  BoostOrder[]
+  metricsDaily VideoMetricDaily[]
+  metricsHourly VideoMetricHourly[]
+  audienceDaily VideoAudienceCountryDaily[]
+  retentionDaily VideoRetentionDaily[]
+  experiments VideoExperiment[]
 }
 
 model Like {
@@ -562,8 +578,8 @@ model Like {
   videoId   String
   createdAt DateTime @default(now())
 
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  video     Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  user      User   @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade, map: "fk_like_user")
+  video     Video  @relation("VideoLikes", fields: [videoId], references: [id], onDelete: Cascade, map: "fk_like_video")
 
   @@unique([userId, videoId])
 }
@@ -603,8 +619,8 @@ model Comment {
   giftId           String?
   starTxId         String?  @unique
 
-  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  video     Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  user      User?   @relation("UserComments", fields: [userId], references: [id], onDelete: SetNull)
+  video     Video   @relation("VideoComments", fields: [videoId], references: [id], onDelete: Cascade)
   gift      Gift?   @relation(fields: [giftId], references: [id], onDelete: SetNull)
   starTx    StarTransaction? @relation(fields: [starTxId], references: [id], onDelete: SetNull)
 
@@ -632,8 +648,8 @@ model VideoProgress {
   seconds   Int      @default(0)
   updatedAt DateTime @updatedAt
 
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  video     Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  user      User   @relation("UserVideoProgress", fields: [userId], references: [id], onDelete: Cascade, map: "fk_progress_user")
+  video     Video  @relation("VideoProgress", fields: [videoId], references: [id], onDelete: Cascade, map: "fk_progress_video")
 
   @@unique([userId, videoId])
 }
@@ -645,8 +661,8 @@ model WatchLaterItem {
   videoId   String
   createdAt DateTime @default(now())
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  user  User  @relation("UserWatchLaterItems", fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation("VideoWatchLaterItems", fields: [videoId], references: [id], onDelete: Cascade)
 
   @@unique([userId, videoId])
   @@index([userId, createdAt])
@@ -819,11 +835,11 @@ model ApiSource {
 
   // Optional ownership (for user-created channel sync sources)
   ownerId     String?
-  owner       User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  owner       User?    @relation("ApiSourceOwner", fields: [ownerId], references: [id], onDelete: SetNull)
 
   // Optional fixed target channel for imported videos
   channelId   String?
-  channel     Channel? @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  channel     Channel? @relation("ApiSourceChannel", fields: [channelId], references: [id], onDelete: SetNull)
 
   // Sync bookkeeping
   lastSyncAt     DateTime?
@@ -886,8 +902,13 @@ model StarTransaction {
   video     Video?     @relation(fields: [videoId], references: [id], onDelete: SetNull)
   gift      Gift?      @relation(fields: [giftId], references: [id], onDelete: SetNull)
 
-  deposit   StarDeposit? @relation(fields: [depositId], references: [id], onDelete: SetNull)
+  deposit   StarDeposit? @relation("StarDepositTransactions", fields: [depositId], references: [id], onDelete: SetNull)
   comment   Comment?
+
+  creatorTip       CreatorTip? @relation("CreatorTipStarTx")
+  seasonPassPurchase SeasonPassPurchase? @relation("SeasonPassPurchaseStarTx")
+  referralBonusesBase  ReferralBonus[] @relation("ReferralBonusBaseTx")
+  referralBonus     ReferralBonus? @relation("ReferralBonusBonusTx")
 
   @@index([userId, createdAt])
   @@index([videoId, createdAt])
@@ -1019,6 +1040,7 @@ model StarDeposit {
   coupon             Coupon?          @relation(fields: [couponId], references: [id], onDelete: SetNull)
   custodialAddress   CustodialAddress @relation(fields: [custodialAddressId], references: [id], onDelete: Cascade)
 
+  transactions       StarTransaction[] @relation("StarDepositTransactions")
   events             StarDepositEvent[]
   webhooks           WebhookAuditLog[]
   fraudAlerts        FraudAlert[]
@@ -1143,7 +1165,7 @@ model CouponRedemption {
   createdAt   DateTime @default(now())
 
   coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation("CouponRedemptionUser", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([couponId, sourceKind, sourceId])
   @@index([userId, createdAt])
@@ -1195,7 +1217,7 @@ model SeasonPassPurchase {
   createdAt  DateTime @default(now())
 
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  starTx     StarTransaction? @relation(fields: [starTxId], references: [id], onDelete: SetNull)
+  starTx     StarTransaction? @relation("SeasonPassPurchaseStarTx", fields: [starTxId], references: [id], onDelete: SetNull)
   coupon    Coupon? @relation(fields: [couponId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt])
@@ -1318,7 +1340,7 @@ model VideoReport {
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
 
-  video      Video        @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  video      Video        @relation("VideoReports", fields: [videoId], references: [id], onDelete: Cascade)
   reporter   User?        @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: SetNull)
   reviewer   User?        @relation("ReportReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
 
@@ -1628,7 +1650,7 @@ model CommunityPollVote {
 
   post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   option    CommunityPollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User @relation("CommunityPollVoteUser", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
   @@index([postId, createdAt])
@@ -1698,10 +1720,13 @@ model NftItem {
   updatedAt    DateTime @updatedAt
 
   collection   NftCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  video        Video? @relation(fields: [videoId], references: [id], onDelete: SetNull)
+  video        Video? @relation("VideoNftItems", fields: [videoId], references: [id], onDelete: SetNull)
   clip         Clip?  @relation(fields: [clipId], references: [id], onDelete: SetNull)
   owner        User @relation("NftItemOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  avatarUser   User? @relation("UserAvatarNft")
+  avatarUser   User? @relation("UserAvatarNftItem")
+
+  clipNft      ClipNft? @relation("ClipNftItem")
+
 
   listings     NftListing[]
   auctions     NftAuction[]
@@ -1728,7 +1753,7 @@ model NftListing {
 
   item      NftItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   seller    User @relation("NftListingSeller", fields: [sellerId], references: [id], onDelete: Cascade)
-  sale      NftSale?
+  sale      NftSale? @relation("NftSaleListing")
 
   @@index([status, createdAt])
   @@index([sellerId, createdAt])
@@ -1747,16 +1772,16 @@ model NftAuction {
   endAt     DateTime
   status    NftAuctionStatus @default(ACTIVE)
 
-  highestBidId String?
+  highestBidId String? @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   item      NftItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   seller    User @relation("NftAuctionSeller", fields: [sellerId], references: [id], onDelete: Cascade)
-  bids      NftBid[]
+  bids      NftBid[] @relation("NftAuctionBids")
   highestBid NftBid? @relation("AuctionHighestBid", fields: [highestBidId], references: [id], onDelete: SetNull)
-  sale      NftSale?
+  sale      NftSale? @relation("NftSaleAuction")
 
   @@index([status, endAt])
   @@index([sellerId, createdAt])
@@ -1771,9 +1796,10 @@ model NftBid {
   holdId    String? @unique
   createdAt DateTime @default(now())
 
-  auction   NftAuction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  auction   NftAuction @relation("NftAuctionBids", fields: [auctionId], references: [id], onDelete: Cascade)
   bidder    User @relation(fields: [bidderId], references: [id], onDelete: Cascade)
-  hold      StarHold? @relation(fields: [holdId], references: [id], onDelete: SetNull)
+  hold      StarHold? @relation("StarHoldNftBid", fields: [holdId], references: [id], onDelete: SetNull)
+  highestFor NftAuction? @relation("AuctionHighestBid")
 
   @@index([auctionId, createdAt])
   @@index([bidderId, createdAt])
@@ -1792,6 +1818,7 @@ model StarHold {
   updatedAt DateTime @updatedAt
 
   user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nftBid    NftBid? @relation("StarHoldNftBid")
 
   @@index([status, releaseAt])
   @@index([userId, createdAt])
@@ -1811,8 +1838,8 @@ model NftSale {
   authorRoyaltyStars  Int
   sellerProceedsStars Int
 
-  listingId String?
-  auctionId String?
+  listingId String? @unique
+  auctionId String? @unique
 
   createdAt DateTime @default(now())
 
@@ -1820,8 +1847,8 @@ model NftSale {
   buyer     User @relation("NftSaleBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
   seller    User @relation("NftSaleSeller", fields: [sellerId], references: [id], onDelete: Cascade)
 
-  listing   NftListing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
-  auction   NftAuction? @relation(fields: [auctionId], references: [id], onDelete: SetNull)
+  listing   NftListing? @relation("NftSaleListing", fields: [listingId], references: [id], onDelete: SetNull)
+  auction   NftAuction? @relation("NftSaleAuction", fields: [auctionId], references: [id], onDelete: SetNull)
 
   @@index([createdAt])
   @@index([sellerId, createdAt])
@@ -1865,7 +1892,7 @@ model NftChainContract {
   pendingAddress String?
   pendingApplyAt DateTime?
   pendingSetById String?
-  pendingSetBy   User? @relation(fields: [pendingSetById], references: [id], onDelete: SetNull)
+  pendingSetBy   User? @relation("NftChainContractPendingSetBy", fields: [pendingSetById], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1943,7 +1970,7 @@ model StorageEndpointConfig {
   pendingJson String? @db.Text
   pendingApplyAt DateTime?
   pendingSetById String?
-  pendingSetBy User? @relation(fields: [pendingSetById], references: [id], onDelete: SetNull)
+  pendingSetBy User? @relation("StorageEndpointConfigPendingSetBy", fields: [pendingSetById], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1957,7 +1984,7 @@ model StorageSecret {
   name String?
   encryptedJson String @db.Text
   createdById String?
-  createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy User? @relation("StorageSecretCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
 
   @@index([type, createdAt])
@@ -1971,7 +1998,7 @@ model VideoAsset {
   lastHealthAt DateTime?
   lastError String? @db.Text
 
-  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  video Video @relation("VideoAssets", fields: [videoId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -2010,7 +2037,7 @@ model CreatorTip {
 
   fromUser User @relation("CreatorTipFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
   toUser   User @relation("CreatorTipTo", fields: [toUserId], references: [id], onDelete: Cascade)
-  starTx   StarTransaction? @relation(fields: [starTxId], references: [id], onDelete: SetNull)
+  starTx   StarTransaction? @relation("CreatorTipStarTx", fields: [starTxId], references: [id], onDelete: SetNull)
 
   @@unique([fromUserId, idempotencyKey])
   @@index([toUserId, createdAt])
@@ -2185,6 +2212,7 @@ model CreatorMembershipPlan {
 
   user        User     @relation("CreatorMembershipPlans", fields: [userId], references: [id], onDelete: Cascade)
   memberships CreatorMembership[]
+  purchases CreatorMembershipPurchase[] @relation("CreatorMembershipPlanPurchases")
 
   @@unique([userId, tier])
   @@index([userId, isActive, sort])
@@ -2205,6 +2233,7 @@ model CreatorMembership {
   plan        CreatorMembershipPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
   user        User    @relation("CreatorMemberships", fields: [userId], references: [id], onDelete: Cascade)
   creator     User    @relation("CreatorMembershipCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  invoices    CreatorMembershipInvoice[] @relation("CreatorMembershipInvoices")
 
   @@unique([planId, userId])
   @@index([creatorId, status, expiresAt])
@@ -2220,7 +2249,7 @@ model CreatorMembershipInvoice {
   starTxId     String?  @unique
   createdAt    DateTime @default(now())
 
-  membership   CreatorMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  membership   CreatorMembership @relation("CreatorMembershipInvoices", fields: [membershipId], references: [id], onDelete: Cascade)
 
   @@unique([membershipId, monthKey])
   @@index([monthKey, createdAt])
@@ -2236,8 +2265,8 @@ model VideoUnlock {
   starTxId        String?  @unique
   createdAt DateTime @default(now())
 
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  video     Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  user      User   @relation("UserVideoUnlocks", fields: [userId], references: [id], onDelete: Cascade)
+  video     Video  @relation("VideoUnlocks", fields: [videoId], references: [id], onDelete: Cascade)
 
   @@unique([userId, videoId])
   @@index([videoId, createdAt])
@@ -2313,7 +2342,7 @@ model VideoNftGate {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  video              Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  video              Video @relation("VideoNftGates", fields: [videoId], references: [id], onDelete: Cascade)
 
   @@index([videoId, enabled])
   @@index([chain, enabled])
@@ -2347,7 +2376,7 @@ model ClipNft {
   royaltyBps   Int           @default(500)
   metadataKey  String?       @db.VarChar(500)
   thumbKey     String?       @db.VarChar(500)
-  nftItemId    String?
+  nftItemId    String? @unique
   attemptCount Int           @default(0)
   lastAttemptAt DateTime?
   lastError    String?       @db.Text
@@ -2355,7 +2384,7 @@ model ClipNft {
   updatedAt    DateTime      @updatedAt
 
   clip         Clip          @relation(fields: [clipId], references: [id], onDelete: Cascade)
-  nftItem      NftItem?      @relation(fields: [nftItemId], references: [id], onDelete: SetNull)
+  nftItem      NftItem?      @relation("ClipNftItem", fields: [nftItemId], references: [id], onDelete: SetNull)
   mints        ClipNftMint[]
 
   @@index([status, createdAt])
@@ -2424,7 +2453,7 @@ model CreatorMembershipPurchase {
   createdAt      DateTime @default(now())
 
   user           User     @relation("CreatorMembershipPurchaser", fields: [userId], references: [id], onDelete: Cascade)
-  plan           CreatorMembershipPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  plan           CreatorMembershipPlan @relation("CreatorMembershipPlanPurchases", fields: [planId], references: [id], onDelete: Cascade)
   creator        User     @relation("CreatorMembershipPurchaseCreator", fields: [creatorId], references: [id], onDelete: Cascade)
 
   @@unique([userId, idempotencyKey])

@@ -1,3 +1,4 @@
+import type { BoostPlan } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export const dynamic = "force-dynamic";
 
-type BoostPlanRow = Awaited<ReturnType<typeof prisma.boostPlan.findFirst>>;
+type BoostPlanRow = BoostPlan;
 
 export default async function AdminBoostPlans() {
   const list = (await prisma.boostPlan.findMany({ orderBy: [{ sort: "asc" }, { createdAt: "desc" }] })) as BoostPlanRow[];

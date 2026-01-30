@@ -1,3 +1,4 @@
+import type { CreatorModerationSetting } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,9 @@ import { Input } from "@/components/ui/input";
 
 export const dynamic = "force-dynamic";
 
-type ModerationKeywordRow = Awaited<ReturnType<typeof prisma.creatorModerationSetting.findFirst>>;
+type ModerationKeywordRow = CreatorModerationSetting & {
+  creator: { id: string; name: string | null; email: string | null } | null;
+};
 
 export default async function AdminModerationKeywordsPage() {
   const rows = (await prisma.creatorModerationSetting.findMany({

@@ -1,11 +1,14 @@
+import type { AdPlacement } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type AdPlacementRow = Awaited<ReturnType<typeof prisma.adPlacement.findFirst>>;
+type AdPlacementRow = AdPlacement;
 
 export default async function AdminAds() {
-  const list = (await prisma.adPlacement.findMany({ orderBy: { scope: "asc" } })) as AdPlacementRow[];
+  const list = prisma
+    ? ((await prisma.adPlacement.findMany({ orderBy: { scope: "asc" } })) as AdPlacementRow[])
+    : [];
 
   return (
     <div style={{ display: "grid", gap: 12, maxWidth: 900 }}>

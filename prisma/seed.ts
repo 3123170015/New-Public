@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -9,7 +9,7 @@ async function seedAdmin() {
   const password = process.env.SEED_ADMIN_PASSWORD ?? "admin123456";
   const name = process.env.SEED_ADMIN_NAME ?? "Admin";
 
-  const passwordHash = await hash(password, 10);
+  const passwordHash = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.upsert({
     where: { email },

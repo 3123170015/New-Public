@@ -1,3 +1,4 @@
+import type { BoostOrder } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export const dynamic = "force-dynamic";
 
-type BoostOrderRow = Awaited<ReturnType<typeof prisma.boostOrder.findFirst>>;
+type BoostOrderRow = BoostOrder & {
+  user: { id: string; name: string | null; email: string | null };
+  video: { id: string; title: string };
+  plan: { name: string };
+};
 
 export default async function AdminBoostOrders() {
   const list = (await prisma.boostOrder.findMany({
