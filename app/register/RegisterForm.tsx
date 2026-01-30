@@ -1,22 +1,14 @@
-import { getRequestLanguage, t } from "@/lib/i18n";
-import { flags } from "@/lib/env";
-import RegisterForm from "./RegisterForm";
+"use client";
 
-export default async function RegisterPage() {
-  const lang = await getRequestLanguage();
-  if (!flags.allowPublicSignup) {
-    return (
-      <div className="mx-auto max-w-md">
-        <div className="card">
-          <div className="text-lg font-semibold">{t(lang, "auth.register.disabledTitle")}</div>
-          <div className="small muted mt-1">{t(lang, "auth.register.disabledSubtitle")}</div>
-        </div>
-      </div>
-    );
-  }
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { t, type Language } from "@/lib/i18nShared";
 
-  return <RegisterForm lang={lang} />;
-}
+export default function RegisterForm({ lang }: { lang: Language }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -29,8 +21,8 @@ export default async function RegisterPage() {
     <div className="mx-auto max-w-md">
       <Card>
         <CardHeader>
-          <CardTitle>Đăng ký</CardTitle>
-          <CardDescription>Tạo tài khoản mới để theo dõi video & bộ sưu tập.</CardDescription>
+          <CardTitle>{t(lang, "auth.register.title")}</CardTitle>
+          <CardDescription>{t(lang, "auth.register.subtitle")}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -40,11 +32,11 @@ export default async function RegisterPage() {
               setErr("");
               setDone("");
               if (!email || !password || !confirm) {
-                setErr("Vui lòng điền đầy đủ thông tin.");
+                setErr(t(lang, "auth.register.errorMissing"));
                 return;
               }
               if (password !== confirm) {
-                setErr("Mật khẩu xác nhận không khớp.");
+                setErr(t(lang, "auth.register.errorMismatch"));
                 return;
               }
               setLoading(true);
@@ -56,15 +48,16 @@ export default async function RegisterPage() {
                 });
                 if (!res.ok) {
                   const data = await res.json().catch(() => ({}));
-                  setErr(data?.error || "Không thể tạo tài khoản.");
                   if (res.status === 403) {
-                    setErr("Đăng ký tạm thời bị tắt. Vui lòng liên hệ quản trị.");
+                    setErr(t(lang, "auth.register.errorDisabled"));
+                  } else {
+                    setErr(data?.error || t(lang, "auth.register.errorGeneric"));
                   }
                 } else {
-                  setDone("Đăng ký thành công! Bạn có thể đăng nhập ngay.");
+                  setDone(t(lang, "auth.register.success"));
                 }
               } catch {
-                setErr("Không thể kết nối tới máy chủ.");
+                setErr(t(lang, "auth.register.errorNetwork"));
               } finally {
                 setLoading(false);
               }
@@ -72,7 +65,7 @@ export default async function RegisterPage() {
             className="grid gap-4"
           >
             <div className="grid gap-2">
-              <Label htmlFor="name">Tên hiển thị</Label>
+              <Label htmlFor="name">{t(lang, "auth.name")}</Label>
               <Input
                 id="name"
                 placeholder="Collector Pro"
@@ -85,14 +78,16 @@ export default async function RegisterPage() {
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
+                required
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t(lang, "auth.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -100,10 +95,12 @@ export default async function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
+                minLength={6}
+                required
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="confirm">Xác nhận mật khẩu</Label>
+              <Label htmlFor="confirm">{t(lang, "auth.passwordConfirm")}</Label>
               <Input
                 id="confirm"
                 type="password"
@@ -111,6 +108,8 @@ export default async function RegisterPage() {
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 autoComplete="new-password"
+                minLength={6}
+                required
               />
             </div>
 
@@ -118,15 +117,15 @@ export default async function RegisterPage() {
             {done ? <div className="text-sm font-medium text-emerald-600">{done}</div> : null}
 
             <Button type="submit" disabled={loading}>
-              {loading ? "Đang tạo..." : "Tạo tài khoản"}
+              {loading ? t(lang, "auth.register.loading") : t(lang, "auth.register.submit")}
             </Button>
 
             <div className="small muted flex items-center justify-between">
               <Link href="/login" className="underline">
-                Đã có tài khoản? Đăng nhập
+                {t(lang, "auth.register.login")}
               </Link>
               <Link href="/" className="underline">
-                ← Quay lại Home
+                ← {t(lang, "auth.backHome")}
               </Link>
             </div>
           </form>
