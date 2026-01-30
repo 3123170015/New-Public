@@ -59,6 +59,7 @@ Khi mở chat mới hoặc cập nhật dự án, đọc theo thứ tự (có b�
 ### Theme Builder (v4.16.26)
 - Upload theme preset (theme.json + assets) via Admin Config.
 - Active preset stored in `SiteConfig.activeThemeId`, injected as CSS variables at runtime.
+- Public signup page `/register` (disable with `ALLOW_PUBLIC_SIGNUP=false`).
 
 ### Ops automation (v4.16.25)
 - aaPanel install/update/monitor scripts with Telegram alerts + optional auto-restart/backup.

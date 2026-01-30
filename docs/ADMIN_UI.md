@@ -46,6 +46,7 @@ Mục tiêu: liệt kê nhanh **admin pages + admin APIs** theo đúng contract,
 - `/admin/config` → `app/admin/config/page.tsx`
 - `/admin/themes` → `app/admin/themes/page.tsx` (Theme presets manager)
 - `/admin/ads` → `app/admin/ads/page.tsx`
+- Public signup: `/register` → `app/register/page.tsx` (toggle via `ALLOW_PUBLIC_SIGNUP=false`)
 
 ### 1.6 NFT (admin)
 - `/admin/nft/contracts` → `app/admin/nft/contracts/page.tsx`

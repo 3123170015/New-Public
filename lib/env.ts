@@ -54,6 +54,7 @@ const schema = z.object({
   CLAMAV_PORT: z.coerce.number().optional().default(3310),
 
   INSTALL_WIZARD_ENABLED: z.string().optional().default("false"),
+  ALLOW_PUBLIC_SIGNUP: z.string().optional().default("true"),
 
   // Payments / Stars topup
   APP_ENV: z.enum(["dev", "prod"]).optional().default("dev"),
@@ -113,6 +114,7 @@ export const flags = {
   subtitlesAuto: env.SUBTITLES_AUTO_ENABLED === "true",
   clamav: env.CLAMAV_ENABLED === "true",
   installWizard: env.INSTALL_WIZARD_ENABLED === "true",
+  allowPublicSignup: env.ALLOW_PUBLIC_SIGNUP === "true",
 };
 
 export function creatorWebhookAllowlist() {
