@@ -1,0 +1,65 @@
+TỔNG QUAN FRONTEND API (External) — Dành cho Bolt/Lovable/Expo
+
+Mục tiêu: dùng chung backend Next.js, cho phép nhiều frontend/app qua API key + JWT.
+
+1) Xác thực ứng dụng (API Key)
+- Bắt buộc header: X-API-Key: <raw key>
+- Admin tạo key: POST /api/admin/api-keys
+- Allowlist domain: cấu hình allowedOrigins (csv) trong API key
+  Ví dụ: "app.domain.com,*.vercel.app,https://myapp.web.app"
+- Khi request có Origin → backend kiểm tra allowlist
+
+2) Xác thực người dùng (JWT)
+- JWT cookie (browser): credentials: "include"
+- JWT Bearer (mobile/expo): Authorization: Bearer <token>
+- Đăng nhập external: POST /api/external/auth/login
+  Body: { "email": "...", "password": "..." }
+  Response: { ok, access_token, user }
+- Đăng ký external: POST /api/external/auth/register
+- Đăng xuất external: POST /api/external/auth/logout
+
+3) Scopes (bắt buộc nếu strictScopes = true)
+Ví dụ scope:
+- public/videos
+- public/search
+- auth/login | auth/register | auth/me
+- me/notifications | me/watch-later
+- stars/topup/intent | stars/topup/history
+- nft/write | user/write
+
+4) Ví dụ: Public videos
+GET /api/external/public/videos?take=12&page=1
+Headers:
+  X-API-Key: <key>
+Response:
+  { ok, items: [{ id, title, thumbUrl, watchUrl, ... }], page, take, total }
+
+5) Ví dụ: Search
+GET /api/external/public/search?q=music
+Headers: X-API-Key
+
+6) Ví dụ: Đăng nhập + lấy token
+POST /api/external/auth/login
+Headers: X-API-Key
+Body: { "email": "demo@site.com", "password": "123456" }
+Response: { ok, access_token, user }
+
+7) Topup Stars (USDT/USDC)
+- Tạo intent:
+POST /api/external/stars/topup/intent
+Headers: X-API-Key + Authorization: Bearer <token> (hoặc cookie)
+Body: { "packageId": "<id>", "couponCode": "..." }
+Response: { ok, deposit: { id, chain, toAddress, memo, expectedAmount, stars } }
+
+- Lịch sử nạp:
+GET /api/external/stars/topup/history
+Headers: X-API-Key + Authorization: Bearer <token>
+
+8) NFT marketplace
+- Create listing: POST /api/external/nft/listings/create (scope: nft/write + user/write)
+- Cancel listing: POST /api/external/nft/listings/cancel
+- Buy listing: POST /api/external/nft/listings/buy
+
+9) Cookie + CORS
+- Browser: fetch(url, { credentials: "include" })
+- CORS allowlist: config allowedOrigins trong API key
