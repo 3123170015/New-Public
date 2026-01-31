@@ -18,7 +18,8 @@ function addDays(d: Date, days: number) {
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const external = await requireExternalUser(req, ["nft/write", "user/write"]);
   if (!(external instanceof Response)) {
-    return handleSettle(req, params.id, external.user.id, undefined, external.cors);
+    const isAdmin = external.user.role === "ADMIN";
+    return handleSettle(req, params.id, external.user.id, undefined, external.cors, isAdmin);
   }
 
   const session = await auth();
@@ -33,6 +34,7 @@ async function handleSettle(
   userId: string,
   session?: Awaited<ReturnType<typeof auth>>,
   headers?: HeadersInit,
+  isAdminExternal = false,
 ) {
 
   const form = await req.formData();
@@ -63,10 +65,13 @@ async function handleSettle(
 
     // Only seller or admin can settle.
     if (auction.sellerId !== userId) {
-      if (!session) throw new Error("FORBIDDEN");
-      try {
-        requireAdmin(session);
-      } catch {
+      if (session) {
+        try {
+          requireAdmin(session);
+        } catch {
+          throw new Error("FORBIDDEN");
+        }
+      } else if (!isAdminExternal) {
         throw new Error("FORBIDDEN");
       }
     }
