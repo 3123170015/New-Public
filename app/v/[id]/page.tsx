@@ -184,7 +184,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
       const plans = v.authorId
         ? await prisma.creatorMembershipPlan.findMany({
             where: { userId: v.authorId, isActive: true },
-            orderBy: [{ tier: "asc" }, { priceStars: "asc" }],
+            orderBy: [{ tier: "asc" }, { starsPrice: "asc" }],
             take: 10,
           })
         : [];
@@ -237,7 +237,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
       const nftGateChains = Array.from(new Set(nftGates.map((g: { chain: string }) => String(g.chain)))) as string[];
 
       const plans = await prisma.creatorMembershipPlan.findMany({
-        where: { userId: v.authorId, isActive: true },
+        where: { userId: v.authorId ?? "", isActive: true },
         orderBy: [{ sort: "asc" }, { starsPrice: "asc" }],
         select: { id: true, title: true, starsPrice: true, durationDays: true, benefits: true, tier: true },
       });
@@ -246,7 +246,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
         <main className="mx-auto max-w-3xl px-2 py-4">
           <PremiumGateClient
             videoId={v.id}
-            creatorId={v.authorId}
+            creatorId={v.authorId ?? ""}
             creatorName={v.author?.name ?? "Creator"}
             premiumUnlockStars={Number((v as any).premiumUnlockStars ?? 0)}
             plans={plans as any}
@@ -292,7 +292,11 @@ export default async function VideoPage({ params, searchParams }: { params: { id
   const displayTitle = assigned?.variant.title ?? v.title;
   const displayThumbKey = assigned?.variant.thumbKey ?? v.thumbKey;
 
-  const stream = await resolveStreamCandidates({ videoId: v.id, masterM3u8Key: v.masterM3u8Key, viewerId: viewerId ?? null });
+  const stream = await resolveStreamCandidates({
+    videoId: v.id,
+    masterM3u8Key: v.masterM3u8Key ?? "",
+    viewerId: viewerId ?? null,
+  });
   const hlsUrl = stream.preferred?.url ?? "";
   const hlsCandidates = stream.candidates;
   const poster = resolveMediaUrl(displayThumbKey) ?? undefined;
@@ -396,10 +400,12 @@ export default async function VideoPage({ params, searchParams }: { params: { id
   // Creator goal progress (current month)
   const nowUtc = new Date();
   const mk = monthKey(nowUtc);
-  const goal = await prisma.creatorGoal.findUnique({
-    where: { creatorId_monthKey: { creatorId: v.authorId, monthKey: mk } },
-    select: { title: true, targetStars: true },
-  });
+  const goal = v.authorId
+    ? await prisma.creatorGoal.findUnique({
+        where: { creatorId_monthKey: { creatorId: v.authorId, monthKey: mk } },
+        select: { title: true, targetStars: true },
+      })
+    : null;
 
   let goalBar: JSX.Element | null = null;
   if (goal && (goal.targetStars ?? 0) > 0) {
@@ -450,7 +456,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
           />
           {viewerId ? <AddToPlaylistButton videoId={v.id} disabled={!interactionsAllowed} /> : null}
           {viewerId ? <WatchLaterToggleForm videoId={v.id} active={watchLaterActive} disabled={false} /> : null}
-          {viewerId && viewerId !== v.authorId && interactionsAllowed ? (
+          {viewerId && v.authorId && viewerId !== v.authorId && interactionsAllowed ? (
             <TipCreatorButton toUserId={v.authorId} />
           ) : null}
           <ReportButton videoId={v.id} />
@@ -548,7 +554,7 @@ export default async function VideoPage({ params, searchParams }: { params: { id
           />
           {viewerId ? <WatchLaterToggleForm videoId={v.id} active={watchLaterActive} disabled={false} /> : null}
           {viewerId ? <AddToPlaylistButton videoId={v.id} disabled={!interactionsAllowed} /> : null}
-          {viewerId && viewerId !== v.authorId && interactionsAllowed ? (
+          {viewerId && v.authorId && viewerId !== v.authorId && interactionsAllowed ? (
             <TipCreatorButton toUserId={v.authorId} />
           ) : null}
           <ReportButton videoId={v.id} />

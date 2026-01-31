@@ -163,8 +163,8 @@ export async function rebuildHlsFromDriveJob(args: { videoId: string }) {
     await prisma.video.update({ where: { id: v.id }, data: { hlsBasePath: prefix, masterM3u8Key, status: "PROCESSING" } });
     await prisma.videoAsset.upsert({
       where: { videoId: v.id },
-      create: { videoId: v.id, healthStatus: "OK" as any, lastHealthCheckedAt: new Date() },
-      update: { healthStatus: "OK" as any, lastHealthCheckedAt: new Date() },
+      create: { videoId: v.id, healthStatus: "OK" as any },
+      update: { healthStatus: "OK" as any },
     });
 
     await prisma.nftEventLog.create({ data: { actorId: null, action: "STORAGE_REBUILD_HLS_FROM_DRIVE_OK", dataJson: JSON.stringify({ videoId: v.id, masterM3u8Key }) } });

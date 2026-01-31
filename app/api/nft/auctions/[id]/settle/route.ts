@@ -18,17 +18,22 @@ function addDays(d: Date, days: number) {
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const external = await requireExternalUser(req, ["nft/write", "user/write"]);
   if (!(external instanceof Response)) {
-    const out = await handleSettle(req, params.id, external.user.id);
-    return Response.json(out.body, { status: out.status, headers: external.cors });
+    return handleSettle(req, params.id, external.user.id, undefined, external.cors);
   }
 
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) return Response.json({ error: "UNAUTHORIZED" }, { status: 401 });
-  return handleSettle(req, params.id, userId);
+  return handleSettle(req, params.id, userId, session);
 }
 
-async function handleSettle(req: Request, auctionId: string, userId: string) {
+async function handleSettle(
+  req: Request,
+  auctionId: string,
+  userId: string,
+  session?: Awaited<ReturnType<typeof auth>>,
+  headers?: HeadersInit,
+) {
 
   const form = await req.formData();
   const back = String(form.get("back") || req.headers.get("referer") || "/nft/market");
@@ -58,6 +63,7 @@ async function handleSettle(req: Request, auctionId: string, userId: string) {
 
     // Only seller or admin can settle.
     if (auction.sellerId !== userId) {
+      if (!session) throw new Error("FORBIDDEN");
       try {
         requireAdmin(session);
       } catch {
@@ -243,11 +249,11 @@ async function handleSettle(req: Request, auctionId: string, userId: string) {
       });
     });
   } catch (e: any) {
-    return { status: 400, body: { ok: false, error: e?.message || "FAILED" } };
+    return Response.json({ ok: false, error: e?.message || "FAILED" }, { status: 400, headers });
   }
 
   if (form.get("back")) {
     redirect(back);
   }
-  return { status: 200, body: { ok: true } };
+  return Response.json({ ok: true }, { status: 200, headers });
 }

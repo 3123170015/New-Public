@@ -70,7 +70,7 @@ async function seedThemePreset() {
         "theme-accent": "#b45309",
         "theme-accent-foreground": "#fff7ed",
       } as any,
-      assetsJson: null,
+      assetsJson: undefined,
     },
   });
 }

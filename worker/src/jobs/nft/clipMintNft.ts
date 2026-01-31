@@ -40,6 +40,7 @@ export async function clipMintNftJob(data: { clipId: string }) {
 
   if (!clipNft) throw new Error("ClipNft not found. Ensure mode is SEPARATE_ONLY or BOTH and mint was initialized.");
   if (clipNft.status === "MINTED") return { ok: true, status: "MINTED" };
+  const clip = (clipNft as any).clip;
 
   // Mark attempt
   await prisma.clipNft.update({
@@ -64,17 +65,17 @@ export async function clipMintNftJob(data: { clipId: string }) {
 
     // Recipient: creator's linked SOL wallet (if any), else mint authority.
     const creatorWallet = await prisma.userWallet.findFirst({
-      where: { userId: clipNft.clip.creatorId, chain: "SOLANA" as any, verifiedAt: { not: null } },
+      where: { userId: clip.creatorId, chain: "SOLANA" as any, verifiedAt: { not: null } },
       orderBy: { verifiedAt: "desc" },
       select: { address: true },
     });
     const recipient = new PublicKey(creatorWallet?.address || kp.publicKey.toBase58());
 
-    const videoTitle = clipNft.clip.video?.title || "Video";
-    const clipTitle = clipNft.clip.title || `Clip ${clipNft.clip.id}`;
+    const videoTitle = clip.video?.title || "Video";
+    const clipTitle = clip.title || `Clip ${clip.id}`;
 
-    const imageUrl = resolveMediaUrlWorker(clipNft.clip.video?.thumbKey) || resolveMediaUrlWorker(clipNft.clip.outputKey) || undefined;
-    const animationUrl = resolveMediaUrlWorker(clipNft.clip.outputKey) || undefined;
+    const imageUrl = resolveMediaUrlWorker(clip.video?.thumbKey) || resolveMediaUrlWorker(clip.outputKey) || undefined;
+    const animationUrl = resolveMediaUrlWorker(clip.outputKey) || undefined;
 
     const metadata = {
       name: `${clipTitle}`,
@@ -83,10 +84,10 @@ export async function clipMintNftJob(data: { clipId: string }) {
       image: imageUrl,
       animation_url: animationUrl,
       attributes: [
-        { trait_type: "VideoId", value: clipNft.clip.videoId },
-        { trait_type: "ClipId", value: clipNft.clip.id },
-        { trait_type: "StartSec", value: clipNft.clip.startSec },
-        { trait_type: "EndSec", value: clipNft.clip.endSec },
+        { trait_type: "VideoId", value: clip.videoId },
+        { trait_type: "ClipId", value: clip.id },
+        { trait_type: "StartSec", value: clip.startSec },
+        { trait_type: "EndSec", value: clip.endSec },
       ],
       properties: {
         category: "video",
@@ -105,7 +106,7 @@ export async function clipMintNftJob(data: { clipId: string }) {
 
     // Limited editions: mint N separate NFTs with the same metadata URI.
     const desired = Math.max(1, Math.min(100, clipNft.editionSize || 1));
-    const existingSerials = new Set<number>((clipNft.mints || []).map((m: any) => Number(m.serial)));
+    const existingSerials = new Set<number>(((clipNft as any).mints || []).map((m: any) => Number(m.serial)));
 
     const minted: { serial: number; mintAddress: string; txHash?: string }[] = [];
 
@@ -138,14 +139,14 @@ export async function clipMintNftJob(data: { clipId: string }) {
       minted.push({ serial, mintAddress, txHash });
     }
 
-    const first = (clipNft.mints?.[0] as any) || minted[0];
+    const first = (((clipNft as any).mints || [])[0] as any) || minted[0];
 
     await prisma.clipNft.update({
       where: { id: clipNft.id },
       data: {
         status: "MINTED",
         metadataKey: key,
-        thumbKey: clipNft.clip.video?.thumbKey || clipNft.clip.outputKey,
+        thumbKey: clip.video?.thumbKey || clip.outputKey,
         mintAddress: first?.mintAddress || clipNft.mintAddress,
         txHash: first?.txHash || clipNft.txHash,
         lastError: null,

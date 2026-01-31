@@ -117,14 +117,14 @@ export async function moderationEscalationScanJob() {
   const [videos, comments] = await Promise.all([
     videoIds.length
       ? prisma.video.findMany({ where: { id: { in: videoIds } }, select: { id: true, authorId: true } })
-      : Promise.resolve([] as Array<{ id: string; authorId: string }>),
+      : Promise.resolve([] as Array<{ id: string; authorId: string | null }>),
     commentIds.length
       ? prisma.comment.findMany({ where: { id: { in: commentIds } }, select: { id: true, userId: true } })
-      : Promise.resolve([] as Array<{ id: string; userId: string }>),
+      : Promise.resolve([] as Array<{ id: string; userId: string | null }>),
   ]);
 
-  const videoToAuthor = new Map(videos.map((v: { id: string; authorId: string }) => [v.id, v.authorId]));
-  const commentToAuthor = new Map(comments.map((c: { id: string; userId: string }) => [c.id, c.userId]));
+  const videoToAuthor = new Map(videos.map((v: { id: string; authorId: string | null }) => [v.id, v.authorId]));
+  const commentToAuthor = new Map(comments.map((c: { id: string; userId: string | null }) => [c.id, c.userId]));
 
   const counts = new Map<string, number>();
   for (const r of videoReports) {

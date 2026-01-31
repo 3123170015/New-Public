@@ -52,23 +52,20 @@ export async function paymentsAlertCronJob() {
   const needsReviewMin = Number(process.env.PAYMENTS_ALERT_NEEDS_REVIEW_MIN || 5);
 
   const [cur, prev] = await Promise.all([
-    prisma.webhookAuditLog.groupBy({
-      by: ["chain"],
-      where: { createdAt: { gte: from } },
-      _count: { _all: true },
-      _sum: { failedInt: true as any },
-    }).catch(async () => {
-      // Prisma doesn't support boolean sums; fallback with two queries.
-      return [] as any[];
-    }),
-    prisma.webhookAuditLog.groupBy({
-      by: ["chain"],
-      where: { createdAt: { gte: prevFrom, lt: prevTo } },
-      _count: { _all: true },
-      _sum: { failedInt: true as any },
-    }).catch(async () => {
-      return [] as any[];
-    }),
+    prisma.webhookAuditLog
+      .groupBy({
+        by: ["chain"],
+        where: { createdAt: { gte: from } },
+        _count: { _all: true },
+      })
+      .catch(async () => [] as any[]),
+    prisma.webhookAuditLog
+      .groupBy({
+        by: ["chain"],
+        where: { createdAt: { gte: prevFrom, lt: prevTo } },
+        _count: { _all: true },
+      })
+      .catch(async () => [] as any[]),
   ]);
 
   // Fallback without boolean sum: do manual counts
@@ -90,11 +87,11 @@ export async function paymentsAlertCronJob() {
     });
 
     const lines = chainBreak
-      .map((b: { chain: string; _count: { _all: number } }) => `- ${b.chain}: ${b._count._all}`)
+      .map((b: { chain: string | null; _count: { _all: number } }) => `- ${b.chain ?? "UNKNOWN"}: ${b._count._all}`)
       .join("\n");
 
     const msg =
-      `⚠️ *Payments webhook fail-rate spike*\nWindow: last 15m\nFail rate: ${fmtPct(curRate)} (prev ${fmtPct(prevRate)})\nTotal: ${curTotal}, Failed: ${curFailed}\n\nBy chain:\n${lines}`,
+      `⚠️ *Payments webhook fail-rate spike*\nWindow: last 15m\nFail rate: ${fmtPct(curRate)} (prev ${fmtPct(prevRate)})\nTotal: ${curTotal}, Failed: ${curFailed}\n\nBy chain:\n${lines}`;
     await postDiscord(msg);
     await postTelegram(msg);
 

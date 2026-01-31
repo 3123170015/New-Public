@@ -219,7 +219,7 @@ export async function nftGateSyncJob(data: { addresses?: Addr[]; reason?: string
         await prisma.creatorMembership.upsert({
           where: { planId_userId: { planId: plan.id, userId } },
           update: { status: "ACTIVE", source: "NFT_GATE" as any, expiresAt, cancelAtPeriodEnd: false },
-          create: { planId: plan.id, userId, status: "ACTIVE", source: "NFT_GATE" as any, expiresAt, cancelAtPeriodEnd: false },
+          create: { planId: plan.id, userId, creatorId, status: "ACTIVE", source: "NFT_GATE" as any, expiresAt, cancelAtPeriodEnd: false },
         });
       }
     }

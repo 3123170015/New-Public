@@ -9,8 +9,7 @@ export const runtime = "nodejs";
 export async function POST(req: Request) {
   const external = await requireExternalUser(req, ["nft/write", "user/write"]);
   if (!(external instanceof Response)) {
-    const out = await handleCreate(req, external.user.id);
-    return Response.json(out.body, { status: out.status, headers: external.cors });
+    return handleCreate(req, external.user.id, external.cors);
   }
 
   const session = await auth();
@@ -19,16 +18,16 @@ export async function POST(req: Request) {
   return handleCreate(req, userId);
 }
 
-async function handleCreate(req: Request, userId: string) {
+async function handleCreate(req: Request, userId: string, headers?: HeadersInit) {
 
   const form = await req.formData();
   const itemId = String(form.get("itemId") || "").trim();
   const priceStars = Number(String(form.get("priceStars") || "0").trim());
   const back = String(form.get("back") || req.headers.get("referer") || "/nft/market");
 
-  if (!itemId) return Response.json({ error: "Missing itemId" }, { status: 400 });
+  if (!itemId) return Response.json({ error: "Missing itemId" }, { status: 400, headers });
   if (!Number.isFinite(priceStars) || priceStars <= 0 || priceStars > 1_000_000_000) {
-    return Response.json({ error: "Invalid priceStars" }, { status: 400 });
+    return Response.json({ error: "Invalid priceStars" }, { status: 400, headers });
   }
 
   try {
@@ -57,11 +56,11 @@ async function handleCreate(req: Request, userId: string) {
       });
     });
   } catch (e: any) {
-    return { status: 400, body: { ok: false, error: e?.message || "FAILED" } };
+    return Response.json({ ok: false, error: e?.message || "FAILED" }, { status: 400, headers });
   }
 
   if (form.get("back")) {
     redirect(back);
   }
-  return { status: 200, body: { ok: true } };
+  return Response.json({ ok: true }, { status: 200, headers });
 }

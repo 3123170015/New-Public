@@ -19,8 +19,7 @@ function addHours(d: Date, hours: number) {
 export async function POST(req: Request) {
   const external = await requireExternalUser(req, ["nft/write", "user/write"]);
   if (!(external instanceof Response)) {
-    const out = await handleCreate(req, external.user.id);
-    return Response.json(out.body, { status: out.status, headers: external.cors });
+    return handleCreate(req, external.user.id, external.cors);
   }
 
   const session = await auth();
@@ -29,7 +28,7 @@ export async function POST(req: Request) {
   return handleCreate(req, userId);
 }
 
-async function handleCreate(req: Request, userId: string) {
+async function handleCreate(req: Request, userId: string, headers?: HeadersInit) {
 
   const form = await req.formData();
   const itemId = String(form.get("itemId") || "").trim();
@@ -71,11 +70,11 @@ async function handleCreate(req: Request, userId: string) {
       });
     });
   } catch (e: any) {
-    return { status: 400, body: { ok: false, error: e?.message || "FAILED" } };
+    return Response.json({ ok: false, error: e?.message || "FAILED" }, { status: 400, headers });
   }
 
   if (form.get("back")) {
     redirect(back);
   }
-  return { status: 200, body: { ok: true } };
+  return Response.json({ ok: true }, { status: 200, headers });
 }

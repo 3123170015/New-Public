@@ -210,7 +210,7 @@ export async function processWebhookAuditJob(auditLogId: string) {
     // Update deposit fields
     const update: Record<string, unknown> = {
       provider: log.provider,
-      status: chooseCandidateStatus(deposit.status),
+      status: chooseCandidateStatus(deposit.status as DepositStatus),
     };
     if (txHash && !deposit.txHash) update.txHash = txHash;
     if (memo && !deposit.memo) update.memo = memo;

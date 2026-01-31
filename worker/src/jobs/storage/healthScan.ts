@@ -38,8 +38,8 @@ export async function storageHealthScanJob(args?: { limit?: number }) {
       ok += 1;
       await prisma.videoAsset.upsert({
         where: { videoId: v.id },
-        create: { videoId: v.id, healthStatus: "OK" as any, lastHealthCheckedAt: new Date() },
-        update: { healthStatus: "OK" as any, lastHealthCheckedAt: new Date() },
+        create: { videoId: v.id, healthStatus: "OK" as any },
+        update: { healthStatus: "OK" as any },
       });
       continue;
     }
@@ -49,8 +49,8 @@ export async function storageHealthScanJob(args?: { limit?: number }) {
       degraded += 1;
       await prisma.videoAsset.upsert({
         where: { videoId: v.id },
-        create: { videoId: v.id, healthStatus: "DEGRADED" as any, lastHealthCheckedAt: new Date() },
-        update: { healthStatus: "DEGRADED" as any, lastHealthCheckedAt: new Date() },
+        create: { videoId: v.id, healthStatus: "DEGRADED" as any },
+        update: { healthStatus: "DEGRADED" as any },
       });
       continue;
     }
@@ -58,8 +58,8 @@ export async function storageHealthScanJob(args?: { limit?: number }) {
     down += 1;
     const asset = await prisma.videoAsset.upsert({
       where: { videoId: v.id },
-      create: { videoId: v.id, healthStatus: "DOWN" as any, lastHealthCheckedAt: new Date() },
-      update: { healthStatus: "DOWN" as any, lastHealthCheckedAt: new Date() },
+      create: { videoId: v.id, healthStatus: "DOWN" as any },
+      update: { healthStatus: "DOWN" as any },
     });
 
     // Attempt rebuild if Drive has origin backup.

@@ -63,7 +63,7 @@ export async function continueWatchingDigestJob() {
             id: true,
             title: true,
             durationSec: true,
-            isPublished: true,
+            status: true,
             isSensitive: true,
           },
         },
@@ -71,7 +71,7 @@ export async function continueWatchingDigestJob() {
     });
 
     const unfinished = items
-      .filter((it: { video?: { isPublished?: boolean | null } }) => it.video?.isPublished)
+      .filter((it: { video?: { status?: string | null } }) => it.video?.status === "PUBLISHED")
       .filter((it: { video?: { durationSec?: number | null } }) => (it.video?.durationSec || 0) > 0)
       .filter((it: { seconds: number; video?: { durationSec?: number | null } }) => it.seconds < ((it.video?.durationSec ?? 0) - 15));
 

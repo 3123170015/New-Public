@@ -16,8 +16,7 @@ function toInt(v: FormDataEntryValue | null, def = 0) {
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const external = await requireExternalUser(req, ["nft/write", "user/write"]);
   if (!(external instanceof Response)) {
-    const out = await handleBid(req, params.id, external.user.id);
-    return Response.json(out.body, { status: out.status, headers: external.cors });
+    return handleBid(req, params.id, external.user.id, external.cors);
   }
 
   const session = await auth();
@@ -26,7 +25,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   return handleBid(req, params.id, userId);
 }
 
-async function handleBid(req: Request, auctionId: string, userId: string) {
+async function handleBid(req: Request, auctionId: string, userId: string, headers?: HeadersInit) {
 
   const form = await req.formData();
   const back = String(form.get("back") || req.headers.get("referer") || "/nft/market");
@@ -90,11 +89,11 @@ async function handleBid(req: Request, auctionId: string, userId: string) {
       }
     });
   } catch (e: any) {
-    return { status: 400, body: { ok: false, error: e?.message || "FAILED" } };
+    return Response.json({ ok: false, error: e?.message || "FAILED" }, { status: 400, headers });
   }
 
   if (form.get("back")) {
     redirect(back);
   }
-  return { status: 200, body: { ok: true } };
+  return Response.json({ ok: true }, { status: 200, headers });
 }
