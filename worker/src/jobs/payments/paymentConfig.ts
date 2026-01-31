@@ -23,6 +23,11 @@ export type PaymentConfigLike = {
   submittedStaleMinutes: number;
   reconcileEveryMs: number;
   allowlist: ProviderAllowlist;
+  depositMemoFormat: string;
+  confirmations: Partial<Record<Chain, number>>;
+  deadmanMinutes: number;
+  telegramBotToken?: string | null;
+  telegramChatId?: string | null;
 
   // Growth / Monetization
   referralEnabled: boolean;
@@ -56,6 +61,20 @@ export async function getPaymentConfigCached(): Promise<PaymentConfigLike> {
     submittedStaleMinutes: row?.submittedStaleMinutes ?? env.PAYMENTS_SUBMITTED_STALE_MINUTES,
     reconcileEveryMs: row?.reconcileEveryMs ?? env.PAYMENTS_RECONCILE_EVERY_MS,
     allowlist: parseAllowlist(row?.allowlistJson ?? undefined),
+    depositMemoFormat: row?.depositMemoFormat ?? "DEPOSIT:{depositId}",
+    confirmations: (() => {
+      if (row?.confirmationsJson) {
+        try {
+          return JSON.parse(row.confirmationsJson) as Partial<Record<Chain, number>>;
+        } catch {
+          return {};
+        }
+      }
+      return {};
+    })(),
+    deadmanMinutes: row?.deadmanMinutes ?? 30,
+    telegramBotToken: (row as any)?.telegramBotToken ?? null,
+    telegramChatId: (row as any)?.telegramChatId ?? null,
 
     referralEnabled: row?.referralEnabled ?? false,
     referralPercent: Math.max(0, Math.min(20, row?.referralPercent ?? 0)),

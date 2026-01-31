@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { requireExternalUser } from "@/lib/externalAuth";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
@@ -15,9 +16,19 @@ function addDays(d: Date, days: number) {
 }
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
+  const external = await requireExternalUser(req, ["nft/write", "user/write"]);
+  if (!(external instanceof Response)) {
+    const out = await handleSettle(req, params.id, external.user.id);
+    return Response.json(out.body, { status: out.status, headers: external.cors });
+  }
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) return Response.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  return handleSettle(req, params.id, userId);
+}
+
+async function handleSettle(req: Request, auctionId: string, userId: string) {
 
   const form = await req.formData();
   const back = String(form.get("back") || req.headers.get("referer") || "/nft/market");
@@ -27,10 +38,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const holdDays = Number((cfg as any).nftUnverifiedFirstSaleHoldDays ?? 10);
   const treasuryUserId = (cfg as any).treasuryUserId as string | null | undefined;
 
-  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    const auction = await tx.nftAuction.findUnique({
-      where: { id: params.id },
-      include: {
+  try {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const auction = await tx.nftAuction.findUnique({
+        where: { id: auctionId },
+        include: {
         item: {
           include: {
             collection: { select: { id: true, creatorId: true, royaltyBps: true, creatorRoyaltySharePct: true } },
@@ -222,14 +234,20 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       });
     }
 
-    await tx.nftEventLog.create({
-      data: {
-        actorId: userId,
-        action: "NFT_AUCTION_SETTLED",
-        dataJson: JSON.stringify({ auctionId: auction.id, saleId: sale.id, winnerId: highest.bidderId, amountStars: bidAmount }),
-      },
+      await tx.nftEventLog.create({
+        data: {
+          actorId: userId,
+          action: "NFT_AUCTION_SETTLED",
+          dataJson: JSON.stringify({ auctionId: auction.id, saleId: sale.id, winnerId: highest.bidderId, amountStars: bidAmount }),
+        },
+      });
     });
-  });
+  } catch (e: any) {
+    return { status: 400, body: { ok: false, error: e?.message || "FAILED" } };
+  }
 
-  redirect(back);
+  if (form.get("back")) {
+    redirect(back);
+  }
+  return { status: 200, body: { ok: true } };
 }

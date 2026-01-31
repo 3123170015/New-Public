@@ -23,6 +23,11 @@ function safeNumber(n: any): number | null {
   return Number.isFinite(f) ? f : null;
 }
 
+function templateMemo(template: string, depositId: string) {
+  if (!template) return depositId;
+  return template.replaceAll("{depositId}", depositId);
+}
+
 async function findToken(chain: Chain, tokenContract: string | undefined | null, assetSymbol?: string | undefined) {
   if (!tokenContract) {
     // Native token: pick by symbol if exists, else first native for chain
@@ -120,9 +125,18 @@ export async function processWebhookAuditJob(auditLogId: string) {
     }
 
     // 1) Match by memo depositId (Solana)
+    const memoTemplate = cfg.depositMemoFormat || "DEPOSIT:{depositId}";
+    const memoPrefix = memoTemplate.split("{depositId}")[0] || "";
+    const memoSuffix = memoTemplate.split("{depositId}")[1] || "";
+    const memoMatch = memo && memo.startsWith(memoPrefix) && memo.endsWith(memoSuffix)
+      ? memo.slice(memoPrefix.length, memo.length - memoSuffix.length)
+      : null;
     let deposit = memo
       ? await prisma.starDeposit.findUnique({ where: { id: memo } }).catch(() => null)
       : null;
+    if (!deposit && memoMatch && memoMatch.length >= 8) {
+      deposit = await prisma.starDeposit.findUnique({ where: { id: memoMatch } }).catch(() => null);
+    }
 
     // 2) Match by txHash
     if (!deposit && txHash) {
@@ -179,7 +193,7 @@ export async function processWebhookAuditJob(auditLogId: string) {
               expectedAmount: expAmount as any,
               actualAmount: expAmount ? (expAmount as any) : null,
               txHash: txHash || null,
-              memo: memo || null,
+              memo: memo || (memoTemplate ? templateMemo(memoTemplate, "UNKNOWN") : null),
               provider: log.provider,
               status: "UNMATCHED",
             },

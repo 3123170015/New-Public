@@ -10,6 +10,11 @@ const schema = z.object({
   submittedStaleMinutes: z.coerce.number().int().min(1).max(10_000),
   reconcileEveryMs: z.coerce.number().int().min(30_000).max(24 * 60 * 60 * 1000),
   allowlistJson: z.string().min(2).max(20_000),
+  depositMemoFormat: z.string().min(3).max(120).optional().default("DEPOSIT:{depositId}"),
+  telegramBotToken: z.string().optional().default(""),
+  telegramChatId: z.string().optional().default(""),
+  confirmationsJson: z.string().min(2).max(20_000).optional().default("{\"ETHEREUM\":12,\"POLYGON\":10,\"BSC\":5,\"BASE\":12,\"SOLANA\":32,\"TRON\":20}"),
+  deadmanMinutes: z.coerce.number().int().min(1).max(1440).optional().default(30),
 
   // Growth / Monetization
   seasonPassEnabled: z.boolean().optional().default(false),
@@ -67,6 +72,11 @@ export async function POST(req: Request) {
       submittedStaleMinutes: parsed.data.submittedStaleMinutes,
       reconcileEveryMs: parsed.data.reconcileEveryMs,
       allowlistJson: parsed.data.allowlistJson,
+      depositMemoFormat: parsed.data.depositMemoFormat ?? "DEPOSIT:{depositId}",
+      telegramBotToken: parsed.data.telegramBotToken || null,
+      telegramChatId: parsed.data.telegramChatId || null,
+      confirmationsJson: parsed.data.confirmationsJson ?? "",
+      deadmanMinutes: parsed.data.deadmanMinutes ?? 30,
 
       seasonPassEnabled: parsed.data.seasonPassEnabled,
       seasonPassPriceStars: parsed.data.seasonPassPriceStars,
@@ -83,6 +93,11 @@ export async function POST(req: Request) {
       submittedStaleMinutes: parsed.data.submittedStaleMinutes,
       reconcileEveryMs: parsed.data.reconcileEveryMs,
       allowlistJson: parsed.data.allowlistJson,
+      depositMemoFormat: parsed.data.depositMemoFormat ?? "DEPOSIT:{depositId}",
+      telegramBotToken: parsed.data.telegramBotToken || null,
+      telegramChatId: parsed.data.telegramChatId || null,
+      confirmationsJson: parsed.data.confirmationsJson ?? "",
+      deadmanMinutes: parsed.data.deadmanMinutes ?? 30,
 
       seasonPassEnabled: parsed.data.seasonPassEnabled,
       seasonPassPriceStars: parsed.data.seasonPassPriceStars,

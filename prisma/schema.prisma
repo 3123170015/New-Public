@@ -855,6 +855,8 @@ model ApiKey {
   name               String
   keyHash            String   @unique
   scopes             String   @default("*")
+  strictScopes       Boolean  @default(false)
+  description        String?  @db.Text
   allowedOrigins     String?  @db.Text
   rateLimitPerMinute Int      @default(600)
   rateLimitWindowSec Int      @default(60)
@@ -1122,6 +1124,11 @@ model PaymentConfig {
   // strict per chain/provider allowlist. Example:
   // { "SOLANA": ["HELIUS","QUICKNODE"], "ETHEREUM": ["ALCHEMY","QUICKNODE"] }
   allowlistJson          String   @db.Text
+  depositMemoFormat      String   @default("DEPOSIT:{depositId}")
+  telegramBotToken       String?  @db.Text
+  telegramChatId         String?  @db.Text
+  confirmationsJson      String   @default("{\"ETHEREUM\":12,\"POLYGON\":10,\"BSC\":5,\"BASE\":12,\"SOLANA\":32,\"TRON\":20}")
+  deadmanMinutes         Int      @default(30)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 }
