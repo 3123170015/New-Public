@@ -412,6 +412,154 @@
           }
         }
       },
+      "NftAuctionCreateRequest": {
+        "type": "object",
+        "required": [
+          "itemId",
+          "startPriceStars",
+          "durationHours"
+        ],
+        "properties": {
+          "itemId": {
+            "type": "string"
+          },
+          "startPriceStars": {
+            "type": "integer"
+          },
+          "reservePriceStars": {
+            "type": "integer"
+          },
+          "durationHours": {
+            "type": "integer"
+          }
+        }
+      },
+      "NftAuctionBidRequest": {
+        "type": "object",
+        "required": [
+          "amountStars"
+        ],
+        "properties": {
+          "amountStars": {
+            "type": "integer"
+          }
+        }
+      },
+      "PlaylistItemRequest": {
+        "type": "object",
+        "required": [
+          "videoId"
+        ],
+        "properties": {
+          "videoId": {
+            "type": "string"
+          }
+        }
+      },
+      "PlaylistItemRemoveRequest": {
+        "type": "object",
+        "properties": {
+          "videoId": {
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string"
+          }
+        }
+      },
+      "PlaylistReorderRequest": {
+        "type": "object",
+        "required": [
+          "itemIds"
+        ],
+        "properties": {
+          "itemIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CommentModerateRequest": {
+        "type": "object",
+        "required": [
+          "commentId",
+          "action"
+        ],
+        "properties": {
+          "commentId": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "example": "HIDE"
+          }
+        }
+      },
+      "CommentReportRequest": {
+        "type": "object",
+        "required": [
+          "commentId"
+        ],
+        "properties": {
+          "commentId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "UploadSignPartRequest": {
+        "type": "object",
+        "required": [
+          "uploadId",
+          "partNumber",
+          "key"
+        ],
+        "properties": {
+          "uploadId": {
+            "type": "string"
+          },
+          "partNumber": {
+            "type": "integer"
+          },
+          "key": {
+            "type": "string"
+          }
+        }
+      },
+      "UploadCompleteRequest": {
+        "type": "object",
+        "required": [
+          "uploadId",
+          "key",
+          "parts"
+        ],
+        "properties": {
+          "uploadId": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "partNumber": {
+                  "type": "integer"
+                },
+                "etag": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
       "AdminApiKeyRequest": {
         "type": "object",
         "required": [
@@ -834,6 +982,16 @@
             "BearerAuth": []
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NftAuctionCreateRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -868,6 +1026,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NftAuctionBidRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1086,6 +1254,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaylistItemRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Created"
@@ -1107,6 +1285,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaylistItemRemoveRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1130,6 +1318,22 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1174,6 +1378,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaylistReorderRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1217,6 +1431,16 @@
           "Upload"
         ],
         "summary": "Lấy URL ký part upload",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadSignPartRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1230,6 +1454,16 @@
           "Upload"
         ],
         "summary": "Hoàn tất upload video",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadCompleteRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1266,6 +1500,16 @@
           "Comments"
         ],
         "summary": "Ẩn/hiện bình luận",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentModerateRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1279,6 +1523,16 @@
           "Comments"
         ],
         "summary": "Báo cáo bình luận",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentReportRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1327,7 +1581,7 @@
         "tags": [
           "Stars"
         ],
-        "summary": "Tạo intent nạp sao (internal)",
+        "summary": "Tạo intent nạp sao",
         "responses": {
           "200": {
             "description": "OK"
@@ -1400,6 +1654,16 @@
           "NFT"
         ],
         "summary": "Tạo auction NFT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NftAuctionCreateRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1423,6 +1687,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NftAuctionBidRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
