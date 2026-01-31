@@ -112,6 +112,8 @@ npm run package:full
 - `docs/ENV.md`: env keys quan trọng
 - `docs/AAPANEL_DEPLOY.md`: deploy VPS aaPanel
 - `docs/openapi.yaml`: OpenAPI spec (Bolt/Lovable friendly)
+- `docs/openapi.json`: OpenAPI JSON (import nhanh)
+- `docs/OPENAPI_NOTE_VI.md`: Ghi chú OpenAPI tiếng Việt
 - `scripts/aapanel-monitor.sh`: cron check DB/Redis/Worker + Telegram alert
 
 ---

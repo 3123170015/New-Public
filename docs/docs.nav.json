@@ -94,6 +94,11 @@
           "file": "openapi.yaml"
         },
         {
+          "slug": "openapi-note-vi",
+          "title": "OpenAPI Notes (VI)",
+          "file": "OPENAPI_NOTE_VI.md"
+        },
+        {
           "slug": "worker-ffmpeg",
           "title": "Worker / ffmpeg",
           "file": "WORKER_FFMPEG.md"
