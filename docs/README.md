@@ -111,6 +111,7 @@ npm run package:full
 - `docs/FEATURE_MAP.md`: map tính năng ↔ file/folder
 - `docs/ENV.md`: env keys quan trọng
 - `docs/AAPANEL_DEPLOY.md`: deploy VPS aaPanel
+- `docs/openapi.yaml`: OpenAPI spec (Bolt/Lovable friendly)
 - `scripts/aapanel-monitor.sh`: cron check DB/Redis/Worker + Telegram alert
 
 ---

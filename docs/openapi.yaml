@@ -1,0 +1,385 @@
+openapi: 3.0.3
+info:
+  title: New-Public API
+  version: 4.16.26
+  description: |
+    OpenAPI mô tả các endpoint quan trọng của backend New-Public (bao gồm /api/external, /api/me, /api/admin).
+servers:
+  - url: https://your-domain.example.com
+    description: Production
+  - url: http://localhost:3000
+    description: Local dev
+tags:
+  - name: External Auth
+  - name: External Public
+  - name: External Me
+  - name: External Stars
+  - name: External NFT
+  - name: Me
+  - name: Admin
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: external_auth
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+    ExternalLoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          example: user@example.com
+        password:
+          type: string
+          example: secret123
+    ExternalLoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            email:
+              type: string
+    ExternalRegisterRequest:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+    ExternalVideo:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        thumbnail:
+          type: string
+        creator:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+    ExternalSearchResponse:
+      type: object
+      properties:
+        videos:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExternalVideo"
+    StarsTopupIntentRequest:
+      type: object
+      required: [amount, chain, token]
+      properties:
+        amount:
+          type: number
+          example: 25
+        chain:
+          type: string
+          example: solana
+        token:
+          type: string
+          example: usdt
+    StarsTopupIntentResponse:
+      type: object
+      properties:
+        depositId:
+          type: string
+        memo:
+          type: string
+        address:
+          type: string
+        amount:
+          type: number
+        token:
+          type: string
+        chain:
+          type: string
+    StarsTopupHistoryItem:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+        amount:
+          type: number
+        token:
+          type: string
+        chain:
+          type: string
+        memo:
+          type: string
+    StarsTopupHistoryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StarsTopupHistoryItem"
+paths:
+  /api/external/auth/login:
+    post:
+      tags: [External Auth]
+      summary: Đăng nhập (JWT + cookie)
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExternalLoginRequest"
+      responses:
+        "200":
+          description: Login thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExternalLoginResponse"
+        "401":
+          description: Sai thông tin đăng nhập
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/external/auth/register:
+    post:
+      tags: [External Auth]
+      summary: Đăng ký tài khoản
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExternalRegisterRequest"
+      responses:
+        "201":
+          description: Đăng ký thành công
+        "400":
+          description: Lỗi dữ liệu đầu vào
+  /api/external/auth/me:
+    get:
+      tags: [External Auth]
+      summary: Lấy thông tin user hiện tại
+      security:
+        - ApiKey: []
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        "200":
+          description: OK
+  /api/external/auth/logout:
+    post:
+      tags: [External Auth]
+      summary: Đăng xuất (xóa cookie)
+      security:
+        - ApiKey: []
+      responses:
+        "200":
+          description: OK
+  /api/external/public/videos:
+    get:
+      tags: [External Public]
+      summary: Danh sách video public
+      security:
+        - ApiKey: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  videos:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ExternalVideo"
+  /api/external/public/search:
+    get:
+      tags: [External Public]
+      summary: Tìm kiếm video
+      security:
+        - ApiKey: []
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExternalSearchResponse"
+  /api/external/me/notifications:
+    get:
+      tags: [External Me]
+      summary: Lấy danh sách thông báo
+      security:
+        - ApiKey: []
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        "200":
+          description: OK
+  /api/external/me/watch-later:
+    get:
+      tags: [External Me]
+      summary: Danh sách xem sau
+      security:
+        - ApiKey: []
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        "200":
+          description: OK
+  /api/external/stars/topup/intent:
+    post:
+      tags: [External Stars]
+      summary: Tạo intent nạp sao (USDT/USDC)
+      security:
+        - ApiKey: []
+        - CookieAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StarsTopupIntentRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StarsTopupIntentResponse"
+  /api/external/stars/topup/history:
+    get:
+      tags: [External Stars]
+      summary: Lịch sử nạp sao
+      security:
+        - ApiKey: []
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StarsTopupHistoryResponse"
+  /api/external/nft/listings/create:
+    post:
+      tags: [External NFT]
+      summary: Tạo listing NFT
+      security:
+        - ApiKey: []
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        "200":
+          description: OK
+  /api/external/nft/listings/cancel:
+    post:
+      tags: [External NFT]
+      summary: Hủy listing NFT
+      security:
+        - ApiKey: []
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        "200":
+          description: OK
+  /api/external/nft/listings/buy:
+    post:
+      tags: [External NFT]
+      summary: Mua listing NFT
+      security:
+        - ApiKey: []
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        "200":
+          description: OK
+  /api/me/notifications:
+    get:
+      tags: [Me]
+      summary: Danh sách thông báo (Next auth cookie)
+      responses:
+        "200":
+          description: OK
+  /api/me/watch-later:
+    get:
+      tags: [Me]
+      summary: Danh sách xem sau
+      responses:
+        "200":
+          description: OK
+  /api/me/watch-later/toggle:
+    post:
+      tags: [Me]
+      summary: Bật/tắt xem sau
+      responses:
+        "200":
+          description: OK
+  /api/admin/site-config:
+    get:
+      tags: [Admin]
+      summary: Lấy cấu hình hệ thống
+      responses:
+        "200":
+          description: OK
+    post:
+      tags: [Admin]
+      summary: Cập nhật cấu hình hệ thống
+      responses:
+        "200":
+          description: OK
+  /api/admin/api-keys:
+    get:
+      tags: [Admin]
+      summary: Danh sách API keys
+      responses:
+        "200":
+          description: OK
+    post:
+      tags: [Admin]
+      summary: Tạo API key
+      responses:
+        "200":
+          description: OK

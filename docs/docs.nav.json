@@ -89,6 +89,11 @@
           "file": "THEME_BUILDER.md"
         },
         {
+          "slug": "openapi",
+          "title": "OpenAPI Spec",
+          "file": "openapi.yaml"
+        },
+        {
           "slug": "worker-ffmpeg",
           "title": "Worker / ffmpeg",
           "file": "WORKER_FFMPEG.md"
