@@ -850,6 +850,20 @@ model ApiSource {
   updatedAt   DateTime @updatedAt
 }
 
+model ApiKey {
+  id                 String   @id @default(cuid())
+  name               String
+  keyHash            String   @unique
+  scopes             String   @default("*")
+  allowedOrigins     String?  @db.Text
+  rateLimitPerMinute Int      @default(600)
+  rateLimitWindowSec Int      @default(60)
+  isActive           Boolean  @default(true)
+  lastUsedAt         DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
 model AdPlacement {
   id          Int      @id @default(autoincrement())
   scope       String

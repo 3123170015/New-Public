@@ -85,6 +85,11 @@ const schema = z.object({
   // Creator webhooks (Task 14): strict allowlist domains, CSV (e.g. "example.com,hooks.myapp.com")
   CREATOR_WEBHOOK_ALLOWLIST: z.string().optional().default(""),
 
+  // External API access
+  EXTERNAL_JWT_COOKIE_NAME: z.string().optional().default("vs_ext_auth"),
+  EXTERNAL_JWT_EXPIRES_MIN: z.coerce.number().int().positive().optional().default(60 * 24 * 30),
+  EXTERNAL_CORS_ALLOW_ORIGIN: z.string().optional().default(""),
+
   // Stars anti-fraud / risk rules (best-effort; enforced when REDIS_URL is configured)
   STARS_RISK_MAX_CREDIT_PER_USER_PER_DAY: z.string().optional().default("200000"),
   STARS_RISK_MAX_CREDITS_PER_USER_PER_HOUR: z.string().optional().default("8"),
