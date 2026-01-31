@@ -7,9 +7,9 @@
 
 ## Auth & Security
 - NextAuth cho web nội bộ.
-- External API: `/api/external/*` sử dụng **X-API-Key** + JWT (cookie hoặc Bearer).
+- External API: `/api/external/*` uses **X-API-Key** + JWT (cookie or Bearer).
 - Kiểm tra allowlist domain theo `ApiKey.allowedOrigins`.
-- Scope enforcement: `strictScopes` + `scopes` để giới hạn quyền.
+- Scope enforcement: `scopes` are the allowed scopes; `strictScopes=true` denies any scope not explicitly listed.
 
 ## Stars/Payments
 - Topup Stars: `StarDeposit`, `StarTransaction`.

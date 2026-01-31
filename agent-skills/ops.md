@@ -1,11 +1,11 @@
 # Ops & Deployment Skills
 
 ## aaPanel
-- Script: `scripts/aapanel-install.sh`, `scripts/aapanel-update.sh`, `scripts/aapanel-monitor.sh`.
-- Config CORS/cookie cross-domain trong `.env`.
+- Scripts: `scripts/aapanel-install.sh`, `scripts/aapanel-update.sh`, `scripts/aapanel-monitor.sh`.
+- Configure CORS/cookie cross-domain in `.env`.
 
 ## Monitoring
-- /verify status endpoint để kiểm tra DB/Redis/worker.
+- `/api/verify` status endpoint checks DB/Redis/worker.
 - Telegram alerts cho worker/payment watchers (config trong admin).
 
 ## Build/Test

@@ -1,13 +1,13 @@
-# Agent Skills (Dự án New-Public)
+# Agent Skills (New-Public Project)
 
-Mục tiêu: cung cấp kiến thức cốt lõi để AI/agent làm việc nhanh và an toàn với dự án.
+Goal: Provide core knowledge for AI/agents to work quickly and safely with the project.
 
-## Mục lục
+## Table of contents
 - [Backend](./backend.md)
 - [Frontend](./frontend.md)
 - [Vận hành & Triển khai](./ops.md)
 
-## Quy tắc chung
-- Ưu tiên thay đổi nhỏ, tránh phá vỡ cấu trúc hiện có.
-- Bảo mật bắt buộc: auth + scope + rate limit khi mở API external.
-- Ghi chú thay đổi quan trọng vào CHANGELOG và tài liệu liên quan (ADMIN_UI, ENV, frontend-api.txt).
+## General rules
+- Prefer small changes; avoid breaking existing structure.
+- Security required: auth + scope + rate limit for external APIs.
+- Record important changes in CHANGELOG and related docs (ADMIN_UI, ENV, frontend-api.txt).
