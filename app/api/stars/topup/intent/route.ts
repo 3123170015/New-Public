@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { calcCouponBonusStars, getValidCouponTx, normalizeCouponCode } from "@/lib/coupons";
+import { getOrInitPaymentConfig } from "@/lib/payments/config";
+import { templateMemo } from "@/lib/payments/memo";
 
 const schema = z.object({
   packageId: z.string().min(1),
@@ -74,8 +76,10 @@ export async function POST(req: Request) {
     include: { token: true, custodialAddress: true, package: true },
   });
 
+  const paymentCfg = await getOrInitPaymentConfig();
+  const memoTemplate = paymentCfg.depositMemoFormat || "DEPOSIT:{depositId}";
   // For Solana we recommend memo = depositId (auto-match)
-  const memo = deposit.chain === "SOLANA" ? deposit.id : "";
+  const memo = deposit.chain === "SOLANA" ? templateMemo(memoTemplate, deposit.id) : "";
   if (deposit.chain === "SOLANA") {
     await prisma.starDeposit.update({ where: { id: deposit.id }, data: { memo } });
   }

@@ -25,6 +25,18 @@ export async function getOrInitPaymentConfig() {
       submittedStaleMinutes: env.PAYMENTS_SUBMITTED_STALE_MINUTES,
       reconcileEveryMs: env.PAYMENTS_RECONCILE_EVERY_MS,
       allowlistJson: JSON.stringify(DEFAULT_ALLOWLIST),
+      depositMemoFormat: "DEPOSIT:{depositId}",
+      confirmationsJson: JSON.stringify({
+        ETHEREUM: 12,
+        POLYGON: 10,
+        BSC: 5,
+        BASE: 12,
+        SOLANA: 32,
+        TRON: 20,
+      }),
+      deadmanMinutes: 30,
+      telegramBotToken: null,
+      telegramChatId: null,
 
       // Growth / Monetization defaults
       seasonPassEnabled: false,

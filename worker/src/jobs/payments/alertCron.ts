@@ -1,5 +1,6 @@
 import { prisma } from "../../prisma";
 import { env } from "../../env";
+import { getPaymentConfigCached } from "./paymentConfig";
 import { moderationEscalationScanJob } from "../moderation/escalationScan";
 import { fraudRadarScanJob } from "./fraudRadarScan";
 
@@ -14,6 +15,19 @@ async function postDiscord(message: string) {
   }).catch(() => {});
 }
 
+async function postTelegram(message: string) {
+  const cfg = await getPaymentConfigCached();
+  const token = cfg.telegramBotToken || "";
+  const chatId = cfg.telegramChatId || "";
+  if (!token || !chatId) return;
+  const url = `https://api.telegram.org/bot${token}/sendMessage`;
+  await fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: "Markdown" }),
+  }).catch(() => {});
+}
+
 function fmtPct(n: number) {
   return `${(n * 100).toFixed(1)}%`;
 }
@@ -24,6 +38,7 @@ export async function paymentsAlertCronJob() {
   const moderation = await moderationEscalationScanJob().catch((e) => ({ ok: false, error: String(e?.message ?? e) } as any));
   const fraud = await fraudRadarScanJob().catch((e) => ({ ok: false, error: String(e?.message ?? e) } as any));
 
+  const cfg = await getPaymentConfigCached();
   const windowMs = 15 * 60 * 1000;
   const now = Date.now();
   const from = new Date(now - windowMs);
@@ -78,9 +93,10 @@ export async function paymentsAlertCronJob() {
       .map((b: { chain: string; _count: { _all: number } }) => `- ${b.chain}: ${b._count._all}`)
       .join("\n");
 
-    await postDiscord(
+    const msg =
       `⚠️ *Payments webhook fail-rate spike*\nWindow: last 15m\nFail rate: ${fmtPct(curRate)} (prev ${fmtPct(prevRate)})\nTotal: ${curTotal}, Failed: ${curFailed}\n\nBy chain:\n${lines}`,
-    );
+    await postDiscord(msg);
+    await postTelegram(msg);
 
     return { alerted: true, curTotal, curFailed, curRate, prevRate, moderation, fraud };
   }
@@ -88,8 +104,23 @@ export async function paymentsAlertCronJob() {
   // Also alert on a burst of NEEDS_REVIEW deposits (often risk-rule triggers or provider issues)
   const needsReview = await prisma.starDeposit.count({ where: { createdAt: { gte: from }, status: "NEEDS_REVIEW" } });
   if (needsReview >= needsReviewMin) {
-    await postDiscord(`⚠️ *Payments deposits NEEDS_REVIEW burst*\nWindow: last 15m\nNEEDS_REVIEW: ${needsReview}`);
+    const msg = `⚠️ *Payments deposits NEEDS_REVIEW burst*\nWindow: last 15m\nNEEDS_REVIEW: ${needsReview}`;
+    await postDiscord(msg);
+    await postTelegram(msg);
     return { alerted: true, reason: "NEEDS_REVIEW_BURST", needsReview, moderation, fraud };
+  }
+
+  if (cfg.deadmanMinutes > 0) {
+    const lastOk = await prisma.webhookAuditLog.findFirst({
+      where: { createdAt: { gte: new Date(Date.now() - cfg.deadmanMinutes * 60 * 1000) } },
+      orderBy: { createdAt: "desc" },
+    });
+    if (!lastOk) {
+      const msg = `⏱️ *Payments deadman alert*\nNo webhook logs in the last ${cfg.deadmanMinutes} minutes.`;
+      await postDiscord(msg);
+      await postTelegram(msg);
+      return { alerted: true, reason: "DEADMAN", moderation, fraud };
+    }
   }
 
   return { alerted: false, curTotal, curFailed, curRate, prevRate, moderation, fraud };

@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { requireExternalUser } from "@/lib/externalAuth";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
@@ -6,9 +7,19 @@ import { redirect } from "next/navigation";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
+  const external = await requireExternalUser(req, ["nft/write", "user/write"]);
+  if (!(external instanceof Response)) {
+    const out = await handleCreate(req, external.user.id);
+    return Response.json(out.body, { status: out.status, headers: external.cors });
+  }
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) return Response.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  return handleCreate(req, userId);
+}
+
+async function handleCreate(req: Request, userId: string) {
 
   const form = await req.formData();
   const itemId = String(form.get("itemId") || "").trim();
@@ -20,11 +31,12 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid priceStars" }, { status: 400 });
   }
 
-  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    const item = await tx.nftItem.findUnique({
-      where: { id: itemId },
-      select: { id: true, ownerId: true, marketplaceFrozen: true, exportStatus: true },
-    });
+  try {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const item = await tx.nftItem.findUnique({
+        where: { id: itemId },
+        select: { id: true, ownerId: true, marketplaceFrozen: true, exportStatus: true },
+      });
     if (!item) throw new Error("NFT_NOT_FOUND");
     if (item.ownerId !== userId) throw new Error("NOT_OWNER");
     if (item.marketplaceFrozen || item.exportStatus !== "NONE") throw new Error("MARKETPLACE_FROZEN");
@@ -35,15 +47,21 @@ export async function POST(req: Request) {
     const activeAuction = await tx.nftAuction.findFirst({ where: { itemId, status: "ACTIVE" }, select: { id: true } });
     if (activeAuction) throw new Error("ALREADY_IN_AUCTION");
 
-    await tx.nftListing.create({
-      data: {
-        itemId,
-        sellerId: userId,
-        priceStars: Math.trunc(priceStars),
-        status: "ACTIVE",
-      },
+      await tx.nftListing.create({
+        data: {
+          itemId,
+          sellerId: userId,
+          priceStars: Math.trunc(priceStars),
+          status: "ACTIVE",
+        },
+      });
     });
-  });
+  } catch (e: any) {
+    return { status: 400, body: { ok: false, error: e?.message || "FAILED" } };
+  }
 
-  redirect(back);
+  if (form.get("back")) {
+    redirect(back);
+  }
+  return { status: 200, body: { ok: true } };
 }

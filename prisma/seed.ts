@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -72,6 +73,28 @@ async function seedThemePreset() {
       assetsJson: null,
     },
   });
+}
+
+async function seedApiKeys() {
+  const name = process.env.SEED_API_KEY_NAME ?? "Default External Key";
+  const existing = await prisma.apiKey.findFirst({ where: { name } });
+  if (existing) return existing;
+  const raw = `vs_${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+  const hash = crypto.createHash("sha256").update(raw).digest("hex");
+  const key = await prisma.apiKey.create({
+    data: {
+      name,
+      keyHash: hash,
+      scopes: "public/*,me/*,auth/*",
+      strictScopes: true,
+      allowedOrigins: "",
+      rateLimitPerMinute: 600,
+      rateLimitWindowSec: 60,
+      isActive: true,
+      description: "Seeded external API key (copy raw key from seed logs).",
+    },
+  });
+  return { key, raw };
 }
 
 async function seedAdPlacements() {
@@ -243,6 +266,27 @@ async function seedNftContracts() {
   }
 }
 
+async function seedExternalApiKey() {
+  const existing = await prisma.apiKey.findFirst({ where: { name: "Default External Key" } });
+  if (existing) return null;
+  const raw = `vs_${crypto.randomBytes(20).toString("hex")}`;
+  const hash = crypto.createHash("sha256").update(raw).digest("hex");
+  const key = await prisma.apiKey.create({
+    data: {
+      name: "Default External Key",
+      keyHash: hash,
+      scopes: "public/*,me/*,auth/*",
+      strictScopes: true,
+      allowedOrigins: "",
+      rateLimitPerMinute: 600,
+      rateLimitWindowSec: 60,
+      isActive: true,
+      description: "Seeded external API key (check seed logs).",
+    },
+  });
+  return { key, raw };
+}
+
 async function main() {
   const { user, password } = await seedAdmin();
   const cfg = await seedConfigs();
@@ -250,6 +294,7 @@ async function main() {
   if (!cfg.activeThemeId && themePreset?.id) {
     await prisma.siteConfig.update({ where: { id: cfg.id }, data: { activeThemeId: themePreset.id } });
   }
+  const externalKey = await seedExternalApiKey();
   await seedAdPlacements();
   await seedBoostPlans();
   await seedGifts();
@@ -258,6 +303,9 @@ async function main() {
   await seedNftContracts();
 
   console.log("Seeded admin:", user.email, "password:", password);
+  if (externalKey) {
+    console.log("Seeded external API key:", externalKey.key.id, "raw:", externalKey.raw);
+  }
 }
 
 main()

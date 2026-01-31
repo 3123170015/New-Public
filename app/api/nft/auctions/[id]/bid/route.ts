@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { requireExternalUser } from "@/lib/externalAuth";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
@@ -13,20 +14,31 @@ function toInt(v: FormDataEntryValue | null, def = 0) {
 }
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
+  const external = await requireExternalUser(req, ["nft/write", "user/write"]);
+  if (!(external instanceof Response)) {
+    const out = await handleBid(req, params.id, external.user.id);
+    return Response.json(out.body, { status: out.status, headers: external.cors });
+  }
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) return Response.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  return handleBid(req, params.id, userId);
+}
+
+async function handleBid(req: Request, auctionId: string, userId: string) {
 
   const form = await req.formData();
   const back = String(form.get("back") || req.headers.get("referer") || "/nft/market");
   const amountStars = Math.max(1, toInt(form.get("amountStars"), 0));
 
-  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // Release matured holds so user can bid using unlocked proceeds.
-    await releaseMaturedHoldsTx(tx, userId);
+  try {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      // Release matured holds so user can bid using unlocked proceeds.
+      await releaseMaturedHoldsTx(tx, userId);
 
     const auction = await tx.nftAuction.findUnique({
-      where: { id: params.id },
+      where: { id: auctionId },
       include: {
         item: {
           include: {
@@ -73,10 +85,16 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     await tx.nftAuction.update({ where: { id: auction.id }, data: { highestBidId: bid.id } });
 
     // Refund previous highest bid hold (outbid).
-    if (auction.highestBid?.holdId) {
-      await releaseHoldNowTx(tx, auction.highestBid.holdId, `Outbid refund for auction ${auction.id}`);
-    }
-  });
+      if (auction.highestBid?.holdId) {
+        await releaseHoldNowTx(tx, auction.highestBid.holdId, `Outbid refund for auction ${auction.id}`);
+      }
+    });
+  } catch (e: any) {
+    return { status: 400, body: { ok: false, error: e?.message || "FAILED" } };
+  }
 
-  redirect(back);
+  if (form.get("back")) {
+    redirect(back);
+  }
+  return { status: 200, body: { ok: true } };
 }

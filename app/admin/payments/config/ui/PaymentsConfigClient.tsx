@@ -16,6 +16,11 @@ type PaymentConfig = {
   submittedStaleMinutes: number;
   reconcileEveryMs: number;
   allowlistJson: string;
+  depositMemoFormat?: string;
+  telegramBotToken?: string | null;
+  telegramChatId?: string | null;
+  confirmationsJson?: string;
+  deadmanMinutes?: number;
   // Growth / Monetization
   seasonPassEnabled?: boolean;
   seasonPassPriceStars?: number;
@@ -66,14 +71,14 @@ export default function PaymentsConfigClient({
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch("/api/admin/payments/config", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          ...cfg,
-          allowlistJson: allowlist,
-        }),
-      });
+       const res = await fetch("/api/admin/payments/config", {
+         method: "POST",
+         headers: { "content-type": "application/json" },
+         body: JSON.stringify({
+           ...cfg,
+           allowlistJson: allowlist,
+         }),
+       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json?.error || "failed");
       setMsg("Saved config");
@@ -140,6 +145,14 @@ export default function PaymentsConfigClient({
                 onChange={(e) => setCfg((p) => ({ ...p, reconcileEveryMs: Number(e.target.value || 0) }))}
               />
             </div>
+            <div className="space-y-2">
+              <div className="text-xs text-muted-foreground">Deadman minutes (alert if no webhooks)</div>
+              <Input
+                type="number"
+                value={Number(cfg.deadmanMinutes ?? 30)}
+                onChange={(e) => setCfg((p) => ({ ...p, deadmanMinutes: Number(e.target.value || 0) }))}
+              />
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-6">
@@ -159,6 +172,38 @@ export default function PaymentsConfigClient({
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground">Allowlist JSON (per chain)</div>
             <Textarea value={allowlist} onChange={(e) => setAllowlist(e.target.value)} rows={10} className="font-mono text-xs" />
+          </div>
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground">Memo format (Solana) — use {"{depositId}"}</div>
+            <Input
+              value={cfg.depositMemoFormat ?? "DEPOSIT:{depositId}"}
+              onChange={(e) => setCfg((p) => ({ ...p, depositMemoFormat: e.target.value }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground">Confirmations JSON (per chain)</div>
+            <Textarea
+              value={cfg.confirmationsJson ?? "{\"ETHEREUM\":12,\"POLYGON\":10,\"BSC\":5,\"BASE\":12,\"SOLANA\":32,\"TRON\":20}"}
+              onChange={(e) => setCfg((p) => ({ ...p, confirmationsJson: e.target.value }))}
+              rows={4}
+              className="font-mono text-xs"
+            />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <div className="text-xs text-muted-foreground">Telegram bot token</div>
+              <Input
+                value={cfg.telegramBotToken ?? ""}
+                onChange={(e) => setCfg((p) => ({ ...p, telegramBotToken: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="text-xs text-muted-foreground">Telegram chat ID</div>
+              <Input
+                value={cfg.telegramChatId ?? ""}
+                onChange={(e) => setCfg((p) => ({ ...p, telegramChatId: e.target.value }))}
+              />
+            </div>
           </div>
 
           <div className="flex gap-2">

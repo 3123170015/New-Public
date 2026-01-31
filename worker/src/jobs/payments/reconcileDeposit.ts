@@ -14,6 +14,27 @@ function isEvm(chain: Chain) {
   return chain === "ETHEREUM" || chain === "POLYGON" || chain === "BSC" || chain === "BASE";
 }
 
+function requiredConfirmations(chain: Chain, cfg: Awaited<ReturnType<typeof getPaymentConfigCached>>) {
+  const conf = cfg.confirmations?.[chain];
+  if (typeof conf === "number" && Number.isFinite(conf) && conf > 0) return Math.floor(conf);
+  switch (chain) {
+    case "BSC":
+      return 5;
+    case "POLYGON":
+      return 10;
+    case "BASE":
+      return 12;
+    case "ETHEREUM":
+      return 12;
+    case "SOLANA":
+      return 32;
+    case "TRON":
+      return 20;
+    default:
+      return 12;
+  }
+}
+
 function rpcUrlForChain(chain: Chain): string {
   switch (chain) {
     case "SOLANA":
@@ -355,12 +376,40 @@ export async function reconcileDepositJob(depositId: string) {
       return;
     }
 
+    const confirmationsRequired = requiredConfirmations(chain, cfg);
+    let txConfirmed = true;
+    if (isEvm(chain)) {
+      const url = rpcUrlForChain(chain);
+      if (url) {
+        const latestHex = await jsonRpc<any>(url, "eth_blockNumber", []);
+        const receipt = await jsonRpc<any>(url, "eth_getTransactionReceipt", [txHash]);
+        const latest = latestHex ? Number(BigInt(latestHex)) : 0;
+        const txBlock = receipt?.blockNumber ? Number(BigInt(receipt.blockNumber)) : 0;
+        const conf = latest && txBlock ? latest - txBlock + 1 : 0;
+        txConfirmed = conf >= confirmationsRequired;
+      }
+    } else if (chain === "SOLANA") {
+      // Solana: treat as confirmed if we can read transaction (heuristic)
+      txConfirmed = true;
+    }
+
+    if (!txConfirmed) {
+      await prisma.starDeposit.update({
+        where: { id: dep.id },
+        data: { status: "OBSERVED", actualAmount: actualStr as any, failureReason: `confirmations_pending_${confirmationsRequired}` },
+      });
+      await prisma.starDepositEvent.create({
+        data: { depositId: dep.id, type: "RECONCILE_PENDING", message: `Awaiting ${confirmationsRequired} confirmations` },
+      });
+      return;
+    }
+
     await prisma.starDeposit.update({
       where: { id: dep.id },
-      data: { status: "CONFIRMED", actualAmount: actualStr as any, failureReason: null },
+      data: { status: "CONFIRMED", actualAmount: actualStr as any, failureReason: null, confirmedAt: new Date() },
     });
     await prisma.starDepositEvent.create({
-      data: { depositId: dep.id, type: "RECONCILE_CONFIRMED", message: `Confirmed amount ${actualStr}` },
+      data: { depositId: dep.id, type: "RECONCILE_CONFIRMED", message: `Confirmed amount ${actualStr} (${confirmationsRequired} conf)` },
     });
 
     // Auto-credit

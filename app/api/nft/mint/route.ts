@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { requireExternalUser } from "@/lib/externalAuth";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
@@ -7,21 +8,35 @@ import { getSiteConfig } from "@/lib/siteConfig";
 import { releaseMaturedHolds } from "@/lib/stars/holds";
 
 export async function POST(req: Request) {
+  const external = await requireExternalUser(req, ["nft/write", "user/write"]);
+  if (!(external instanceof Response)) {
+    const out = await handleMint(req, external.user.id, external.user);
+    return Response.json(out.body, { status: out.status, headers: external.cors });
+  }
+
   const session = await auth();
   const userId = (session?.user as any)?.id as string | undefined;
   if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const out = await handleMint(req, userId, session?.user as any);
+  if (out.redirectTo) {
+    redirect(out.redirectTo);
+  }
+  return Response.json(out.body, { status: out.status });
+}
 
-  const tier = getActiveMembershipTier((session?.user as any) ?? ({} as any));
+async function handleMint(req: Request, userId: string, sessionUser: any): Promise<{ status: number; body: any; redirectTo?: string }> {
+
+  const tier = getActiveMembershipTier(sessionUser ?? ({} as any));
   if (tier !== "PREMIUM_PLUS") {
-    return Response.json({ error: "Premium+ required" }, { status: 403 });
+    return { status: 403, body: { error: "Premium+ required" } };
   }
 
   const form = await req.formData();
   const videoId = String(form.get("videoId") || "");
   if (!videoId) {
-    return Response.json({ error: "Missing videoId" }, { status: 400 });
+    return { status: 400, body: { error: "Missing videoId" } };
   }
 
   const cfg = await getSiteConfig();
@@ -45,22 +60,22 @@ export async function POST(req: Request) {
   });
 
   if (!me) {
-    return Response.json({ error: "User not found" }, { status: 404 });
+    return { status: 404, body: { error: "User not found" } };
   }
   if (!video || video.authorId !== userId) {
-    return Response.json({ error: "Video not found" }, { status: 404 });
+    return { status: 404, body: { error: "Video not found" } };
   }
   if (video.status !== "PUBLISHED") {
-    return Response.json({ error: "Video must be PUBLISHED" }, { status: 400 });
+    return { status: 400, body: { error: "Video must be PUBLISHED" } };
   }
   if (existing) {
-    return Response.json({ error: "Video already minted" }, { status: 409 });
+    return { status: 409, body: { error: "Video already minted" } };
   }
   // If user has no collection yet, they'll also pay the collection fee.
   const needsCollection = !collection;
   const totalFee = Number(itemFee) + (needsCollection ? Number(collectionFee) : 0);
   if (me.starBalance < totalFee) {
-    return Response.json({ error: "Not enough stars" }, { status: 400 });
+    return { status: 400, body: { error: "Not enough stars" } };
   }
 
   await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -120,5 +135,8 @@ export async function POST(req: Request) {
     }
   });
 
-  redirect(`/u/${userId}/nfts`);
+  if (req.headers.get("content-type")?.includes("application/json")) {
+    return { status: 200, body: { ok: true, userId } };
+  }
+  return { status: 200, body: { ok: true }, redirectTo: `/u/${userId}/nfts` };
 }

@@ -97,7 +97,7 @@ export default async function AdminConfig() {
                 defaultValue={(cfg as any).homeSectionOrder ?? "TRENDING,FEED,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT"}
               />
               <div className="text-xs text-zinc-500">
-                Giá trị ví dụ: TRENDING,FEED,BOOSTED,CONTINUE_WATCHING,COMMUNITY,RECENT,CATEGORIES
+                Mặc định: TRENDING → FEED → BOOSTED → CONTINUE_WATCHING → COMMUNITY → RECENT. Có thể thêm CATEGORIES.
               </div>
             </div>
             <div className="grid gap-2">

@@ -215,7 +215,10 @@ export async function requireApiKey(req: Request, scopes: string[] = []) {
     }
   }
   const allowedScopes = parseCsv(apiKey.scopes).map(normalizeScope);
-  if (!hasScopes(allowedScopes.length ? allowedScopes : ["*"], scopes.map(normalizeScope))) {
+  const strict = Boolean((apiKey as any).strictScopes);
+  const required = scopes.map(normalizeScope);
+  const effectiveAllowed = allowedScopes.length ? allowedScopes : strict ? [] : ["*"];
+  if (!hasScopes(effectiveAllowed, required)) {
     return Response.json({ ok: false, error: "SCOPE_DENIED" }, { status: 403, headers: buildExternalCorsHeaders(req, origin) });
   }
   const ip = getClientIp(req);
