@@ -64,32 +64,36 @@ Headers: X-API-Key + Authorization: Bearer <token>
 - Browser: fetch(url, { credentials: "include" })
 - CORS allowlist: config allowedOrigins trong API key
 
-10) Gợi ý bổ sung endpoint theo module
-- Billing/Subscription:
+10) WalletScan / Ledger (đã triển khai)
+- GET /api/external/wallet-scan/search (username/userId/address/txHash/contractAddress)
+- Trả về: user, wallets, ledger (sao + nạp), deposit, nft export, wallet assets
+
+11) Gợi ý bổ sung endpoint theo module
+- Billing/Subscription (đề xuất):
   - GET /api/external/billing/plans
   - POST /api/external/billing/subscribe
   - POST /api/external/billing/cancel
   - GET /api/external/billing/invoices
-- Wallet/History:
+- Wallet/History (đề xuất):
   - GET /api/external/wallets/history
   - GET /api/external/wallets/balances
   - POST /api/external/wallets/withdraw
-- Multi-chain status:
+- Multi-chain status (đề xuất):
   - GET /api/external/chains/status
   - GET /api/external/chains/confirmations
-- Live/Streaming:
+- Live/Streaming (đề xuất):
   - POST /api/external/live/ingest
   - GET /api/external/live/{id}
   - POST /api/external/live/{id}/stop
-- Moderation queue:
+- Moderation queue (đề xuất):
   - GET /api/admin/moderation/queue
   - POST /api/admin/moderation/{id}/approve
   - POST /api/admin/moderation/{id}/reject
-- Webhook system:
+- Webhook system (đề xuất):
   - POST /api/admin/webhooks
   - GET /api/admin/webhooks
   - POST /api/admin/webhooks/{id}/test
-- Analytics:
+- Analytics (đề xuất):
   - GET /api/admin/analytics/overview
   - GET /api/external/analytics/me
  - Referral / Creator stats / AI moderation / Payout (đã triển khai):
