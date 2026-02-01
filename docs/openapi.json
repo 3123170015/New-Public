@@ -2589,9 +2589,9 @@
       },
       "options": {
         "tags": [
-          "External"
+          "External WalletScan"
         ],
-        "summary": "OPTIONS /api/external/stars/topup/history",
+        "summary": "OPTIONS /api/external/wallet-scan/ledger",
         "responses": {
           "200": {
             "description": "OK"
@@ -2600,12 +2600,6 @@
         "security": [
           {
             "ApiKey": []
-          },
-          {
-            "CookieAuth": []
-          },
-          {
-            "BearerAuth": []
           }
         ]
       }
