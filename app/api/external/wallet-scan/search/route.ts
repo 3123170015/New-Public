@@ -161,7 +161,7 @@ export async function GET(req: Request) {
       amount: tx.delta.toString(),
       status: "SETTLED",
       txHash: null,
-      note: tx.note,
+      memo: tx.note,
       type: tx.type,
     })),
     ...deposits.map((deposit) => ({
