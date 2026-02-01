@@ -162,6 +162,7 @@ export async function GET(req: Request) {
       status: "SETTLED",
       txHash: null,
       memo: tx.note,
+      note: null,
       type: tx.type,
     })),
     ...deposits.map((deposit) => ({
