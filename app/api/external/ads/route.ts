@@ -18,11 +18,11 @@ export async function GET(req: Request) {
     : null;
 
   const mem = {
-    membershipTier: ((member?.membershipTier ?? "NONE") as any) ?? "NONE",
+    membershipTier: member?.membershipTier ?? "NONE",
     membershipExpiresAt: member?.membershipExpiresAt ? new Date(member.membershipExpiresAt) : null,
   };
 
-  const activeTier = getActiveMembershipTier(mem as any);
+  const activeTier = getActiveMembershipTier(mem);
   const allowHtmlAds = activeTier === "NONE";
 
   const { searchParams } = new URL(req.url);

@@ -2,6 +2,29 @@
 
 Tài liệu này mô tả cách frontend thiết kế màn hình ledger giống Tronscan/Bscscan cho hệ thống Stars + NFT hiện tại. Backend đã có endpoint `/api/external/wallet-scan/search` để tổng hợp dữ liệu theo username, địa chỉ ví, transaction hash hoặc contract address.
 
+## Prompt gợi ý cho Bolt/Lovable (WalletScan UI)
+
+```
+Bạn là frontend builder. Hãy tạo trang "WalletScan Explorer" sử dụng các endpoint sau:
+- GET /api/external/wallet-scan/search?q=...
+- GET /api/external/wallet-scan/tx/{hash}
+- GET /api/external/wallet-scan/user/{username}
+- GET /api/external/wallet-scan/wallets?username=...
+- GET /api/external/wallet-scan/assets?username=...&chain=...
+- GET /api/external/wallet-scan/ledger?username=...
+- GET /api/external/wallet-scan/nfts?username=...
+- GET /api/external/wallet-scan/nft-transfers?username=...
+
+Yêu cầu UI:
+1) Search bar (username/userId/address/txHash/contract).
+2) Tabs: Wallets, Assets, Ledger, NFTs, Transfers, Swaps.
+3) Ledger hiển thị starTransactions nếu includePrivate=1 và user đăng nhập.
+4) Render addressHits/contractHits/txHits/userHits thành "search result cards".
+5) Table cho ledger (timestamp, type, chain, amount, memo/txHash).
+6) NFT grid (thumbnail, collection, listing/auction status).
+7) Assets snapshot theo chain, có filter chain.
+```
+
 ## Mục tiêu
 
 - Hiển thị lịch sử nạp (Stars) + ledger nội bộ.
