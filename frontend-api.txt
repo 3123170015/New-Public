@@ -82,12 +82,16 @@ Headers: X-API-Key + Authorization: Bearer <token>
  - GET /api/external/wallet-scan/swaps?chain=... (DEX swap history placeholder)
  - GET /api/external/wallet-scan/payouts?username=...&includePrivate=1 (payout on-chain ledger private)
 
-12) Analytics (đã triển khai)
+ 12) Analytics (đã triển khai)
 - GET /api/external/analytics/content (video mới tạo + bài viết mới + comment mới)
 - GET /api/external/analytics/top (top comment + top creator hoạt động)
 
-13) Public trending (đã triển khai)
-- GET /api/external/public/trending?days=7 (mirror /api/trending)
+ 13) Public trending (đã triển khai)
+  - GET /api/external/public/trending?days=7 (mirror /api/trending)
+
+14) Ads & Boost (đã triển khai)
+ - GET /api/external/ads?scope=FEED
+ - GET /api/external/boost/plans
 
 11) Gợi ý bổ sung endpoint theo module
 - Billing/Subscription (đề xuất):

@@ -90,6 +90,19 @@ components:
           type: string
         name:
           type: string
+    BoostPlan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        priceStars:
+          type: integer
+        durationDays:
+          type: integer
+        active:
+          type: boolean
     ExternalVideo:
       type: object
       properties:
@@ -1136,6 +1149,54 @@ paths:
       - ApiKey: []
       - CookieAuth: []
       - BearerAuth: []
+  /api/external/ads:
+    get:
+      tags:
+      - External Ads
+      summary: Ad placement config (external)
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: scope
+        schema:
+          type: string
+          example: FEED
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  everyN:
+                    type: integer
+                  html:
+                    type: string
+  /api/external/boost/plans:
+    get:
+      tags:
+      - External Boost
+      summary: Boost plan list
+      security:
+      - ApiKey: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  plans:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BoostPlan'
   /api/external/analytics/content:
     get:
       tags:
