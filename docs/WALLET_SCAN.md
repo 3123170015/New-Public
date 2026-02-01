@@ -43,6 +43,17 @@ Query parameters:
 - `walletAssets`: snapshot on-chain holdings (UserWalletAsset).
 - `payoutLedger`: tương lai payout on-chain (hiện rỗng).
 
+## Bộ endpoint explorer (đã triển khai)
+
+- GET `/api/external/wallet-scan/tx/{hash}`: tra nhanh theo txHash
+- GET `/api/external/wallet-scan/user/{username}`: tra theo username (phân trang)
+- GET `/api/external/wallet-scan/wallets?username=...`: danh sách ví
+- GET `/api/external/wallet-scan/assets?username=...&chain=...`: snapshot tài sản on-chain
+- GET `/api/external/wallet-scan/nfts?username=...`: danh sách NFT + listings/auctions/sales
+- GET `/api/external/wallet-scan/ledger?username=...`: ledger tổng hợp
+- GET `/api/external/wallet-scan/contracts`: danh sách contract export
+- GET `/api/external/wallet-scan/contract/{chain}/{address}`: chi tiết contract export
+
 ## Cách hiển thị Ledger
 
 Mỗi item trong `ledger` có `kind`:

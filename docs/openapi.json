@@ -296,6 +296,109 @@
           },
           "chain": {
             "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "take": {
+            "type": "integer"
+          },
+          "includePrivate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WalletScanHitUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "starBalance": {
+            "type": "integer"
+          }
+        }
+      },
+      "WalletScanHitAddress": {
+        "type": "object",
+        "properties": {
+          "walletId": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        }
+      },
+      "WalletScanHitTx": {
+        "type": "object",
+        "properties": {
+          "txHash": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "WalletScanHitContract": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "type": "string"
+          },
+          "contractAddress": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      },
+      "WalletScanHits": {
+        "type": "object",
+        "properties": {
+          "userHits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanHitUser"
+            }
+          },
+          "addressHits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanHitAddress"
+            }
+          },
+          "txHits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanHitTx"
+            }
+          },
+          "contractHits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanHitContract"
+            }
           }
         }
       },
@@ -491,6 +594,9 @@
           "query": {
             "$ref": "#/components/schemas/WalletScanQuery"
           },
+          "hits": {
+            "$ref": "#/components/schemas/WalletScanHits"
+          },
           "user": {
             "$ref": "#/components/schemas/WalletScanUser"
           },
@@ -564,6 +670,189 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WalletScanLedgerItem"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "take": {
+            "type": "integer"
+          }
+        }
+      },
+      "WalletScanContractsResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanHitContract"
+            }
+          }
+        }
+      },
+      "WalletScanContractResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "contractAddress": {
+            "type": "string"
+          },
+          "exports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftExport"
+            }
+          }
+        }
+      },
+      "WalletScanAssetsResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "user": {
+            "$ref": "#/components/schemas/WalletScanUser"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "contractAddress": {
+            "type": "string"
+          },
+          "wallets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanWallet"
+            }
+          },
+          "assets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanAsset"
+            }
+          }
+        }
+      },
+      "WalletScanWalletsResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "user": {
+            "$ref": "#/components/schemas/WalletScanUser"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "wallets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanWallet"
+            }
+          }
+        }
+      },
+      "WalletScanLedgerResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "user": {
+            "$ref": "#/components/schemas/WalletScanUser"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "ledger": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanLedgerItem"
+            }
+          },
+          "deposits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanDeposit"
+            }
+          },
+          "starTransactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanStarTx"
+            }
+          },
+          "payoutLedger": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanLedgerItem"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "take": {
+            "type": "integer"
+          }
+        }
+      },
+      "WalletScanNftsResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "user": {
+            "$ref": "#/components/schemas/WalletScanUser"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "nftItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftItem"
+            }
+          },
+          "nftListings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftListing"
+            }
+          },
+          "nftAuctions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftAuction"
+            }
+          },
+          "nftSales": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftSale"
+            }
+          },
+          "nftEventLogs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftEventLog"
+            }
+          },
+          "nftExports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftExport"
             }
           },
           "page": {
@@ -1721,6 +2010,580 @@
                   "payoutLedger": [],
                   "page": 1,
                   "take": 40
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "OPTIONS /api/external/wallet-scan/search",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/external/wallet-scan/tx/{hash}": {
+      "get": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "Tra cứu nhanh theo txHash",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hash",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "chain",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "includePrivate",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletScanResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "OPTIONS /api/external/wallet-scan/tx/{hash}",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/external/wallet-scan/user/{username}": {
+      "get": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "Tra cứu theo username",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "chain",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "includePrivate",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletScanResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "OPTIONS /api/external/wallet-scan/user/{username}",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/external/wallet-scan/contracts": {
+      "get": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "Danh sách contract đã export",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletScanContractsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "OPTIONS /api/external/wallet-scan/contracts",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/external/wallet-scan/contract/{chain}/{address}": {
+      "get": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "Chi tiết contract export",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chain",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletScanContractResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "OPTIONS /api/external/wallet-scan/contract/{chain}/{address}",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/external/wallet-scan/wallets": {
+      "get": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "Danh sách ví theo user",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "address",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "chain",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletScanWalletsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "OPTIONS /api/external/wallet-scan/wallets",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/external/wallet-scan/assets": {
+      "get": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "Snapshot tài sản on-chain",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "chain",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "contractAddress",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletScanAssetsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "OPTIONS /api/external/wallet-scan/assets",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/external/wallet-scan/nfts": {
+      "get": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "NFT ledger snapshot",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "chain",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletScanNftsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "OPTIONS /api/external/wallet-scan/nfts",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/external/wallet-scan/ledger": {
+      "get": {
+        "tags": [
+          "External WalletScan"
+        ],
+        "summary": "Ledger tổng hợp (stars + deposit + payout)",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "chain",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "includePrivate",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletScanLedgerResponse"
                 }
               }
             }
