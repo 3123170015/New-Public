@@ -297,8 +297,6 @@ components:
           type: string
         txHash:
           type: string
-        note:
-          type: string
         memo:
           type: string
         tokenIdHex:

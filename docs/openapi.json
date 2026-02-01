@@ -472,9 +472,6 @@
           "txHash": {
             "type": "string"
           },
-          "note": {
-            "type": "string"
-          },
           "memo": {
             "type": "string"
           },

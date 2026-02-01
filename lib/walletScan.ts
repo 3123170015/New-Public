@@ -252,7 +252,41 @@ export async function getWalletScanWalletAssets(walletIds: string[], contractAdd
   });
 }
 
-export function buildWalletScanLedger(starTx: any[], deposits: any[], nftExports: any[]) {
+type WalletScanStarTxRow = {
+  id: string;
+  createdAt: Date;
+  delta: number;
+  note: string | null;
+  type: string;
+};
+
+type WalletScanDepositRow = {
+  id: string;
+  createdAt: Date;
+  chain: Chain;
+  status: string;
+  txHash: string | null;
+  memo: string | null;
+  actualAmount: number | null;
+  expectedAmount: number | null;
+  token: { symbol: string | null } | null;
+};
+
+type WalletScanExportRow = {
+  id: string;
+  createdAt: Date;
+  chain: Chain;
+  status: string;
+  txHash: string | null;
+  contractAddress: string | null;
+  tokenIdHex: string | null;
+};
+
+export function buildWalletScanLedger(
+  starTx: WalletScanStarTxRow[],
+  deposits: WalletScanDepositRow[],
+  nftExports: WalletScanExportRow[],
+) {
   return [
     ...starTx.map((tx) => ({
       kind: "STAR_TX",
@@ -264,7 +298,6 @@ export function buildWalletScanLedger(starTx: any[], deposits: any[], nftExports
       status: "SETTLED",
       txHash: null,
       memo: tx.note ?? null,
-      note: null,
       type: tx.type,
     })),
     ...deposits.map((deposit) => ({
@@ -359,7 +392,6 @@ export async function getWalletScanData(query: WalletScanQuery, options: WalletS
   return {
     wallets,
     deposits,
-    starLedger,
     starTransactions: starLedger,
     nftExports,
     nftItems: nftDetails.nftItems,
