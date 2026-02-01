@@ -64,7 +64,7 @@ Headers: X-API-Key + Authorization: Bearer <token>
 - Browser: fetch(url, { credentials: "include" })
 - CORS allowlist: config allowedOrigins trong API key
 
-10) Gợi ý bổ sung endpoint theo module (chưa triển khai)
+10) Gợi ý bổ sung endpoint theo module
 - Billing/Subscription:
   - GET /api/external/billing/plans
   - POST /api/external/billing/subscribe
@@ -92,3 +92,23 @@ Headers: X-API-Key + Authorization: Bearer <token>
 - Analytics:
   - GET /api/admin/analytics/overview
   - GET /api/external/analytics/me
+ - Referral / Creator stats / AI moderation / Payout (đã triển khai):
+   - GET /api/external/referrals/me
+   - POST /api/external/referrals/claim
+   - GET /api/external/creator-stats/summary
+   - GET /api/external/creator-stats/revenue
+   - GET /api/external/creator-stats/top-fans
+   - GET /api/admin/moderation/ai/queue
+   - POST /api/admin/moderation/ai/{id}/decision
+   - GET /api/admin/moderation/ai/status
+   - GET /api/external/payouts/methods
+   - POST /api/external/payouts/request
+   - GET /api/external/payouts/{id}
+ - Live/Streaming (đã triển khai):
+   - GET /api/external/live/streams
+   - POST /api/external/live/streams
+   - GET /api/external/live/streams/{id}
+   - POST /api/external/live/streams/{id}/start
+   - POST /api/external/live/streams/{id}/stop
+   - GET /api/external/live/streams/{id}/chat
+   - POST /api/external/live/streams/{id}/chat
