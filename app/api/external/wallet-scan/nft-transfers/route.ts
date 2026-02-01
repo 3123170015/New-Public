@@ -37,7 +37,9 @@ export async function GET(req: Request) {
   const user = await resolveWalletScanUser({ userId: parsed.data.userId, username: parsed.data.username });
   const authUser = await getExternalUser(req);
   const includePrivate = parsed.data.includePrivate === "1";
-  const canSeePrivate = includePrivate && authUser && user && (authUser.role === "ADMIN" || authUser.id === user.id);
+  const canSeePrivate = Boolean(
+    includePrivate && authUser && user && (authUser.role === "ADMIN" || authUser.id === user.id),
+  );
 
   const data = await getWalletScanData(
     { userId: user?.id, username: parsed.data.username, chain: chainResult.chain },

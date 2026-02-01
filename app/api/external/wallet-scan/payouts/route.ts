@@ -37,7 +37,9 @@ export async function GET(req: Request) {
   const user = await resolveWalletScanUser({ userId: parsed.data.userId, username: parsed.data.username });
   const authUser = await getExternalUser(req);
   const includePrivate = parsed.data.includePrivate === "1";
-  const canSeePrivate = includePrivate && authUser && user && (authUser.role === "ADMIN" || authUser.id === user.id);
+  const canSeePrivate = Boolean(
+    includePrivate && authUser && user && (authUser.role === "ADMIN" || authUser.id === user.id),
+  );
   if (!canSeePrivate) {
     return Response.json({ ok: false, error: "FORBIDDEN" }, { status: 403, headers: key.cors });
   }

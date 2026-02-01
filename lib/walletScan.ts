@@ -132,7 +132,7 @@ export async function getWalletScanWallets({ userId, address, chain }: WalletSca
 }
 
 export async function getWalletScanDeposits({ userId, txHash, chain }: WalletScanQuery, page: number, take: number) {
-  return prisma.starDeposit.findMany({
+  const rows = await prisma.starDeposit.findMany({
     where: {
       ...(userId ? { userId } : {}),
       ...(txHash ? { txHash } : {}),
@@ -143,6 +143,11 @@ export async function getWalletScanDeposits({ userId, txHash, chain }: WalletSca
     take,
     skip: (page - 1) * take,
   });
+  return rows.map((row) => ({
+    ...row,
+    actualAmount: row.actualAmount ? row.actualAmount.toString() : null,
+    expectedAmount: row.expectedAmount ? row.expectedAmount.toString() : null,
+  }));
 }
 
 export async function getWalletScanStarLedger(userId: string | undefined, page: number, take: number) {
@@ -358,8 +363,8 @@ type WalletScanDepositRow = {
   status: string;
   txHash: string | null;
   memo: string | null;
-  actualAmount: number | null;
-  expectedAmount: number | null;
+  actualAmount: string | null;
+  expectedAmount: string | null;
   token: { symbol: string | null } | null;
 };
 
