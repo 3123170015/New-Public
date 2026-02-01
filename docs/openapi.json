@@ -2766,6 +2766,548 @@
             }
           }
         ]
+      }
+    },
+    "/api/external/referrals/me": {
+      "get": {
+        "tags": [
+          "External Me"
+        ],
+        "summary": "Lấy referral code của user",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/external/referrals/claim": {
+      "post": {
+        "tags": [
+          "External Me"
+        ],
+        "summary": "Nhập referral code",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/external/creator-stats/summary": {
+      "get": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Tổng quan creator stats",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/external/creator-stats/revenue": {
+      "get": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Doanh thu creator",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/external/creator-stats/top-fans": {
+      "get": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Top fan của creator",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/moderation/ai/queue": {
+      "get": {
+        "tags": [
+          "Admin Moderation"
+        ],
+        "summary": "Hàng chờ AI moderation",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/moderation/ai/{id}/decision": {
+      "post": {
+        "tags": [
+          "Admin Moderation"
+        ],
+        "summary": "Quyết định AI moderation",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "example": "APPROVE"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/moderation/ai/status": {
+      "get": {
+        "tags": [
+          "Admin Moderation"
+        ],
+        "summary": "Trạng thái model AI moderation",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/external/payouts/methods": {
+      "get": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Danh sách payout methods",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/external/payouts/request": {
+      "post": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Tạo payout request",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "methodId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/external/payouts/{id}": {
+      "get": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Xem payout request",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/external/live/streams": {
+      "get": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Danh sách live stream",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Tạo live stream mới",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/external/live/streams/{id}": {
+      "get": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Trạng thái live stream",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/external/live/streams/{id}/start": {
+      "post": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Bắt đầu live stream",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/external/live/streams/{id}/stop": {
+      "post": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Kết thúc live stream",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/external/live/streams/{id}/chat": {
+      "get": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Lịch sử chat live",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "External"
+        ],
+        "summary": "Gửi chat live",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       },
       "options": {
         "tags": [
