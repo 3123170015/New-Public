@@ -1466,6 +1466,65 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WalletScanResponse"
+                },
+                "example": {
+                  "ok": true,
+                  "query": {
+                    "username": "demo",
+                    "userId": null,
+                    "address": null,
+                    "txHash": null,
+                    "contractAddress": null,
+                    "chain": "SOLANA"
+                  },
+                  "user": {
+                    "id": "usr_123",
+                    "username": "demo",
+                    "name": "Demo User",
+                    "email": "demo@site.com",
+                    "starBalance": 120
+                  },
+                  "wallets": [
+                    {
+                      "id": "wal_1",
+                      "chain": "SOLANA",
+                      "address": "Hx9...",
+                      "verifiedAt": "2026-01-01T00:00:00Z",
+                      "createdAt": "2026-01-01T00:00:00Z"
+                    }
+                  ],
+                  "ledger": [
+                    {
+                      "kind": "STAR_TX",
+                      "id": "stx_1",
+                      "createdAt": "2026-01-01T01:00:00Z",
+                      "chain": "OFFCHAIN",
+                      "token": "STARS",
+                      "amount": "5",
+                      "status": "SETTLED",
+                      "memo": "Tip",
+                      "note": null,
+                      "txHash": null
+                    },
+                    {
+                      "kind": "DEPOSIT",
+                      "id": "dep_1",
+                      "createdAt": "2026-01-02T00:00:00Z",
+                      "chain": "SOLANA",
+                      "token": "USDT",
+                      "amount": "25",
+                      "status": "CONFIRMED",
+                      "memo": "DEPOSIT:dep_1",
+                      "txHash": "0xabc"
+                    }
+                  ],
+                  "deposits": [],
+                  "starTransactions": [],
+                  "nftExports": [],
+                  "walletAssets": [],
+                  "payoutLedger": [],
+                  "page": 1,
+                  "take": 40
                 }
               }
             }

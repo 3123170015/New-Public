@@ -99,6 +99,11 @@
           "file": "OPENAPI_NOTE_VI.md"
         },
         {
+          "slug": "wallet-scan",
+          "title": "WalletScan (Ledger)",
+          "file": "WALLET_SCAN.md"
+        },
+        {
           "slug": "worker-ffmpeg",
           "title": "Worker / ffmpeg",
           "file": "WORKER_FFMPEG.md"
