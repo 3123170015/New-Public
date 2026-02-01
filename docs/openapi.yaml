@@ -26,6 +26,76 @@ tags:
   - name: Admin Storage
   - name: Admin Videos
   - name: Admin Moderation
+x-suggestedEndpoints:
+  liveStreaming:
+    summary: Gợi ý endpoint cho module Live/Streaming
+    routes:
+      - path: /api/external/live/streams
+        method: GET
+        description: Danh sách live đang diễn ra
+      - path: /api/external/live/streams
+        method: POST
+        description: Tạo live stream mới (creator)
+      - path: /api/external/live/streams/{id}
+        method: GET
+        description: Chi tiết live + trạng thái
+      - path: /api/external/live/streams/{id}/start
+        method: POST
+        description: Bắt đầu live (server side)
+      - path: /api/external/live/streams/{id}/stop
+        method: POST
+        description: Kết thúc live
+      - path: /api/external/live/streams/{id}/chat
+        method: GET
+        description: Lịch sử chat/live reactions
+      - path: /api/external/live/streams/{id}/chat
+        method: POST
+        description: Gửi chat/reaction
+  moderationQueues:
+    summary: Gợi ý endpoint cho module Moderation Queue
+    routes:
+      - path: /api/admin/moderation/queue
+        method: GET
+        description: Lấy danh sách item chờ duyệt
+      - path: /api/admin/moderation/queue/{id}/approve
+        method: POST
+        description: Duyệt nội dung
+      - path: /api/admin/moderation/queue/{id}/reject
+        method: POST
+        description: Từ chối nội dung + lý do
+      - path: /api/admin/moderation/appeals
+        method: GET
+        description: Danh sách khiếu nại
+  webhooks:
+    summary: Gợi ý endpoint cho module Webhook system
+    routes:
+      - path: /api/admin/webhooks
+        method: GET
+        description: Danh sách webhook đăng ký
+      - path: /api/admin/webhooks
+        method: POST
+        description: Tạo webhook mới
+      - path: /api/admin/webhooks/{id}
+        method: PATCH
+        description: Cập nhật webhook
+      - path: /api/admin/webhooks/{id}/test
+        method: POST
+        description: Gửi thử webhook
+  analytics:
+    summary: Gợi ý endpoint cho module Analytics
+    routes:
+      - path: /api/admin/analytics/overview
+        method: GET
+        description: Tổng quan analytics (views, watchtime, revenue)
+      - path: /api/admin/analytics/videos
+        method: GET
+        description: Báo cáo theo video
+      - path: /api/admin/analytics/creators
+        method: GET
+        description: Báo cáo theo creator
+      - path: /api/admin/analytics/exports
+        method: POST
+        description: Xuất báo cáo analytics
 components:
   securitySchemes:
     ApiKey:
