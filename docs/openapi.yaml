@@ -2,100 +2,34 @@ openapi: 3.0.3
 info:
   title: New-Public API
   version: 4.16.26
-  description: |
-    OpenAPI mô tả các endpoint quan trọng của backend New-Public (bao gồm /api/external, /api/me, /api/admin).
+  description: 'OpenAPI mô tả các endpoint quan trọng của backend New-Public (bao
+    gồm /api/external, /api/me, /api/admin).
+
+    '
 servers:
-  - url: https://your-domain.example.com
-    description: Production
-  - url: http://localhost:3000
-    description: Local dev
+- url: https://your-domain.example.com
+  description: Production
+- url: http://localhost:3000
+  description: Local dev
 tags:
-  - name: External Auth
-  - name: External Public
-  - name: External Me
-  - name: External Stars
-  - name: External NFT
-  - name: Playlists
-  - name: Upload
-  - name: Comments
-  - name: Stars
-  - name: NFT
-  - name: Me
-  - name: Admin
-  - name: Admin Payments
-  - name: Admin Storage
-  - name: Admin Videos
-  - name: Admin Moderation
-x-suggestedEndpoints:
-  liveStreaming:
-    summary: Gợi ý endpoint cho module Live/Streaming
-    routes:
-      - path: /api/external/live/streams
-        method: GET
-        description: Danh sách live đang diễn ra
-      - path: /api/external/live/streams
-        method: POST
-        description: Tạo live stream mới (creator)
-      - path: /api/external/live/streams/{id}
-        method: GET
-        description: Chi tiết live + trạng thái
-      - path: /api/external/live/streams/{id}/start
-        method: POST
-        description: Bắt đầu live (server side)
-      - path: /api/external/live/streams/{id}/stop
-        method: POST
-        description: Kết thúc live
-      - path: /api/external/live/streams/{id}/chat
-        method: GET
-        description: Lịch sử chat/live reactions
-      - path: /api/external/live/streams/{id}/chat
-        method: POST
-        description: Gửi chat/reaction
-  moderationQueues:
-    summary: Gợi ý endpoint cho module Moderation Queue
-    routes:
-      - path: /api/admin/moderation/queue
-        method: GET
-        description: Lấy danh sách item chờ duyệt
-      - path: /api/admin/moderation/queue/{id}/approve
-        method: POST
-        description: Duyệt nội dung
-      - path: /api/admin/moderation/queue/{id}/reject
-        method: POST
-        description: Từ chối nội dung + lý do
-      - path: /api/admin/moderation/appeals
-        method: GET
-        description: Danh sách khiếu nại
-  webhooks:
-    summary: Gợi ý endpoint cho module Webhook system
-    routes:
-      - path: /api/admin/webhooks
-        method: GET
-        description: Danh sách webhook đăng ký
-      - path: /api/admin/webhooks
-        method: POST
-        description: Tạo webhook mới
-      - path: /api/admin/webhooks/{id}
-        method: PATCH
-        description: Cập nhật webhook
-      - path: /api/admin/webhooks/{id}/test
-        method: POST
-        description: Gửi thử webhook
-  analytics:
-    summary: Gợi ý endpoint cho module Analytics
-    routes:
-      - path: /api/admin/analytics/overview
-        method: GET
-        description: Tổng quan analytics (views, watchtime, revenue)
-      - path: /api/admin/analytics/videos
-        method: GET
-        description: Báo cáo theo video
-      - path: /api/admin/analytics/creators
-        method: GET
-        description: Báo cáo theo creator
-      - path: /api/admin/analytics/exports
-        method: POST
-        description: Xuất báo cáo analytics
+- name: External Auth
+- name: External Public
+- name: External Me
+- name: External Stars
+- name: External NFT
+- name: Playlists
+- name: Upload
+- name: Comments
+- name: Stars
+- name: NFT
+- name: Me
+- name: Admin
+- name: Admin Payments
+- name: Admin Storage
+- name: Admin Videos
+- name: Admin Moderation
+- name: External
+- name: Public
 components:
   securitySchemes:
     ApiKey:
@@ -119,7 +53,9 @@ components:
           type: string
     ExternalLoginRequest:
       type: object
-      required: [email, password]
+      required:
+      - email
+      - password
       properties:
         email:
           type: string
@@ -141,7 +77,10 @@ components:
               type: string
     ExternalRegisterRequest:
       type: object
-      required: [email, password, name]
+      required:
+      - email
+      - password
+      - name
       properties:
         email:
           type: string
@@ -173,10 +112,13 @@ components:
         videos:
           type: array
           items:
-            $ref: "#/components/schemas/ExternalVideo"
+            $ref: '#/components/schemas/ExternalVideo'
     StarsTopupIntentRequest:
       type: object
-      required: [amount, chain, token]
+      required:
+      - amount
+      - chain
+      - token
       properties:
         amount:
           type: number
@@ -223,7 +165,7 @@ components:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/StarsTopupHistoryItem"
+            $ref: '#/components/schemas/StarsTopupHistoryItem'
     OkResponse:
       type: object
       properties:
@@ -231,7 +173,8 @@ components:
           type: boolean
     PlaylistCreateRequest:
       type: object
-      required: [title]
+      required:
+      - title
       properties:
         title:
           type: string
@@ -257,7 +200,10 @@ components:
           type: string
     UploadInitRequest:
       type: object
-      required: [filename, size, mime]
+      required:
+      - filename
+      - size
+      - mime
       properties:
         filename:
           type: string
@@ -286,7 +232,9 @@ components:
                 type: string
     CommentCreateRequest:
       type: object
-      required: [videoId, body]
+      required:
+      - videoId
+      - body
       properties:
         videoId:
           type: string
@@ -295,7 +243,9 @@ components:
           example: Awesome video!
     StarsSendRequest:
       type: object
-      required: [receiverId, amount]
+      required:
+      - receiverId
+      - amount
       properties:
         receiverId:
           type: string
@@ -306,7 +256,9 @@ components:
           type: string
     NftListingCreateRequest:
       type: object
-      required: [nftId, price]
+      required:
+      - nftId
+      - price
       properties:
         nftId:
           type: string
@@ -314,7 +266,10 @@ components:
           type: number
     NftAuctionCreateRequest:
       type: object
-      required: [itemId, startPriceStars, durationHours]
+      required:
+      - itemId
+      - startPriceStars
+      - durationHours
       properties:
         itemId:
           type: string
@@ -326,13 +281,15 @@ components:
           type: integer
     NftAuctionBidRequest:
       type: object
-      required: [amountStars]
+      required:
+      - amountStars
       properties:
         amountStars:
           type: integer
     PlaylistItemRequest:
       type: object
-      required: [videoId]
+      required:
+      - videoId
       properties:
         videoId:
           type: string
@@ -345,7 +302,8 @@ components:
           type: string
     PlaylistReorderRequest:
       type: object
-      required: [itemIds]
+      required:
+      - itemIds
       properties:
         itemIds:
           type: array
@@ -353,7 +311,9 @@ components:
             type: string
     CommentModerateRequest:
       type: object
-      required: [commentId, action]
+      required:
+      - commentId
+      - action
       properties:
         commentId:
           type: string
@@ -362,7 +322,8 @@ components:
           example: HIDE
     CommentReportRequest:
       type: object
-      required: [commentId]
+      required:
+      - commentId
       properties:
         commentId:
           type: string
@@ -370,7 +331,10 @@ components:
           type: string
     UploadSignPartRequest:
       type: object
-      required: [uploadId, partNumber, key]
+      required:
+      - uploadId
+      - partNumber
+      - key
       properties:
         uploadId:
           type: string
@@ -380,7 +344,10 @@ components:
           type: string
     UploadCompleteRequest:
       type: object
-      required: [uploadId, key, parts]
+      required:
+      - uploadId
+      - key
+      - parts
       properties:
         uploadId:
           type: string
@@ -397,7 +364,9 @@ components:
                 type: string
     AdminApiKeyRequest:
       type: object
-      required: [name, scopes]
+      required:
+      - name
+      - scopes
       properties:
         name:
           type: string
@@ -412,74 +381,123 @@ components:
 paths:
   /api/external/auth/login:
     post:
-      tags: [External Auth]
+      tags:
+      - External Auth
       summary: Đăng nhập (JWT + cookie)
       security:
-        - ApiKey: []
+      - ApiKey: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ExternalLoginRequest"
+              $ref: '#/components/schemas/ExternalLoginRequest'
       responses:
-        "200":
+        '200':
           description: Login thành công
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ExternalLoginResponse"
-        "401":
+                $ref: '#/components/schemas/ExternalLoginResponse'
+        '401':
           description: Sai thông tin đăng nhập
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/auth/login
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/auth/register:
     post:
-      tags: [External Auth]
+      tags:
+      - External Auth
       summary: Đăng ký tài khoản
       security:
-        - ApiKey: []
+      - ApiKey: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ExternalRegisterRequest"
+              $ref: '#/components/schemas/ExternalRegisterRequest'
       responses:
-        "201":
+        '201':
           description: Đăng ký thành công
-        "400":
+        '400':
           description: Lỗi dữ liệu đầu vào
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/auth/register
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/auth/me:
     get:
-      tags: [External Auth]
+      tags:
+      - External Auth
       summary: Lấy thông tin user hiện tại
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/auth/me
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/auth/logout:
     post:
-      tags: [External Auth]
+      tags:
+      - External Auth
       summary: Đăng xuất (xóa cookie)
       security:
-        - ApiKey: []
+      - ApiKey: []
       responses:
-        "200":
+        '200':
           description: OK
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/auth/logout
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/public/videos:
     get:
-      tags: [External Public]
+      tags:
+      - External Public
       summary: Danh sách video public
       security:
-        - ApiKey: []
+      - ApiKey: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -489,309 +507,430 @@ paths:
                   videos:
                     type: array
                     items:
-                      $ref: "#/components/schemas/ExternalVideo"
+                      $ref: '#/components/schemas/ExternalVideo'
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/public/videos
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/public/search:
     get:
-      tags: [External Public]
+      tags:
+      - External Public
       summary: Tìm kiếm video
       security:
-        - ApiKey: []
+      - ApiKey: []
       parameters:
-        - in: query
-          name: q
-          schema:
-            type: string
-          required: true
+      - in: query
+        name: q
+        schema:
+          type: string
+        required: true
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ExternalSearchResponse"
+                $ref: '#/components/schemas/ExternalSearchResponse'
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/public/search
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/me/notifications:
     get:
-      tags: [External Me]
+      tags:
+      - External Me
       summary: Lấy danh sách thông báo
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/me/notifications
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/me/watch-later:
     get:
-      tags: [External Me]
+      tags:
+      - External Me
       summary: Danh sách xem sau
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/me/watch-later
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/stars/topup/intent:
     post:
-      tags: [External Stars]
+      tags:
+      - External Stars
       summary: Tạo intent nạp sao (USDT/USDC)
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StarsTopupIntentRequest"
+              $ref: '#/components/schemas/StarsTopupIntentRequest'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StarsTopupIntentResponse"
+                $ref: '#/components/schemas/StarsTopupIntentResponse'
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/stars/topup/intent
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/stars/topup/history:
     get:
-      tags: [External Stars]
+      tags:
+      - External Stars
       summary: Lịch sử nạp sao
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StarsTopupHistoryResponse"
+                $ref: '#/components/schemas/StarsTopupHistoryResponse'
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/stars/topup/history
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/nft/listings/create:
     post:
-      tags: [External NFT]
+      tags:
+      - External NFT
       summary: Tạo listing NFT
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/nft/listings/create
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/nft/listings/cancel:
     post:
-      tags: [External NFT]
+      tags:
+      - External NFT
       summary: Hủy listing NFT
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/nft/listings/cancel
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/nft/listings/buy:
     post:
-      tags: [External NFT]
+      tags:
+      - External NFT
       summary: Mua listing NFT
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/nft/listings/buy
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/nft/auctions/create:
     post:
-      tags: [External NFT]
+      tags:
+      - External NFT
       summary: Tạo auction NFT
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NftAuctionCreateRequest"
+              $ref: '#/components/schemas/NftAuctionCreateRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/external/nft/auctions/{id}/bid:
     post:
-      tags: [External NFT]
+      tags:
+      - External NFT
       summary: Đặt bid auction NFT
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NftAuctionBidRequest"
+              $ref: '#/components/schemas/NftAuctionBidRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/external/nft/auctions/{id}/cancel:
     post:
-      tags: [External NFT]
+      tags:
+      - External NFT
       summary: Hủy auction NFT
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
   /api/external/nft/auctions/{id}/settle:
     post:
-      tags: [External NFT]
+      tags:
+      - External NFT
       summary: Chốt auction NFT
       security:
-        - ApiKey: []
-        - CookieAuth: []
-        - BearerAuth: []
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
   /api/me/notifications:
     get:
-      tags: [Me]
+      tags:
+      - Me
       summary: Danh sách thông báo (Next auth cookie)
       responses:
-        "200":
+        '200':
           description: OK
   /api/me/watch-later:
     get:
-      tags: [Me]
+      tags:
+      - Me
       summary: Danh sách xem sau
       responses:
-        "200":
+        '200':
           description: OK
   /api/me/watch-later/toggle:
     post:
-      tags: [Me]
+      tags:
+      - Me
       summary: Bật/tắt xem sau
       responses:
-        "200":
+        '200':
           description: OK
   /api/playlists:
     get:
-      tags: [Playlists]
+      tags:
+      - Playlists
       summary: Danh sách playlist của tôi
       responses:
-        "200":
+        '200':
           description: OK
     post:
-      tags: [Playlists]
+      tags:
+      - Playlists
       summary: Tạo playlist mới
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlaylistCreateRequest"
+              $ref: '#/components/schemas/PlaylistCreateRequest'
       responses:
-        "201":
+        '201':
           description: Created
   /api/playlists/{id}:
     get:
-      tags: [Playlists]
+      tags:
+      - Playlists
       summary: Chi tiết playlist
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
     patch:
-      tags: [Playlists]
+      tags:
+      - Playlists
       summary: Cập nhật playlist
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlaylistUpdateRequest"
+              $ref: '#/components/schemas/PlaylistUpdateRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/playlists/{id}/items:
     post:
-      tags: [Playlists]
+      tags:
+      - Playlists
       summary: Thêm video vào playlist
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlaylistItemRequest"
+              $ref: '#/components/schemas/PlaylistItemRequest'
       responses:
-        "201":
+        '201':
           description: Created
     delete:
-      tags: [Playlists]
+      tags:
+      - Playlists
       summary: Xóa video khỏi playlist
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlaylistItemRemoveRequest"
+              $ref: '#/components/schemas/PlaylistItemRemoveRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/playlists/{id}/cover:
     post:
-      tags: [Playlists]
+      tags:
+      - Playlists
       summary: Cập nhật cover playlist
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -803,324 +942,786 @@ paths:
                   type: string
                   format: binary
       responses:
-        "200":
+        '200':
           description: OK
     delete:
-      tags: [Playlists]
+      tags:
+      - Playlists
       summary: Xóa cover playlist
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
   /api/playlists/{id}/reorder:
     post:
-      tags: [Playlists]
+      tags:
+      - Playlists
       summary: Sắp xếp lại playlist items
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlaylistReorderRequest"
+              $ref: '#/components/schemas/PlaylistReorderRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/upload/init:
     post:
-      tags: [Upload]
+      tags:
+      - Upload
       summary: Khởi tạo upload video
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UploadInitRequest"
+              $ref: '#/components/schemas/UploadInitRequest'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UploadInitResponse"
+                $ref: '#/components/schemas/UploadInitResponse'
   /api/upload/sign-part:
     post:
-      tags: [Upload]
+      tags:
+      - Upload
       summary: Lấy URL ký part upload
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UploadSignPartRequest"
+              $ref: '#/components/schemas/UploadSignPartRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/upload/complete:
     post:
-      tags: [Upload]
+      tags:
+      - Upload
       summary: Hoàn tất upload video
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UploadCompleteRequest"
+              $ref: '#/components/schemas/UploadCompleteRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/comments:
     post:
-      tags: [Comments]
+      tags:
+      - Comments
       summary: Tạo bình luận
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CommentCreateRequest"
+              $ref: '#/components/schemas/CommentCreateRequest'
       responses:
-        "201":
+        '201':
           description: Created
   /api/comments/moderate:
     post:
-      tags: [Comments]
+      tags:
+      - Comments
       summary: Ẩn/hiện bình luận
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CommentModerateRequest"
+              $ref: '#/components/schemas/CommentModerateRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/comments/report:
     post:
-      tags: [Comments]
+      tags:
+      - Comments
       summary: Báo cáo bình luận
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CommentReportRequest"
+              $ref: '#/components/schemas/CommentReportRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/stars/send:
     post:
-      tags: [Stars]
+      tags:
+      - Stars
       summary: Tặng sao (Super Thanks)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StarsSendRequest"
+              $ref: '#/components/schemas/StarsSendRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/stars/balance:
     get:
-      tags: [Stars]
+      tags:
+      - Stars
       summary: Số dư sao
       responses:
-        "200":
+        '200':
           description: OK
   /api/stars/topup/intent:
     post:
-      tags: [Stars]
+      tags:
+      - Stars
       summary: Tạo intent nạp sao
       responses:
-        "200":
+        '200':
           description: OK
   /api/stars/topup/history:
     get:
-      tags: [Stars]
+      tags:
+      - Stars
       summary: Lịch sử nạp sao
       responses:
-        "200":
+        '200':
           description: OK
   /api/nft/listings/create:
     post:
-      tags: [NFT]
+      tags:
+      - NFT
       summary: Tạo NFT listing
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NftListingCreateRequest"
+              $ref: '#/components/schemas/NftListingCreateRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/nft/listings/{id}/buy:
     post:
-      tags: [NFT]
+      tags:
+      - NFT
       summary: Mua NFT listing
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
   /api/nft/auctions/create:
     post:
-      tags: [NFT]
+      tags:
+      - NFT
       summary: Tạo auction NFT
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NftAuctionCreateRequest"
+              $ref: '#/components/schemas/NftAuctionCreateRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/nft/auctions/{id}/bid:
     post:
-      tags: [NFT]
+      tags:
+      - NFT
       summary: Đặt bid auction NFT
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NftAuctionBidRequest"
+              $ref: '#/components/schemas/NftAuctionBidRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/nft/auctions/{id}/settle:
     post:
-      tags: [NFT]
+      tags:
+      - NFT
       summary: Chốt auction NFT
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/site-config:
     get:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: Lấy cấu hình hệ thống
       responses:
-        "200":
+        '200':
           description: OK
     post:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: Cập nhật cấu hình hệ thống
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/api-keys:
     get:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: Danh sách API keys
       responses:
-        "200":
+        '200':
           description: OK
     post:
-      tags: [Admin]
+      tags:
+      - Admin
       summary: Tạo API key
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AdminApiKeyRequest"
+              $ref: '#/components/schemas/AdminApiKeyRequest'
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/payments/dashboard:
     get:
-      tags: [Admin Payments]
+      tags:
+      - Admin Payments
       summary: Dashboard payments
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/payments/deposits/manual-credit:
     post:
-      tags: [Admin Payments]
+      tags:
+      - Admin Payments
       summary: Manual credit deposit
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/payments/deposits/refund:
     post:
-      tags: [Admin Payments]
+      tags:
+      - Admin Payments
       summary: Refund deposit
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/payments/fraud/alerts:
     get:
-      tags: [Admin Payments]
+      tags:
+      - Admin Payments
       summary: Danh sách fraud alerts
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/storage/config:
     get:
-      tags: [Admin Storage]
+      tags:
+      - Admin Storage
       summary: Lấy cấu hình storage
       responses:
-        "200":
+        '200':
           description: OK
     post:
-      tags: [Admin Storage]
+      tags:
+      - Admin Storage
       summary: Cập nhật cấu hình storage
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/videos/publish:
     post:
-      tags: [Admin Videos]
+      tags:
+      - Admin Videos
       summary: Publish video
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/videos/hide:
     post:
-      tags: [Admin Videos]
+      tags:
+      - Admin Videos
       summary: Ẩn video
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/videos/delete:
     post:
-      tags: [Admin Videos]
+      tags:
+      - Admin Videos
       summary: Xóa video
       responses:
-        "200":
+        '200':
           description: OK
   /api/admin/moderation/actions:
     post:
-      tags: [Admin Moderation]
+      tags:
+      - Admin Moderation
       summary: Thao tác moderation
       responses:
-        "200":
+        '200':
           description: OK
+  /api/admin/hls-config:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/hls-config
+      responses:
+        '200':
+          description: OK
+  /api/admin/theme-presets:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/theme-presets
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/theme-presets
+      responses:
+        '200':
+          description: OK
+  /api/admin/star-transactions:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/star-transactions
+      responses:
+        '200':
+          description: OK
+  /api/admin/reports:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/reports
+      responses:
+        '200':
+          description: OK
+  /api/admin/stars-adjust:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/stars-adjust
+      responses:
+        '200':
+          description: OK
+  /api/admin/ad-placement:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/ad-placement
+      responses:
+        '200':
+          description: OK
+  /api/admin/api-sources:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/api-sources
+      responses:
+        '200':
+          description: OK
+  /api/admin/gifts:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/gifts
+      responses:
+        '200':
+          description: OK
+  /api/admin/stars/export/ledger:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/stars/export/ledger
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/secrets:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/payments/secrets
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/payments/secrets
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/coupons:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/payments/coupons
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/payments/coupons
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/config:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/payments/config
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/payments/config
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/bundles:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/payments/bundles
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/payments/bundles
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/coupons/{id}:
+    delete:
+      tags:
+      - Admin
+      summary: DELETE /api/admin/payments/coupons/{id}
+      responses:
+        '200':
+          description: OK
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+  /api/admin/payments/fraud/alerts/ack:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/payments/fraud/alerts/ack
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/fraud/alerts/resolve:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/payments/fraud/alerts/resolve
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/deposits/reconcile:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/payments/deposits/reconcile
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/deposits/assign-user:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/payments/deposits/assign-user
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/export/events:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/payments/export/events
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/export/deposits:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/payments/export/deposits
+      responses:
+        '200':
+          description: OK
+  /api/admin/payments/export/webhooks:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/payments/export/webhooks
+      responses:
+        '200':
+          description: OK
+  /api/admin/videos/update-metadata:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/videos/update-metadata
+      responses:
+        '200':
+          description: OK
+  /api/admin/videos/requeue:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/videos/requeue
+      responses:
+        '200':
+          description: OK
+  /api/admin/storage/ftp/test-upload:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/storage/ftp/test-upload
+      responses:
+        '200':
+          description: OK
+  /api/admin/storage/ftp/verify:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/storage/ftp/verify
+      responses:
+        '200':
+          description: OK
+  /api/admin/storage/drive/verify:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/storage/drive/verify
+      responses:
+        '200':
+          description: OK
+  /api/admin/subtitles/request:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/subtitles/request
+      responses:
+        '200':
+          description: OK
+  /api/admin/reports/comments:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/reports/comments
+      responses:
+        '200':
+          description: OK
+  /api/admin/nft/contracts:
+    get:
+      tags:
+      - Admin
+      summary: GET /api/admin/nft/contracts
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/nft/contracts
+      responses:
+        '200':
+          description: OK
+  /api/admin/api-sources/sync:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/api-sources/sync
+      responses:
+        '200':
+          description: OK
+  /api/admin/boost/plans:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/boost/plans
+      responses:
+        '200':
+          description: OK
+  /api/admin/boost/orders:
+    post:
+      tags:
+      - Admin
+      summary: POST /api/admin/boost/orders
+      responses:
+        '200':
+          description: OK
+  /api/public/videos:
+    get:
+      tags:
+      - Public
+      summary: GET /api/public/videos
+      responses:
+        '200':
+          description: OK
+    options:
+      tags:
+      - Public
+      summary: OPTIONS /api/public/videos
+      responses:
+        '200':
+          description: OK
+  /api/public/search:
+    get:
+      tags:
+      - Public
+      summary: GET /api/public/search
+      responses:
+        '200':
+          description: OK
+    options:
+      tags:
+      - Public
+      summary: OPTIONS /api/public/search
+      responses:
+        '200':
+          description: OK
+  /api/public/video/{id}:
+    get:
+      tags:
+      - Public
+      summary: GET /api/public/video/{id}
+      responses:
+        '200':
+          description: OK
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    options:
+      tags:
+      - Public
+      summary: OPTIONS /api/public/video/{id}
+      responses:
+        '200':
+          description: OK
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+x-suggestedEndpoints:
+  liveStreaming:
+    summary: Gợi ý endpoint cho module Live/Streaming
+    routes:
+    - path: /api/external/live/streams
+      method: GET
+      description: Danh sách live đang diễn ra
+    - path: /api/external/live/streams
+      method: POST
+      description: Tạo live stream mới (creator)
+    - path: /api/external/live/streams/{id}
+      method: GET
+      description: Chi tiết live + trạng thái
+    - path: /api/external/live/streams/{id}/start
+      method: POST
+      description: Bắt đầu live (server side)
+    - path: /api/external/live/streams/{id}/stop
+      method: POST
+      description: Kết thúc live
+    - path: /api/external/live/streams/{id}/chat
+      method: GET
+      description: Lịch sử chat/live reactions
+    - path: /api/external/live/streams/{id}/chat
+      method: POST
+      description: Gửi chat/reaction
+  moderationQueues:
+    summary: Gợi ý endpoint cho module Moderation Queue
+    routes:
+    - path: /api/admin/moderation/queue
+      method: GET
+      description: Lấy danh sách item chờ duyệt
+    - path: /api/admin/moderation/queue/{id}/approve
+      method: POST
+      description: Duyệt nội dung
+    - path: /api/admin/moderation/queue/{id}/reject
+      method: POST
+      description: Từ chối nội dung + lý do
+    - path: /api/admin/moderation/appeals
+      method: GET
+      description: Danh sách khiếu nại
+  webhooks:
+    summary: Gợi ý endpoint cho module Webhook system
+    routes:
+    - path: /api/admin/webhooks
+      method: GET
+      description: Danh sách webhook đăng ký
+    - path: /api/admin/webhooks
+      method: POST
+      description: Tạo webhook mới
+    - path: /api/admin/webhooks/{id}
+      method: PATCH
+      description: Cập nhật webhook
+    - path: /api/admin/webhooks/{id}/test
+      method: POST
+      description: Gửi thử webhook
+  analytics:
+    summary: Gợi ý endpoint cho module Analytics
+    routes:
+    - path: /api/admin/analytics/overview
+      method: GET
+      description: Tổng quan analytics (views, watchtime, revenue)
+    - path: /api/admin/analytics/videos
+      method: GET
+      description: Báo cáo theo video
+    - path: /api/admin/analytics/creators
+      method: GET
+      description: Báo cáo theo creator
+    - path: /api/admin/analytics/exports
+      method: POST
+      description: Xuất báo cáo analytics
