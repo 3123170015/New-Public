@@ -817,6 +817,24 @@ paths:
       - ApiKey: []
       - CookieAuth: []
       - BearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StarsTopupHistoryResponse'
+    options:
+      tags:
+      - External
+      summary: OPTIONS /api/external/stars/topup/history
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
   /api/external/wallet-scan/search:
     get:
       tags:

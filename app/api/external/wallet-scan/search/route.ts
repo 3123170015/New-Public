@@ -17,6 +17,14 @@ const querySchema = z.object({
 
 const knownChains = ["SOLANA", "ETHEREUM", "POLYGON", "BSC", "BASE", "TRON"];
 
+type WalletScanUser = {
+  id: string;
+  username: string | null;
+  name: string | null;
+  email: string | null;
+  starBalance: number;
+};
+
 export async function OPTIONS(req: Request) {
   const key = await requireApiKey(req, ["wallet-scan/read"]);
   if (key instanceof Response) return key;
@@ -39,7 +47,7 @@ export async function GET(req: Request) {
     return Response.json({ ok: false, error: "INVALID_CHAIN" }, { status: 400, headers: key.cors });
   }
 
-  let user = null as null | { id: string; username: string | null; name: string | null; email: string | null; starBalance: number };
+  let user: WalletScanUser | null = null;
   if (rawUserId) {
     user = await prisma.user.findUnique({
       where: { id: rawUserId },
@@ -148,7 +156,7 @@ export async function GET(req: Request) {
       createdAt: tx.createdAt,
       chain: null,
       token: "STARS",
-      amount: tx.delta,
+      amount: tx.delta.toString(),
       status: "SETTLED",
       txHash: null,
       note: tx.note ?? null,
