@@ -43,11 +43,11 @@ export async function GET(req: Request) {
   }
 
   const { username, userId: rawUserId, address, txHash, contractAddress } = parsed.data;
-  const chain = parsed.data.chain ? parsed.data.chain.toUpperCase() : undefined;
-  if (chain && !knownChains.includes(chain)) {
+  const rawChain = parsed.data.chain ? parsed.data.chain.toUpperCase() : undefined;
+  const chainFilter = rawChain && knownChains.includes(rawChain as Chain) ? (rawChain as Chain) : undefined;
+  if (rawChain && !chainFilter) {
     return Response.json({ ok: false, error: "INVALID_CHAIN" }, { status: 400, headers: key.cors });
   }
-  const chainFilter = chain as Chain | undefined;
 
   let user: WalletScanUser | null = null;
   if (rawUserId) {
@@ -197,7 +197,7 @@ export async function GET(req: Request) {
         address: address ?? null,
         txHash: txHash ?? null,
         contractAddress: contractAddress ?? null,
-        chain: chain ?? null,
+        chain: rawChain ?? null,
       },
       user,
       wallets,
