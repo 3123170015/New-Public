@@ -63,3 +63,32 @@ Headers: X-API-Key + Authorization: Bearer <token>
 9) Cookie + CORS
 - Browser: fetch(url, { credentials: "include" })
 - CORS allowlist: config allowedOrigins trong API key
+
+10) Gợi ý bổ sung endpoint theo module (chưa triển khai)
+- Billing/Subscription:
+  - GET /api/external/billing/plans
+  - POST /api/external/billing/subscribe
+  - POST /api/external/billing/cancel
+  - GET /api/external/billing/invoices
+- Wallet/History:
+  - GET /api/external/wallets/history
+  - GET /api/external/wallets/balances
+  - POST /api/external/wallets/withdraw
+- Multi-chain status:
+  - GET /api/external/chains/status
+  - GET /api/external/chains/confirmations
+- Live/Streaming:
+  - POST /api/external/live/ingest
+  - GET /api/external/live/{id}
+  - POST /api/external/live/{id}/stop
+- Moderation queue:
+  - GET /api/admin/moderation/queue
+  - POST /api/admin/moderation/{id}/approve
+  - POST /api/admin/moderation/{id}/reject
+- Webhook system:
+  - POST /api/admin/webhooks
+  - GET /api/admin/webhooks
+  - POST /api/admin/webhooks/{id}/test
+- Analytics:
+  - GET /api/admin/analytics/overview
+  - GET /api/external/analytics/me
