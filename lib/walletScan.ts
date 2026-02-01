@@ -142,6 +142,9 @@ export async function getWalletScanNftExports(
 
 export async function getWalletScanNftDetails(userId: string | undefined, exportItemIds: string[], take: number) {
   const nftItemIds = new Set<string>(exportItemIds);
+  if (!userId && !exportItemIds.length) {
+    return { nftItems: [], nftListings: [], nftAuctions: [], nftSales: [], nftEventLogs: [], nftItemIds: [] as string[] };
+  }
   const nftItems = await prisma.nftItem.findMany({
     where: {
       OR: [
