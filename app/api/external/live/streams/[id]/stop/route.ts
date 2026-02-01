@@ -8,12 +8,13 @@ export async function OPTIONS(req: Request) {
   return new Response(null, { status: 204, headers: auth.cors });
 }
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireExternalUser(req, ["live/streams"]);
   if (auth instanceof Response) return auth;
+  const { id } = await params;
 
   return Response.json(
-    { ok: true, streamId: params.id, status: "ENDED" },
+    { ok: true, streamId: id, status: "ENDED" },
     { headers: auth.cors },
   );
 }

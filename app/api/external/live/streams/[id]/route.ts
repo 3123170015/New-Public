@@ -8,15 +8,16 @@ export async function OPTIONS(req: Request) {
   return new Response(null, { status: 204, headers: auth.cors });
 }
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireExternalUser(req, ["live/streams"]);
   if (auth instanceof Response) return auth;
+  const { id } = await params;
 
   return Response.json(
     {
       ok: true,
       stream: {
-        id: params.id,
+        id,
         status: "LIVE",
         viewerCount: 0,
       },
