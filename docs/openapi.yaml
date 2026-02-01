@@ -1924,6 +1924,12 @@ paths:
       responses:
         '200':
           description: OK
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
     options:
       tags:
       - Public

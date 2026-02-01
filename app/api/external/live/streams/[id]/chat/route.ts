@@ -13,16 +13,18 @@ export async function OPTIONS(req: Request) {
   return new Response(null, { status: 204, headers: auth.cors });
 }
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireExternalUser(req, ["live/streams"]);
   if (auth instanceof Response) return auth;
+  const { id } = await params;
 
-  return Response.json({ ok: true, items: [], streamId: params.id }, { headers: auth.cors });
+  return Response.json({ ok: true, items: [], streamId: id }, { headers: auth.cors });
 }
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireExternalUser(req, ["live/streams"]);
   if (auth instanceof Response) return auth;
+  const { id } = await params;
 
   const body = await req.json().catch(() => null);
   const parsed = messageSchema.safeParse(body);
@@ -33,7 +35,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   return Response.json(
     {
       ok: true,
-      streamId: params.id,
+      streamId: id,
       message: {
         id: `msg_${Date.now()}`,
         text: parsed.data.message,

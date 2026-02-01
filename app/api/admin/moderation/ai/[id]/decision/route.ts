@@ -10,7 +10,7 @@ const bodySchema = z.object({
   note: z.string().optional(),
 });
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   requireAdmin(session);
 
@@ -22,8 +22,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     return Response.json({ ok: false, error: "INVALID_BODY" }, { status: 400 });
   }
 
+  const { id } = await params;
   const report = await prisma.videoReport.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       status: parsed.data.action === "APPROVE" ? "RESOLVED" : "REJECTED",
       reviewerId: (session?.user as any)?.id ?? null,
