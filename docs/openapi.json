@@ -265,285 +265,476 @@
           }
         }
       },
-    "StarsTopupHistoryResponse": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
+      "StarsTopupHistoryResponse": {
+        "type": "object",
+        "properties": {
           "items": {
-            "$ref": "#/components/schemas/StarsTopupHistoryItem"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StarsTopupHistoryItem"
+            }
           }
         }
-      }
-    },
-    "WalletScanQuery": {
-      "type": "object",
-      "properties": {
-        "username": {
-          "type": "string"
-        },
-        "userId": {
-          "type": "string"
-        },
-        "address": {
-          "type": "string"
-        },
-        "txHash": {
-          "type": "string"
-        },
-        "contractAddress": {
-          "type": "string"
-        },
-        "chain": {
-          "type": "string"
-        }
-      }
-    },
-    "WalletScanUser": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "starBalance": {
-          "type": "integer"
-        }
-      }
-    },
-    "WalletScanWallet": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "chain": {
-          "type": "string"
-        },
-        "address": {
-          "type": "string"
-        },
-        "verifiedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "WalletScanLedgerItem": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "chain": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        },
-        "amount": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "txHash": {
-          "type": "string"
-        },
-        "note": {
-          "type": "string"
-        },
-        "memo": {
-          "type": "string"
-        },
-        "tokenIdHex": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        }
-      }
-    },
-    "WalletScanDeposit": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "chain": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "expectedAmount": {
-          "type": "string"
-        },
-        "actualAmount": {
-          "type": "string"
-        },
-        "memo": {
-          "type": "string"
-        },
-        "txHash": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "WalletScanStarTx": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        },
-        "delta": {
-          "type": "integer"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "WalletScanNftExport": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "chain": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "contractAddress": {
-          "type": "string"
-        },
-        "tokenIdHex": {
-          "type": "string"
-        },
-        "txHash": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "WalletScanAsset": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "chain": {
-          "type": "string"
-        },
-        "assetKey": {
-          "type": "string"
-        },
-        "kind": {
-          "type": "string"
-        },
-        "balance": {
-          "type": "integer"
-        },
-        "lastSyncAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "WalletScanResponse": {
-      "type": "object",
-      "properties": {
-        "ok": {
-          "type": "boolean"
-        },
-        "query": {
-          "$ref": "#/components/schemas/WalletScanQuery"
-        },
-        "user": {
-          "$ref": "#/components/schemas/WalletScanUser"
-        },
-        "wallets": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/WalletScanWallet"
+      },
+      "WalletScanQuery": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "txHash": {
+            "type": "string"
+          },
+          "contractAddress": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
           }
-        },
-        "ledger": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/WalletScanLedgerItem"
-          }
-        },
-        "deposits": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/WalletScanDeposit"
-          }
-        },
-        "starTransactions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/WalletScanStarTx"
-          }
-        },
-        "nftExports": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/WalletScanNftExport"
-          }
-        },
-        "walletAssets": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/WalletScanAsset"
-          }
-        },
-        "payoutLedger": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/WalletScanLedgerItem"
-          }
-        },
-        "page": {
-          "type": "integer"
-        },
-        "take": {
-          "type": "integer"
         }
-      }
-    },
+      },
+      "WalletScanUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "starBalance": {
+            "type": "integer"
+          }
+        }
+      },
+      "WalletScanWallet": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "verifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WalletScanLedgerItem": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "txHash": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "memo": {
+            "type": "string"
+          },
+          "tokenIdHex": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "WalletScanDeposit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "expectedAmount": {
+            "type": "string"
+          },
+          "actualAmount": {
+            "type": "string"
+          },
+          "memo": {
+            "type": "string"
+          },
+          "txHash": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WalletScanStarTx": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "delta": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WalletScanNftExport": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "contractAddress": {
+            "type": "string"
+          },
+          "tokenIdHex": {
+            "type": "string"
+          },
+          "txHash": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WalletScanAsset": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "assetKey": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "integer"
+          },
+          "lastSyncAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WalletScanResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "query": {
+            "$ref": "#/components/schemas/WalletScanQuery"
+          },
+          "user": {
+            "$ref": "#/components/schemas/WalletScanUser"
+          },
+          "wallets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanWallet"
+            }
+          },
+          "ledger": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanLedgerItem"
+            }
+          },
+          "deposits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanDeposit"
+            }
+          },
+          "starTransactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanStarTx"
+            }
+          },
+          "nftItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftItem"
+            }
+          },
+          "nftListings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftListing"
+            }
+          },
+          "nftAuctions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftAuction"
+            }
+          },
+          "nftSales": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftSale"
+            }
+          },
+          "nftEventLogs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftEventLog"
+            }
+          },
+          "nftExports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanNftExport"
+            }
+          },
+          "walletAssets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanAsset"
+            }
+          },
+          "payoutLedger": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletScanLedgerItem"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "take": {
+            "type": "integer"
+          }
+        }
+      },
+      "WalletScanNftItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "collectionId": {
+            "type": "string"
+          },
+          "exportStatus": {
+            "type": "string"
+          },
+          "exportChain": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WalletScanNftListing": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string"
+          },
+          "sellerId": {
+            "type": "string"
+          },
+          "priceStars": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "soldAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "cancelledAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "WalletScanNftAuction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string"
+          },
+          "sellerId": {
+            "type": "string"
+          },
+          "startPriceStars": {
+            "type": "integer"
+          },
+          "reservePriceStars": {
+            "type": "integer",
+            "nullable": true
+          },
+          "startAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "highestBidId": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WalletScanNftSale": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string"
+          },
+          "buyerId": {
+            "type": "string"
+          },
+          "sellerId": {
+            "type": "string"
+          },
+          "priceStars": {
+            "type": "integer"
+          },
+          "platformFeeStars": {
+            "type": "integer"
+          },
+          "royaltyStars": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "listingId": {
+            "type": "string",
+            "nullable": true
+          },
+          "auctionId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "WalletScanNftEventLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "dataJson": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "OkResponse": {
         "type": "object",
         "properties": {
@@ -1515,11 +1706,16 @@
                       "amount": "25",
                       "status": "CONFIRMED",
                       "memo": "DEPOSIT:dep_1",
-                      "txHash": "0xabc"
+                      "txHash": 2748
                     }
                   ],
                   "deposits": [],
                   "starTransactions": [],
+                  "nftItems": [],
+                  "nftListings": [],
+                  "nftAuctions": [],
+                  "nftSales": [],
+                  "nftEventLogs": [],
                   "nftExports": [],
                   "walletAssets": [],
                   "payoutLedger": [],
@@ -1533,9 +1729,9 @@
       },
       "options": {
         "tags": [
-          "External WalletScan"
+          "External"
         ],
-        "summary": "OPTIONS /api/external/wallet-scan/search",
+        "summary": "OPTIONS /api/external/stars/topup/history",
         "responses": {
           "200": {
             "description": "OK"

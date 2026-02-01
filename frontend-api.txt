@@ -66,7 +66,9 @@ Headers: X-API-Key + Authorization: Bearer <token>
 
 10) WalletScan / Ledger (đã triển khai)
 - GET /api/external/wallet-scan/search (username/userId/address/txHash/contractAddress)
-- Trả về: user, wallets, ledger (sao + nạp), deposit, nft export, wallet assets
+- Trả về: user, wallets, ledger (sao + nạp), deposits, star tx
+- Bổ sung: nftItems, nftListings, nftAuctions, nftSales, nftEventLogs (đã triển khai)
+- Bổ sung: walletAssets, payoutLedger (placeholder)
 
 11) Gợi ý bổ sung endpoint theo module
 - Billing/Subscription (đề xuất):

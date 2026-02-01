@@ -329,6 +329,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WalletScanStarTx'
+        nftItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanNftItem'
+        nftListings:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanNftListing'
+        nftAuctions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanNftAuction'
+        nftSales:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanNftSale'
+        nftEventLogs:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanNftEventLog'
         nftExports:
           type: array
           items:
@@ -345,6 +365,117 @@ components:
           type: integer
         take:
           type: integer
+    WalletScanNftItem:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        ownerId:
+          type: string
+        collectionId:
+          type: string
+        exportStatus:
+          type: string
+        exportChain:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    WalletScanNftListing:
+      type: object
+      properties:
+        id:
+          type: string
+        itemId:
+          type: string
+        sellerId:
+          type: string
+        priceStars:
+          type: integer
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        soldAt:
+          type: string
+          format: date-time
+          nullable: true
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
+    WalletScanNftAuction:
+      type: object
+      properties:
+        id:
+          type: string
+        itemId:
+          type: string
+        sellerId:
+          type: string
+        startPriceStars:
+          type: integer
+        reservePriceStars:
+          type: integer
+          nullable: true
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+        highestBidId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    WalletScanNftSale:
+      type: object
+      properties:
+        id:
+          type: string
+        itemId:
+          type: string
+        buyerId:
+          type: string
+        sellerId:
+          type: string
+        priceStars:
+          type: integer
+        platformFeeStars:
+          type: integer
+        royaltyStars:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        listingId:
+          type: string
+          nullable: true
+        auctionId:
+          type: string
+          nullable: true
+    WalletScanNftEventLog:
+      type: object
+      properties:
+        id:
+          type: string
+        action:
+          type: string
+        dataJson:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
     OkResponse:
       type: object
       properties:
@@ -925,6 +1056,11 @@ paths:
                   txHash: 0xabc
                 deposits: []
                 starTransactions: []
+                nftItems: []
+                nftListings: []
+                nftAuctions: []
+                nftSales: []
+                nftEventLogs: []
                 nftExports: []
                 walletAssets: []
                 payoutLedger: []
