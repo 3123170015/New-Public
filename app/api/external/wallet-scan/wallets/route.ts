@@ -36,11 +36,12 @@ export async function GET(req: Request) {
     address: parsed.data.address,
     chain: chainResult.chain,
   });
+  const safeUser = user ? { ...user, email: null } : null;
 
   return Response.json(
     {
       ok: true,
-      user,
+      user: safeUser,
       chain: chainResult.chain ?? null,
       wallets,
     },

@@ -51,17 +51,19 @@ export async function GET(req: Request) {
     },
     { page: parsed.data.page ?? 1, take: parsed.data.take ?? 40, includeStarLedger: canSeePrivate },
   );
+  const safeUser = user ? { ...user, email: canSeePrivate ? user.email : null } : null;
 
   return Response.json(
     {
       ok: true,
-      user,
+      user: safeUser,
       chain: chainResult.chain ?? null,
       nftItems: data.nftItems,
       nftListings: data.nftListings,
       nftAuctions: data.nftAuctions,
       nftSales: data.nftSales,
       nftEventLogs: data.nftEventLogs,
+      nftTransfers: data.nftTransfers,
       nftExports: data.nftExports,
       page: data.page,
       take: data.take,

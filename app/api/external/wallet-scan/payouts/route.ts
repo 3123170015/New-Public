@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { requireApiKey, getExternalUser } from "@/lib/externalAuth";
-import {
-  getWalletScanData,
-  normalizeWalletScanChain,
-  resolveWalletScanUser,
-} from "@/lib/walletScan";
+import { getWalletScanPayoutLedger, normalizeWalletScanChain, resolveWalletScanUser } from "@/lib/walletScan";
 
 export const runtime = "nodejs";
 
@@ -42,16 +38,15 @@ export async function GET(req: Request) {
   const authUser = await getExternalUser(req);
   const includePrivate = parsed.data.includePrivate === "1";
   const canSeePrivate = includePrivate && authUser && user && (authUser.role === "ADMIN" || authUser.id === user.id);
+  if (!canSeePrivate) {
+    return Response.json({ ok: false, error: "FORBIDDEN" }, { status: 403, headers: key.cors });
+  }
 
-  const data = await getWalletScanData(
-    {
-      userId: user?.id,
-      username: parsed.data.username,
-      chain: chainResult.chain,
-    },
-    { page: parsed.data.page ?? 1, take: parsed.data.take ?? 40, includeStarLedger: canSeePrivate, includeNftDetails: false },
+  const payouts = await getWalletScanPayoutLedger(
+    { userId: user?.id, username: parsed.data.username, chain: chainResult.chain },
+    parsed.data.page ?? 1,
+    parsed.data.take ?? 40,
   );
-
   const safeUser = user ? { ...user, email: canSeePrivate ? user.email : null } : null;
 
   return Response.json(
@@ -59,12 +54,9 @@ export async function GET(req: Request) {
       ok: true,
       user: safeUser,
       chain: chainResult.chain ?? null,
-      ledger: data.ledger,
-      deposits: data.deposits,
-      starTransactions: canSeePrivate ? data.starTransactions : [],
-      payoutLedger: canSeePrivate ? data.payoutLedger : [],
-      page: data.page,
-      take: data.take,
+      payouts,
+      page: parsed.data.page ?? 1,
+      take: parsed.data.take ?? 40,
     },
     { headers: key.cors },
   );

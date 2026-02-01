@@ -11,6 +11,39 @@ export type WalletScanUser = {
   starBalance: number;
 };
 
+export type WalletScanNftTransfer = {
+  id: string;
+  itemId: string | null;
+  chain: Chain | null;
+  fromUserId: string | null;
+  toUserId: string | null;
+  source: "SALE" | "AUCTION" | "EXPORT";
+  priceStars: number | null;
+  contractAddress: string | null;
+  txHash: string | null;
+  createdAt: Date;
+};
+
+export type WalletScanDexSwap = {
+  id: string;
+  chain: Chain;
+  txHash: string | null;
+  fromAsset: string | null;
+  toAsset: string | null;
+  amountIn: string | null;
+  amountOut: string | null;
+  createdAt: Date;
+};
+
+export type WalletScanPayoutLedger = {
+  id: string;
+  chain: Chain | null;
+  amount: string | null;
+  status: string;
+  txHash: string | null;
+  createdAt: Date;
+};
+
 type WalletScanQuery = {
   username?: string;
   userId?: string;
@@ -242,6 +275,61 @@ export async function getWalletScanNftDetails(userId: string | undefined, export
   return { nftItems, nftListings, nftAuctions, nftSales, nftEventLogs, nftItemIds: nftIdList };
 }
 
+export function buildWalletScanNftTransfers(
+  nftSales: Array<{
+    id: string;
+    itemId: string;
+    buyerId: string;
+    sellerId: string;
+    priceStars: number;
+    createdAt: Date;
+    auctionId: string | null;
+  }>,
+  nftExports: Array<{
+    id: string;
+    itemId: string;
+    chain: Chain;
+    contractAddress: string | null;
+    txHash: string | null;
+    createdAt: Date;
+    userId: string;
+  }>,
+): WalletScanNftTransfer[] {
+  const saleTransfers: WalletScanNftTransfer[] = nftSales.map((sale) => ({
+    id: sale.id,
+    itemId: sale.itemId,
+    chain: null,
+    fromUserId: sale.sellerId,
+    toUserId: sale.buyerId,
+    source: sale.auctionId ? "AUCTION" : "SALE",
+    priceStars: Number(sale.priceStars || 0),
+    contractAddress: null,
+    txHash: null,
+    createdAt: sale.createdAt,
+  }));
+  const exportTransfers: WalletScanNftTransfer[] = nftExports.map((exportReq) => ({
+    id: exportReq.id,
+    itemId: exportReq.itemId ?? null,
+    chain: exportReq.chain,
+    fromUserId: exportReq.userId,
+    toUserId: null,
+    source: "EXPORT",
+    priceStars: null,
+    contractAddress: exportReq.contractAddress ?? null,
+    txHash: exportReq.txHash ?? null,
+    createdAt: exportReq.createdAt,
+  }));
+  return [...saleTransfers, ...exportTransfers].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+}
+
+export async function getWalletScanDexSwaps(_query: WalletScanQuery, _page: number, _take: number): Promise<WalletScanDexSwap[]> {
+  return [];
+}
+
+export async function getWalletScanPayoutLedger(_query: WalletScanQuery, _page: number, _take: number): Promise<WalletScanPayoutLedger[]> {
+  return [];
+}
+
 export async function getWalletScanWalletAssets(walletIds: string[], contractAddress?: string, chain?: Chain, take = 80) {
   if (!walletIds.length) return [];
   return prisma.userWalletAsset.findMany({
@@ -388,9 +476,31 @@ export async function getWalletScanData(query: WalletScanQuery, options: WalletS
   const nftDetails = options.includeNftDetails === false
     ? { nftItems: [], nftListings: [], nftAuctions: [], nftSales: [], nftEventLogs: [], nftItemIds: [] as string[] }
     : await getWalletScanNftDetails(query.userId, exportItemIds, options.take);
+  const nftTransfers = buildWalletScanNftTransfers(
+    nftDetails.nftSales.map((sale) => ({
+      id: sale.id,
+      itemId: sale.itemId,
+      buyerId: sale.buyerId,
+      sellerId: sale.sellerId,
+      priceStars: sale.priceStars,
+      createdAt: sale.createdAt,
+      auctionId: sale.auctionId ?? null,
+    })),
+    nftExports.map((exp) => ({
+      id: exp.id,
+      itemId: exp.itemId,
+      chain: exp.chain,
+      contractAddress: exp.contractAddress ?? null,
+      txHash: exp.txHash ?? null,
+      createdAt: exp.createdAt,
+      userId: exp.userId,
+    })),
+  );
   const walletAssets = options.includeAssets === false
     ? []
     : await getWalletScanWalletAssets(walletIds, query.contractAddress, query.chain, options.take);
+  const dexSwaps = await getWalletScanDexSwaps(query, options.page, options.take);
+  const payoutLedger = await getWalletScanPayoutLedger(query, options.page, options.take);
   const ledger = buildWalletScanLedger(starLedger, deposits, nftExports);
   return {
     wallets,
@@ -402,8 +512,10 @@ export async function getWalletScanData(query: WalletScanQuery, options: WalletS
     nftAuctions: nftDetails.nftAuctions,
     nftSales: nftDetails.nftSales,
     nftEventLogs: nftDetails.nftEventLogs,
+    nftTransfers,
+    dexSwaps,
     walletAssets,
-    payoutLedger: [],
+    payoutLedger,
     ledger,
     page: options.page,
     take: options.take,

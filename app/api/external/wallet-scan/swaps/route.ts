@@ -1,20 +1,13 @@
 import { z } from "zod";
 import { requireApiKey } from "@/lib/externalAuth";
-import {
-  getWalletScanWalletAssets,
-  getWalletScanWallets,
-  normalizeWalletScanChain,
-  resolveWalletScanUser,
-} from "@/lib/walletScan";
+import { getWalletScanDexSwaps, normalizeWalletScanChain } from "@/lib/walletScan";
 
 export const runtime = "nodejs";
 
 const querySchema = z.object({
-  username: z.string().min(1).max(60).optional(),
-  userId: z.string().min(1).optional(),
   chain: z.string().min(2).max(30).optional(),
-  contractAddress: z.string().min(1).max(200).optional(),
-  take: z.coerce.number().int().min(1).max(200).optional(),
+  page: z.coerce.number().int().min(1).max(500).optional(),
+  take: z.coerce.number().int().min(1).max(100).optional(),
 });
 
 export async function OPTIONS(req: Request) {
@@ -32,29 +25,25 @@ export async function GET(req: Request) {
   if (!parsed.success) {
     return Response.json({ ok: false, error: "INVALID_QUERY" }, { status: 400, headers: key.cors });
   }
+
   const chainResult = normalizeWalletScanChain(parsed.data.chain);
   if (chainResult.error) {
     return Response.json({ ok: false, error: "INVALID_CHAIN" }, { status: 400, headers: key.cors });
   }
-  const user = await resolveWalletScanUser({ userId: parsed.data.userId, username: parsed.data.username });
-  const wallets = await getWalletScanWallets({ userId: user?.id, chain: chainResult.chain });
-  const walletIds = wallets.map((wallet) => wallet.id);
-  const assets = await getWalletScanWalletAssets(
-    walletIds,
-    parsed.data.contractAddress,
-    chainResult.chain,
-    parsed.data.take ?? 80,
+
+  const swaps = await getWalletScanDexSwaps(
+    { chain: chainResult.chain },
+    parsed.data.page ?? 1,
+    parsed.data.take ?? 40,
   );
-  const safeUser = user ? { ...user, email: null } : null;
 
   return Response.json(
     {
       ok: true,
-      user: safeUser,
       chain: chainResult.chain ?? null,
-      contractAddress: parsed.data.contractAddress ?? null,
-      wallets,
-      assets,
+      swaps,
+      page: parsed.data.page ?? 1,
+      take: parsed.data.take ?? 40,
     },
     { headers: key.cors },
   );

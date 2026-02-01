@@ -76,8 +76,9 @@ export async function GET(req: Request) {
       includeStarLedger: canSeePrivate,
     },
   );
+  const safeUser = user ? { ...user, email: canSeePrivate ? user.email : null } : null;
   const hits = buildWalletScanHits({
-    user,
+    user: safeUser,
     wallets: data.wallets.map((wallet) => ({ id: wallet.id, chain: wallet.chain, address: wallet.address })),
     deposits: data.deposits.map((deposit) => ({
       txHash: deposit.txHash ?? null,
@@ -103,7 +104,7 @@ export async function GET(req: Request) {
         includePrivate,
       },
       hits,
-      user,
+      user: safeUser,
       wallets: data.wallets,
       ledger: data.ledger,
       deposits: data.deposits,
@@ -113,9 +114,11 @@ export async function GET(req: Request) {
       nftAuctions: data.nftAuctions,
       nftSales: data.nftSales,
       nftEventLogs: data.nftEventLogs,
+      nftTransfers: data.nftTransfers,
+      dexSwaps: data.dexSwaps,
       nftExports: data.nftExports,
       walletAssets: data.walletAssets,
-      payoutLedger: data.payoutLedger,
+      payoutLedger: canSeePrivate ? data.payoutLedger : [],
       page: data.page,
       take: data.take,
     },

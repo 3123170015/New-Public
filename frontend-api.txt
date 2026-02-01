@@ -66,9 +66,10 @@ Headers: X-API-Key + Authorization: Bearer <token>
 
 10) WalletScan / Ledger (đã triển khai)
 - GET /api/external/wallet-scan/search (username/userId/address/txHash/contractAddress)
-- Trả về: user, wallets, ledger (sao + nạp), deposits, star tx
+- Trả về: user, wallets, ledger (sao + nạp), deposits, star tx (ẩn mặc định)
 - Bổ sung: nftItems, nftListings, nftAuctions, nftSales, nftEventLogs (đã triển khai)
-- Bổ sung: walletAssets, payoutLedger (placeholder)
+- Bổ sung: nftTransfers (NFT on-chain transfer history), dexSwaps (DEX history placeholder), payoutLedger (on-chain payout ledger placeholder)
+- Bổ sung: walletAssets, wallet contracts (đã triển khai)
  - GET /api/external/wallet-scan/tx/{hash} (tra nhanh theo txHash)
  - GET /api/external/wallet-scan/user/{username} (tra theo username + phân trang)
  - GET /api/external/wallet-scan/contracts (danh sách contract export)
@@ -77,6 +78,16 @@ Headers: X-API-Key + Authorization: Bearer <token>
  - GET /api/external/wallet-scan/assets?username=...&chain=...
  - GET /api/external/wallet-scan/nfts?username=...
  - GET /api/external/wallet-scan/ledger?username=...
+ - GET /api/external/wallet-scan/nft-transfers?username=... (lịch sử chuyển NFT)
+ - GET /api/external/wallet-scan/swaps?chain=... (DEX swap history placeholder)
+ - GET /api/external/wallet-scan/payouts?username=...&includePrivate=1 (payout on-chain ledger private)
+
+12) Analytics (đã triển khai)
+- GET /api/external/analytics/content (video mới tạo + bài viết mới + comment mới)
+- GET /api/external/analytics/top (top comment + top creator hoạt động)
+
+13) Public trending (đã triển khai)
+- GET /api/external/public/trending?days=7 (mirror /api/trending)
 
 11) Gợi ý bổ sung endpoint theo module
 - Billing/Subscription (đề xuất):

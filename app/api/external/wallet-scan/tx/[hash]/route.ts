@@ -48,8 +48,9 @@ export async function GET(req: Request, context: { params: Promise<{ hash: strin
     { txHash: hash, userId: user?.id, chain: chainResult.chain },
     { page, take, includeStarLedger: false },
   );
+  const safeUser = user ? { ...user, email: null } : null;
   const hits = buildWalletScanHits({
-    user,
+    user: safeUser,
     wallets: data.wallets.map((wallet) => ({ id: wallet.id, chain: wallet.chain, address: wallet.address })),
     deposits: data.deposits.map((deposit) => ({
       txHash: deposit.txHash ?? null,
@@ -69,7 +70,7 @@ export async function GET(req: Request, context: { params: Promise<{ hash: strin
         includePrivate: parsed.data.includePrivate === "1",
       },
       hits,
-      user,
+      user: safeUser,
       wallets: data.wallets,
       ledger: data.ledger,
       deposits: data.deposits,
@@ -78,9 +79,11 @@ export async function GET(req: Request, context: { params: Promise<{ hash: strin
       nftAuctions: data.nftAuctions,
       nftSales: data.nftSales,
       nftEventLogs: data.nftEventLogs,
+      nftTransfers: data.nftTransfers,
+      dexSwaps: data.dexSwaps,
       nftExports: data.nftExports,
       walletAssets: data.walletAssets,
-      payoutLedger: data.payoutLedger,
+      payoutLedger: [],
       page,
       take,
     },

@@ -40,8 +40,12 @@ Query parameters:
 - `deposits`: chi tiết StarDeposit (nạp Stars).
 - `starTransactions`: chi tiết StarTransaction (gift, tip, topup, refund...).
 - `nftExports`: NftExportRequest (on-chain NFT).
+- `nftTransfers`: lịch sử chuyển NFT (sale/auction/export).
+- `dexSwaps`: lịch sử swap/DEX (placeholder, chưa crawl on-chain).
 - `walletAssets`: snapshot on-chain holdings (UserWalletAsset).
-- `payoutLedger`: tương lai payout on-chain (hiện rỗng).
+- `payoutLedger`: tương lai payout on-chain (hiện rỗng, yêu cầu includePrivate).
+- `nftTransfers`: lịch sử chuyển NFT (sale/auction/export).
+- `dexSwaps`: lịch sử swap/DEX (placeholder).
 
 ## Bộ endpoint explorer (đã triển khai)
 
@@ -51,6 +55,9 @@ Query parameters:
 - GET `/api/external/wallet-scan/assets?username=...&chain=...`: snapshot tài sản on-chain
 - GET `/api/external/wallet-scan/nfts?username=...`: danh sách NFT + listings/auctions/sales
 - GET `/api/external/wallet-scan/ledger?username=...`: ledger tổng hợp
+- GET `/api/external/wallet-scan/nft-transfers?username=...`: lịch sử chuyển NFT
+- GET `/api/external/wallet-scan/swaps?chain=...`: lịch sử DEX (placeholder)
+- GET `/api/external/wallet-scan/payouts?username=...&includePrivate=1`: payout ledger (private)
 - GET `/api/external/wallet-scan/contracts`: danh sách contract export
 - GET `/api/external/wallet-scan/contract/{chain}/{address}`: chi tiết contract export
 

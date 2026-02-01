@@ -18,6 +18,7 @@ tags:
 - name: External Stars
 - name: External NFT
 - name: External WalletScan
+- name: External Analytics
 - name: Playlists
 - name: Upload
 - name: Comments
@@ -416,6 +417,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WalletScanNftEventLog'
+        nftTransfers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanNftTransfer'
+        dexSwaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanDexSwap'
         nftExports:
           type: array
           items:
@@ -427,7 +436,7 @@ components:
         payoutLedger:
           type: array
           items:
-            $ref: '#/components/schemas/WalletScanLedgerItem'
+            $ref: '#/components/schemas/WalletScanPayoutLedger'
         page:
           type: integer
         take:
@@ -473,6 +482,38 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WalletScanAsset'
+    WalletScanSwapsResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        chain:
+          type: string
+        swaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanDexSwap'
+        page:
+          type: integer
+        take:
+          type: integer
+    WalletScanPayoutsResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        user:
+          $ref: '#/components/schemas/WalletScanUser'
+        chain:
+          type: string
+        payouts:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanPayoutLedger'
+        page:
+          type: integer
+        take:
+          type: integer
     WalletScanWalletsResponse:
       type: object
       properties:
@@ -510,7 +551,7 @@ components:
         payoutLedger:
           type: array
           items:
-            $ref: '#/components/schemas/WalletScanLedgerItem'
+            $ref: '#/components/schemas/WalletScanPayoutLedger'
         page:
           type: integer
         take:
@@ -544,6 +585,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WalletScanNftEventLog'
+        nftTransfers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanNftTransfer'
         nftExports:
           type: array
           items:
@@ -660,6 +705,81 @@ components:
           type: string
         dataJson:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+    WalletScanNftTransfer:
+      type: object
+      properties:
+        id:
+          type: string
+        itemId:
+          type: string
+          nullable: true
+        chain:
+          type: string
+          nullable: true
+        fromUserId:
+          type: string
+          nullable: true
+        toUserId:
+          type: string
+          nullable: true
+        source:
+          type: string
+        priceStars:
+          type: integer
+          nullable: true
+        contractAddress:
+          type: string
+          nullable: true
+        txHash:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    WalletScanDexSwap:
+      type: object
+      properties:
+        id:
+          type: string
+        chain:
+          type: string
+        txHash:
+          type: string
+          nullable: true
+        fromAsset:
+          type: string
+          nullable: true
+        toAsset:
+          type: string
+          nullable: true
+        amountIn:
+          type: string
+          nullable: true
+        amountOut:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    WalletScanPayoutLedger:
+      type: object
+      properties:
+        id:
+          type: string
+        chain:
+          type: string
+          nullable: true
+        amount:
+          type: string
+          nullable: true
+        status:
+          type: string
+        txHash:
+          type: string
+          nullable: true
         createdAt:
           type: string
           format: date-time
@@ -1016,6 +1136,157 @@ paths:
       - ApiKey: []
       - CookieAuth: []
       - BearerAuth: []
+  /api/external/analytics/content:
+    get:
+      tags:
+      - External Analytics
+      summary: Latest videos/posts/comments snapshot
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: take
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  latestVideos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        title:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                        viewCount:
+                          type: integer
+                        commentCount:
+                          type: integer
+                        likeCount:
+                          type: integer
+                  latestPosts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        text:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                        authorId:
+                          type: string
+                  latestComments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        videoId:
+                          type: string
+                        userId:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                        isSuperThanks:
+                          type: boolean
+                        superThanksStars:
+                          type: integer
+    options:
+      tags:
+      - External Analytics
+      summary: OPTIONS /api/external/analytics/content
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+  /api/external/analytics/top:
+    get:
+      tags:
+      - External Analytics
+      summary: Top comments and creators by activity
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: take
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  topComments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        videoId:
+                          type: string
+                        userId:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                        isSuperThanks:
+                          type: boolean
+                        superThanksStars:
+                          type: integer
+                        superThanksQty:
+                          type: integer
+                  topCreators:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        username:
+                          type: string
+                        name:
+                          type: string
+                        videoCount:
+                          type: integer
+                        postCount:
+                          type: integer
+                        commentCount:
+                          type: integer
+    options:
+      tags:
+      - External Analytics
+      summary: OPTIONS /api/external/analytics/top
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
   /api/external/public/search:
     get:
       tags:
@@ -1047,6 +1318,30 @@ paths:
       - ApiKey: []
       - CookieAuth: []
       - BearerAuth: []
+  /api/external/public/trending:
+    get:
+      tags:
+      - External Public
+      summary: Trending videos snapshot
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: days
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+    options:
+      tags:
+      - External Public
+      summary: OPTIONS /api/external/public/trending
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
   /api/external/me/notifications:
     get:
       tags:
@@ -1491,6 +1786,90 @@ paths:
           description: OK
       security:
       - ApiKey: []
+  /api/external/wallet-scan/swaps:
+    get:
+      tags:
+      - External WalletScan
+      summary: DEX swap history (placeholder)
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: chain
+        schema:
+          type: string
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: take
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletScanSwapsResponse'
+    options:
+      tags:
+      - External WalletScan
+      summary: OPTIONS /api/external/wallet-scan/swaps
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+  /api/external/wallet-scan/payouts:
+    get:
+      tags:
+      - External WalletScan
+      summary: On-chain payout ledger (private)
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: username
+        schema:
+          type: string
+      - in: query
+        name: userId
+        schema:
+          type: string
+      - in: query
+        name: chain
+        schema:
+          type: string
+      - in: query
+        name: includePrivate
+        schema:
+          type: string
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: take
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletScanPayoutsResponse'
+    options:
+      tags:
+      - External WalletScan
+      summary: OPTIONS /api/external/wallet-scan/payouts
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
   /api/external/wallet-scan/nfts:
     get:
       tags:
@@ -1578,6 +1957,153 @@ paths:
       tags:
       - External WalletScan
       summary: OPTIONS /api/external/wallet-scan/ledger
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+  /api/external/wallet-scan/nft-transfers:
+    get:
+      tags:
+      - External WalletScan
+      summary: NFT transfer history
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: username
+        schema:
+          type: string
+      - in: query
+        name: userId
+        schema:
+          type: string
+      - in: query
+        name: chain
+        schema:
+          type: string
+      - in: query
+        name: includePrivate
+        schema:
+          type: string
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: take
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  user:
+                    $ref: '#/components/schemas/WalletScanUser'
+                  chain:
+                    type: string
+                  nftTransfers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WalletScanNftTransfer'
+                  page:
+                    type: integer
+                  take:
+                    type: integer
+    options:
+      tags:
+      - External WalletScan
+      summary: OPTIONS /api/external/wallet-scan/nft-transfers
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+  /api/external/wallet-scan/swaps:
+    get:
+      tags:
+      - External WalletScan
+      summary: DEX swap history (placeholder)
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: chain
+        schema:
+          type: string
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: take
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletScanSwapsResponse'
+    options:
+      tags:
+      - External WalletScan
+      summary: OPTIONS /api/external/wallet-scan/swaps
+      responses:
+        '200':
+          description: OK
+      security:
+      - ApiKey: []
+  /api/external/wallet-scan/payouts:
+    get:
+      tags:
+      - External WalletScan
+      summary: On-chain payout ledger (private)
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: username
+        schema:
+          type: string
+      - in: query
+        name: userId
+        schema:
+          type: string
+      - in: query
+        name: chain
+        schema:
+          type: string
+      - in: query
+        name: includePrivate
+        schema:
+          type: string
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: take
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletScanPayoutsResponse'
+    options:
+      tags:
+      - External WalletScan
+      summary: OPTIONS /api/external/wallet-scan/payouts
       responses:
         '200':
           description: OK

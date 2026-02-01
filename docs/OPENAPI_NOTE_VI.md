@@ -26,6 +26,6 @@ File OpenAPI giúp Bolt/Lovable (và các tool UI generator) đọc được cá
 ## Nếu cần thêm endpoint
 1. Thêm route mới ở backend.
 2. Cập nhật `docs/openapi.yaml`.
-3. (Tuỳ chọn) cập nhật `docs/openapi.json`.
+3. Cập nhật `docs/openapi.json` để giữ đồng bộ với YAML (khuyến nghị).
 
 Nếu bạn muốn mình mở rộng OpenAPI thêm endpoint chi tiết hơn, hãy gửi danh sách route cụ thể cần bổ sung.

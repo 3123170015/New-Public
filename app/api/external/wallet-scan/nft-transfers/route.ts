@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { requireApiKey, getExternalUser } from "@/lib/externalAuth";
-import {
-  getWalletScanData,
-  normalizeWalletScanChain,
-  resolveWalletScanUser,
-} from "@/lib/walletScan";
+import { getWalletScanData, normalizeWalletScanChain, resolveWalletScanUser } from "@/lib/walletScan";
 
 export const runtime = "nodejs";
 
@@ -44,14 +40,9 @@ export async function GET(req: Request) {
   const canSeePrivate = includePrivate && authUser && user && (authUser.role === "ADMIN" || authUser.id === user.id);
 
   const data = await getWalletScanData(
-    {
-      userId: user?.id,
-      username: parsed.data.username,
-      chain: chainResult.chain,
-    },
-    { page: parsed.data.page ?? 1, take: parsed.data.take ?? 40, includeStarLedger: canSeePrivate, includeNftDetails: false },
+    { userId: user?.id, username: parsed.data.username, chain: chainResult.chain },
+    { page: parsed.data.page ?? 1, take: parsed.data.take ?? 40, includeStarLedger: canSeePrivate },
   );
-
   const safeUser = user ? { ...user, email: canSeePrivate ? user.email : null } : null;
 
   return Response.json(
@@ -59,10 +50,7 @@ export async function GET(req: Request) {
       ok: true,
       user: safeUser,
       chain: chainResult.chain ?? null,
-      ledger: data.ledger,
-      deposits: data.deposits,
-      starTransactions: canSeePrivate ? data.starTransactions : [],
-      payoutLedger: canSeePrivate ? data.payoutLedger : [],
+      nftTransfers: data.nftTransfers,
       page: data.page,
       take: data.take,
     },
