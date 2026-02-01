@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import type { Chain } from "@prisma/client";
 import { requireApiKey } from "@/lib/externalAuth";
 
 export const runtime = "nodejs";
@@ -15,7 +16,7 @@ const querySchema = z.object({
   take: z.coerce.number().int().min(1).max(100).optional(),
 });
 
-const knownChains = ["SOLANA", "ETHEREUM", "POLYGON", "BSC", "BASE", "TRON"];
+const knownChains: Chain[] = ["SOLANA", "ETHEREUM", "POLYGON", "BSC", "BASE", "TRON"];
 
 type WalletScanUser = {
   id: string;
@@ -46,6 +47,7 @@ export async function GET(req: Request) {
   if (chain && !knownChains.includes(chain)) {
     return Response.json({ ok: false, error: "INVALID_CHAIN" }, { status: 400, headers: key.cors });
   }
+  const chainFilter = chain as Chain | undefined;
 
   let user: WalletScanUser | null = null;
   if (rawUserId) {
@@ -90,7 +92,7 @@ export async function GET(req: Request) {
     where: {
       ...(userId ? { userId } : {}),
       ...(address ? { address } : {}),
-      ...(chain ? { chain: chain as any } : {}),
+      ...(chainFilter ? { chain: chainFilter } : {}),
     },
     select: {
       id: true,
@@ -108,7 +110,7 @@ export async function GET(req: Request) {
     where: {
       ...(userId ? { userId } : {}),
       ...(txHash ? { txHash } : {}),
-      ...(chain ? { chain: chain as any } : {}),
+      ...(chainFilter ? { chain: chainFilter } : {}),
     },
     include: { token: true },
     orderBy: { createdAt: "desc" },
@@ -130,7 +132,7 @@ export async function GET(req: Request) {
       ...(userId ? { userId } : {}),
       ...(txHash ? { txHash } : {}),
       ...(contractAddress ? { contractAddress } : {}),
-      ...(chain ? { chain: chain as any } : {}),
+      ...(chainFilter ? { chain: chainFilter } : {}),
     },
     orderBy: { createdAt: "desc" },
     take,
@@ -142,7 +144,7 @@ export async function GET(req: Request) {
         where: {
           walletId: { in: walletIds },
           ...(contractAddress ? { assetKey: contractAddress } : {}),
-          ...(chain ? { chain: chain as any } : {}),
+          ...(chainFilter ? { chain: chainFilter } : {}),
         },
         orderBy: { lastSyncAt: "desc" },
         take,
