@@ -17,6 +17,7 @@ tags:
 - name: External Me
 - name: External Stars
 - name: External NFT
+- name: External WalletScan
 - name: Playlists
 - name: Upload
 - name: Comments
@@ -166,6 +167,184 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/StarsTopupHistoryItem'
+    WalletScanQuery:
+      type: object
+      properties:
+        username:
+          type: string
+        userId:
+          type: string
+        address:
+          type: string
+        txHash:
+          type: string
+        contractAddress:
+          type: string
+        chain:
+          type: string
+    WalletScanUser:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        starBalance:
+          type: integer
+    WalletScanWallet:
+      type: object
+      properties:
+        id:
+          type: string
+        chain:
+          type: string
+        address:
+          type: string
+        verifiedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+    WalletScanLedgerItem:
+      type: object
+      properties:
+        kind:
+          type: string
+        id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        chain:
+          type: string
+        token:
+          type: string
+        amount:
+          type: string
+        status:
+          type: string
+        txHash:
+          type: string
+        note:
+          type: string
+        memo:
+          type: string
+        tokenIdHex:
+          type: string
+        type:
+          type: string
+    WalletScanDeposit:
+      type: object
+      properties:
+        id:
+          type: string
+        chain:
+          type: string
+        status:
+          type: string
+        expectedAmount:
+          type: string
+        actualAmount:
+          type: string
+        memo:
+          type: string
+        txHash:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    WalletScanStarTx:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        delta:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    WalletScanNftExport:
+      type: object
+      properties:
+        id:
+          type: string
+        chain:
+          type: string
+        status:
+          type: string
+        contractAddress:
+          type: string
+        tokenIdHex:
+          type: string
+        txHash:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    WalletScanAsset:
+      type: object
+      properties:
+        id:
+          type: string
+        chain:
+          type: string
+        assetKey:
+          type: string
+        kind:
+          type: string
+        balance:
+          type: integer
+        lastSyncAt:
+          type: string
+          format: date-time
+    WalletScanResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        query:
+          $ref: '#/components/schemas/WalletScanQuery'
+        user:
+          $ref: '#/components/schemas/WalletScanUser'
+        wallets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanWallet'
+        ledger:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanLedgerItem'
+        deposits:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanDeposit'
+        starTransactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanStarTx'
+        nftExports:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanNftExport'
+        walletAssets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanAsset'
+        payoutLedger:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletScanLedgerItem'
+        page:
+          type: integer
+        take:
+          type: integer
     OkResponse:
       type: object
       properties:
@@ -634,6 +813,64 @@ paths:
       tags:
       - External Stars
       summary: Lịch sử nạp sao
+      security:
+      - ApiKey: []
+      - CookieAuth: []
+      - BearerAuth: []
+  /api/external/wallet-scan/search:
+    get:
+      tags:
+      - External WalletScan
+      summary: Tra cứu ledger + on-chain theo user/tx/contract
+      security:
+      - ApiKey: []
+      parameters:
+      - in: query
+        name: username
+        schema:
+          type: string
+      - in: query
+        name: userId
+        schema:
+          type: string
+      - in: query
+        name: address
+        schema:
+          type: string
+      - in: query
+        name: txHash
+        schema:
+          type: string
+      - in: query
+        name: contractAddress
+        schema:
+          type: string
+      - in: query
+        name: chain
+        schema:
+          type: string
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: take
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletScanResponse'
+    options:
+      tags:
+      - External WalletScan
+      summary: OPTIONS /api/external/wallet-scan/search
+      responses:
+        '200':
+          description: OK
       security:
       - ApiKey: []
       - CookieAuth: []
