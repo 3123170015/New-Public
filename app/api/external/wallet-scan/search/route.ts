@@ -139,6 +139,113 @@ export async function GET(req: Request) {
     skip: (page - 1) * take,
   });
 
+  const exportItemIds = nftExports.map((item) => item.itemId);
+  const nftItemIds = new Set<string>(exportItemIds);
+
+  const nftItems = await prisma.nftItem.findMany({
+    where: {
+      OR: [
+        ...(userId ? [{ ownerId: userId }] : []),
+        ...(exportItemIds.length ? [{ id: { in: exportItemIds } }] : []),
+      ],
+    },
+    select: {
+      id: true,
+      name: true,
+      ownerId: true,
+      collectionId: true,
+      exportStatus: true,
+      exportChain: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take,
+  });
+
+  nftItems.forEach((item) => nftItemIds.add(item.id));
+
+  const nftListings = await prisma.nftListing.findMany({
+    where: {
+      OR: [
+        ...(userId ? [{ sellerId: userId }] : []),
+        ...(nftItemIds.size ? [{ itemId: { in: Array.from(nftItemIds) } }] : []),
+      ],
+    },
+    select: {
+      id: true,
+      itemId: true,
+      sellerId: true,
+      priceStars: true,
+      status: true,
+      createdAt: true,
+      soldAt: true,
+      cancelledAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take,
+  });
+
+  const nftAuctions = await prisma.nftAuction.findMany({
+    where: {
+      OR: [
+        ...(userId ? [{ sellerId: userId }] : []),
+        ...(nftItemIds.size ? [{ itemId: { in: Array.from(nftItemIds) } }] : []),
+      ],
+    },
+    select: {
+      id: true,
+      itemId: true,
+      sellerId: true,
+      startPriceStars: true,
+      reservePriceStars: true,
+      startAt: true,
+      endAt: true,
+      status: true,
+      highestBidId: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take,
+  });
+
+  const nftSales = await prisma.nftSale.findMany({
+    where: {
+      OR: [
+        ...(userId ? [{ buyerId: userId }, { sellerId: userId }] : []),
+        ...(nftItemIds.size ? [{ itemId: { in: Array.from(nftItemIds) } }] : []),
+      ],
+    },
+    select: {
+      id: true,
+      itemId: true,
+      buyerId: true,
+      sellerId: true,
+      priceStars: true,
+      platformFeeStars: true,
+      royaltyStars: true,
+      createdAt: true,
+      listingId: true,
+      auctionId: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take,
+  });
+
+  const nftEventLogs = userId
+    ? await prisma.nftEventLog.findMany({
+        where: { actorId: userId },
+        select: {
+          id: true,
+          action: true,
+          dataJson: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take,
+      })
+    : [];
+
   const walletAssets = walletIds.length
     ? await prisma.userWalletAsset.findMany({
         where: {
@@ -205,6 +312,11 @@ export async function GET(req: Request) {
       ledger,
       deposits,
       starTransactions: starTx,
+      nftItems,
+      nftListings,
+      nftAuctions,
+      nftSales,
+      nftEventLogs,
       nftExports,
       walletAssets,
       payoutLedger: [],
