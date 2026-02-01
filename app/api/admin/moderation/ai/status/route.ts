@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { requireAdmin } from "@/lib/authz";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = await auth();

@@ -30,15 +30,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       reviewerId: (session?.user as any)?.id ?? null,
       reviewedAt: new Date(),
     },
-    select: { id: true, status: true },
+    select: { id: true, status: true, videoId: true, reporterId: true },
   });
 
   await prisma.moderationAction.create({
     data: {
       actorUserId: (session?.user as any)?.id,
-      targetType: "VIDEO_REPORT",
-      targetId: report.id,
-      action: parsed.data.action,
+      type: parsed.data.action === "APPROVE" ? "UNHIDE_VIDEO" : "HIDE_VIDEO",
+      videoId: report.videoId ?? null,
+      targetUserId: report.reporterId ?? null,
       reason: parsed.data.note ?? null,
     },
   });
