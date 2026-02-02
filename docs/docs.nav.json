@@ -104,6 +104,11 @@
           "file": "WALLET_SCAN.md"
         },
         {
+          "slug": "live-ingest",
+          "title": "Live Ingest Guide",
+          "file": "LIVE_INGEST.md"
+        },
+        {
           "slug": "worker-ffmpeg",
           "title": "Worker / ffmpeg",
           "file": "WORKER_FFMPEG.md"
