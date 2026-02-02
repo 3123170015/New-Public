@@ -11,15 +11,15 @@ servers:
   description: Production
 - url: http://localhost:3000
   description: Local dev
-  tags:
+  tags: null
 - name: External Auth
 - name: External Public
 - name: External Me
 - name: External Stars
 - name: External NFT
-  - name: External WalletScan
-  - name: External Analytics
-  - name: External Boost
+- name: External WalletScan
+- name: External Analytics
+- name: External Boost
 - name: Playlists
 - name: Upload
 - name: Comments
@@ -224,7 +224,7 @@ components:
     BoostTargetRequest:
       type: object
       required:
-        - planId
+      - planId
       properties:
         planId:
           type: string
@@ -1068,6 +1068,54 @@ components:
           type: array
           items:
             type: string
+    LiveSchedule:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        scheduledAt:
+          type: string
+          format: date-time
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          example: SCHEDULED
+    LiveIngestConfig:
+      type: object
+      properties:
+        nginxRtmp:
+          type: object
+          properties:
+            ingestUrl:
+              type: string
+            streamKey:
+              type: string
+            hlsOutput:
+              type: string
+        cloudflareStream:
+          type: object
+          properties:
+            ingestUrl:
+              type: string
+            streamKey:
+              type: string
+            playbackUrl:
+              type: string
+    LiveViewerStats:
+      type: object
+      properties:
+        streamId:
+          type: string
+        viewers:
+          type: integer
+        peakViewers:
+          type: integer
+        avgWatchSeconds:
+          type: number
 paths:
   /api/external/auth/login:
     post:
@@ -1831,7 +1879,7 @@ paths:
                   amount: '25'
                   status: CONFIRMED
                   memo: DEPOSIT:dep_1
-                  txHash: 0xabc
+                  txHash: 2748
                 deposits: []
                 starTransactions: []
                 nftItems: []
@@ -2316,90 +2364,6 @@ paths:
       tags:
       - External WalletScan
       summary: OPTIONS /api/external/wallet-scan/nft-transfers
-      responses:
-        '200':
-          description: OK
-      security:
-      - ApiKey: []
-  /api/external/wallet-scan/swaps:
-    get:
-      tags:
-      - External WalletScan
-      summary: DEX swap history (placeholder)
-      security:
-      - ApiKey: []
-      parameters:
-      - in: query
-        name: chain
-        schema:
-          type: string
-      - in: query
-        name: page
-        schema:
-          type: integer
-      - in: query
-        name: take
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WalletScanSwapsResponse'
-    options:
-      tags:
-      - External WalletScan
-      summary: OPTIONS /api/external/wallet-scan/swaps
-      responses:
-        '200':
-          description: OK
-      security:
-      - ApiKey: []
-  /api/external/wallet-scan/payouts:
-    get:
-      tags:
-      - External WalletScan
-      summary: On-chain payout ledger (private)
-      security:
-      - ApiKey: []
-      parameters:
-      - in: query
-        name: username
-        schema:
-          type: string
-      - in: query
-        name: userId
-        schema:
-          type: string
-      - in: query
-        name: chain
-        schema:
-          type: string
-      - in: query
-        name: includePrivate
-        schema:
-          type: string
-      - in: query
-        name: page
-        schema:
-          type: integer
-      - in: query
-        name: take
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WalletScanPayoutsResponse'
-    options:
-      tags:
-      - External WalletScan
-      summary: OPTIONS /api/external/wallet-scan/payouts
       responses:
         '200':
           description: OK
@@ -3692,6 +3656,290 @@ paths:
         required: true
         schema:
           type: string
+  /api/external/live/ingest/config:
+    get:
+      tags:
+      - External
+      summary: Lấy cấu hình ingest livestream
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  ingest:
+                    $ref: '#/components/schemas/LiveIngestConfig'
+    options:
+      responses:
+        '204':
+          description: CORS
+  /api/external/live/ingest/status:
+    post:
+      tags:
+      - External
+      summary: Kiểm tra tình trạng m3u8 livestream
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                m3u8Url:
+                  type: string
+              required:
+              - m3u8Url
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  status:
+                    type: string
+                  health:
+                    type: string
+                  lastSegmentAt:
+                    type: string
+                  m3u8Url:
+                    type: string
+    options:
+      responses:
+        '204':
+          description: CORS
+  /api/external/live/schedules:
+    get:
+      tags:
+      - External
+      summary: Danh sách lịch live
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LiveSchedule'
+    post:
+      tags:
+      - External
+      summary: Tạo lịch live
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiveSchedule'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  schedule:
+                    $ref: '#/components/schemas/LiveSchedule'
+    options:
+      responses:
+        '204':
+          description: CORS
+  /api/external/live/schedules/{id}:
+    patch:
+      tags:
+      - External
+      summary: Cập nhật lịch live
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiveSchedule'
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - External
+      summary: Hủy lịch live
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+    options:
+      responses:
+        '204':
+          description: CORS
+  /api/external/live/streams/{id}/reactions:
+    post:
+      tags:
+      - External
+      summary: Gửi reaction trong live
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emoji:
+                  type: string
+              required:
+              - emoji
+      responses:
+        '200':
+          description: OK
+    options:
+      responses:
+        '204':
+          description: CORS
+  /api/external/live/streams/{id}/viewer-stats:
+    get:
+      tags:
+      - External
+      summary: Lấy thống kê viewer live
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiveViewerStats'
+    options:
+      responses:
+        '204':
+          description: CORS
+  /api/external/live/streams/{id}/moderation/timeout:
+    post:
+      tags:
+      - External
+      summary: Timeout user trong live
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                durationSec:
+                  type: integer
+              required:
+              - userId
+              - durationSec
+      responses:
+        '200':
+          description: OK
+    options:
+      responses:
+        '204':
+          description: CORS
+  /api/external/live/streams/{id}/moderation/ban:
+    post:
+      tags:
+      - External
+      summary: Ban user trong live
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                reason:
+                  type: string
+              required:
+              - userId
+      responses:
+        '200':
+          description: OK
+    options:
+      responses:
+        '204':
+          description: CORS
+  /api/external/live/streams/{id}/moderation/unban:
+    post:
+      tags:
+      - External
+      summary: Unban user trong live
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+              required:
+              - userId
+      responses:
+        '200':
+          description: OK
+    options:
+      responses:
+        '204':
+          description: CORS
 x-suggestedEndpoints:
   liveStreaming:
     summary: Gợi ý endpoint cho module Live/Streaming

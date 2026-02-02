@@ -14,8 +14,8 @@ type DepositRow = {
   failureReason: string | null;
   createdAt: Date;
   creditedAt: Date | null;
-  expectedAmount: number | null;
-  actualAmount: number | null;
+  expectedAmount: Prisma.Decimal | null;
+  actualAmount: Prisma.Decimal | null;
   token: { symbol: string } | null;
   user: { id: string; email: string | null } | null;
   package: { stars: number } | null;

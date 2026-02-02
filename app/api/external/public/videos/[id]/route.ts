@@ -20,7 +20,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       id: true,
       title: true,
       description: true,
-      slug: true,
       status: true,
       access: true,
       thumbKey: true,

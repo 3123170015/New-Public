@@ -148,3 +148,16 @@ Headers: X-API-Key + Authorization: Bearer <token>
    - POST /api/external/live/streams/{id}/stop
    - GET /api/external/live/streams/{id}/chat
    - POST /api/external/live/streams/{id}/chat
+
+## Live (External) - Bổ sung
+- GET /api/external/live/ingest/config
+- POST /api/external/live/ingest/status
+- GET /api/external/live/schedules
+- POST /api/external/live/schedules
+- PATCH /api/external/live/schedules/{id}
+- DELETE /api/external/live/schedules/{id}
+- POST /api/external/live/streams/{id}/reactions
+- GET /api/external/live/streams/{id}/viewer-stats
+- POST /api/external/live/streams/{id}/moderation/timeout
+- POST /api/external/live/streams/{id}/moderation/ban
+- POST /api/external/live/streams/{id}/moderation/unban

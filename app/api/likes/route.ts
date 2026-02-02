@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     return Response.json({ liked: false });
   }
 
-  await prisma.$transaction(async (tx: typeof prisma) => {
+  await prisma.$transaction(async (tx) => {
     await tx.like.create({
       data: { userId, videoId },
     });
