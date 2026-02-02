@@ -24,14 +24,14 @@ export async function GET(req: Request) {
     take: 20,
   });
 
-  const userIds = tips.map((t) => t.fromUserId);
+  const userIds = tips.map((t: (typeof tips)[number]) => t.fromUserId);
   const users = await prisma.user.findMany({
     where: { id: { in: userIds } },
     select: { id: true, name: true, username: true, image: true },
   });
-  const map = new Map(users.map((u) => [u.id, u]));
+  const map = new Map(users.map((u: (typeof users)[number]) => [u.id, u]));
 
-  const topFans = tips.map((row) => ({
+  const topFans = tips.map((row: (typeof tips)[number]) => ({
     user: map.get(row.fromUserId) ?? { id: row.fromUserId },
     stars: Number(row._sum.stars ?? 0),
     tipCount: row._count ?? 0,

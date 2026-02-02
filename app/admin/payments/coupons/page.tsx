@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CouponsAdminPage() {
   const coupons = await prisma.coupon.findMany({ orderBy: { updatedAt: "desc" }, take: 200 });
-  const initialCoupons = coupons.map((c) => ({
+  const initialCoupons = coupons.map((c: typeof coupons[number]) => ({
     ...c,
     startsAt: c.startsAt ? c.startsAt.toISOString() : null,
     endsAt: c.endsAt ? c.endsAt.toISOString() : null,

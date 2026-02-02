@@ -65,7 +65,7 @@ export default async function ThemeManagerPage() {
               <div className="text-xs uppercase text-zinc-500">Recent keys</div>
               <div className="mt-2 space-y-1 text-xs">
                 {keys.length ? (
-                  keys.map((k) => (
+                  keys.map((k: (typeof keys)[number]) => (
                     <div key={k.id} className="flex flex-wrap gap-2">
                       <span className="font-medium">{k.name}</span>
                       <span className="text-zinc-500">{k.scopes}</span>

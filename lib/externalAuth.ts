@@ -1,9 +1,10 @@
 import crypto from "crypto";
-import type { ApiKey, Role, User } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { env } from "@/lib/env";
 import { rateLimit } from "@/lib/rateLimit";
 import { getClientIp } from "@/lib/requestIp";
+
+type Role = "USER" | "ADMIN";
 
 type JwtPayload = {
   sub: string;
@@ -251,7 +252,7 @@ export async function requireExternalUser(req: Request, scopes: string[] = []) {
   return { ...apiKeyResult, user };
 }
 
-export function sanitizeUser(user: User | ExternalUser) {
+export function sanitizeUser(user: ExternalUser | { id: string; email?: string | null; name?: string | null; role?: Role }) {
   return {
     id: user.id,
     email: user.email ?? null,

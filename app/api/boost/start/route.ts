@@ -105,18 +105,6 @@ export async function POST(req: Request) {
         throw new Error("BOOST_DUPLICATE");
       }
 
-      const duplicate = await tx.boostOrder.findFirst({
-        where: {
-          videoId,
-          status: "ACTIVE",
-          OR: [{ endAt: null }, { endAt: { gt: new Date() } }],
-        },
-        select: { id: true },
-      });
-      if (duplicate) {
-        throw new Error("BOOST_DUPLICATE");
-      }
-
       return tx.boostOrder.create({
         data: {
           userId: uid,

@@ -81,14 +81,14 @@ export async function GET(req: Request) {
   const safeUser = user ? { ...user, email: canSeePrivate ? user.email : null } : null;
   const hits = buildWalletScanHits({
     user: safeUser,
-    wallets: data.wallets.map((wallet) => ({ id: wallet.id, chain: wallet.chain, address: wallet.address })),
-    deposits: data.deposits.map((deposit) => ({
+    wallets: data.wallets.map((wallet: (typeof data.wallets)[number]) => ({ id: wallet.id, chain: wallet.chain, address: wallet.address })),
+    deposits: data.deposits.map((deposit: (typeof data.deposits)[number]) => ({
       txHash: deposit.txHash ?? null,
       chain: deposit.chain,
       status: deposit.status,
       token: deposit.token ? { symbol: deposit.token.symbol } : null,
     })),
-    nftExports: data.nftExports.map((item) => ({ contractAddress: item.contractAddress ?? null, chain: item.chain })),
+    nftExports: data.nftExports.map((item: (typeof data.nftExports)[number]) => ({ contractAddress: item.contractAddress ?? null, chain: item.chain })),
   });
 
   return Response.json(

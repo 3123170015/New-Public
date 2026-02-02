@@ -49,7 +49,7 @@ export async function GET(req: Request) {
     where: { id: { in: topIds }, status: "PUBLISHED", access: "PUBLIC", deletedAt: null },
     select: { id: true, title: true, thumbKey: true, createdAt: true, viewCount: true, likeCount: true, commentCount: true, shareCount: true, starCount: true, giftCount: true },
   });
-  const map = new Map(videos.map((v) => [v.id, v]));
+  const map = new Map(videos.map((v: (typeof videos)[number]) => [v.id, v]));
 
   const out = scored
     .slice(0, 60)
