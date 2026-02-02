@@ -1,9 +1,16 @@
-import type { ApiSource } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type ApiSourceRow = ApiSource;
+type ApiSourceRow = {
+  id: string;
+  name: string;
+  prefix: string;
+  baseUrl: string;
+  apiKey?: string | null;
+  enabled: boolean;
+  mappingJson: string;
+};
 
 export default async function AdminApiSources() {
   const list = prisma

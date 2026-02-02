@@ -57,7 +57,7 @@ export async function GET(req: Request) {
     {
       ok: true,
       topComments,
-      topCreators: topUsers.map((user) => ({
+      topCreators: topUsers.map((user: (typeof topUsers)[number]) => ({
         id: user.id,
         username: user.username,
         name: user.name,

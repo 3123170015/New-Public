@@ -331,6 +331,7 @@ model User {
 
   // Boost
   boostOrders BoostOrder[]
+  boostPostOrders BoostPostOrder[]
 
   // Subscriptions / Community
   subscriptionsOut Subscription[] @relation("SubscriptionsOut")
@@ -1563,6 +1564,7 @@ model BoostPlan {
   updatedAt      DateTime      @updatedAt
 
   orders         BoostOrder[]
+  postOrders     BoostPostOrder[]
 }
 
 model BoostOrder {
@@ -1677,6 +1679,7 @@ model CommunityPost {
   author      User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
   pollOptions CommunityPollOption[]
   pollVotes   CommunityPollVote[]
+  boostOrders BoostPostOrder[]
 
   @@index([authorId, createdAt])
   @@index([createdAt])

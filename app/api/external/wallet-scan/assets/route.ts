@@ -38,7 +38,7 @@ export async function GET(req: Request) {
   }
   const user = await resolveWalletScanUser({ userId: parsed.data.userId, username: parsed.data.username });
   const wallets = await getWalletScanWallets({ userId: user?.id, chain: chainResult.chain });
-  const walletIds = wallets.map((wallet) => wallet.id);
+  const walletIds = wallets.map((wallet: (typeof wallets)[number]) => wallet.id);
   const assets = await getWalletScanWalletAssets(
     walletIds,
     parsed.data.contractAddress,

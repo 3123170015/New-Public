@@ -1,4 +1,3 @@
-import type { NftChainContract } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/siteConfig";
 import { ContractsNotice } from "./ContractsNotice";
@@ -14,7 +13,14 @@ export default async function AdminNftContractsPage() {
   const rows = (await prisma.nftChainContract.findMany({
     orderBy: { chain: "asc" },
     include: { pendingSetBy: { select: { id: true, name: true } } },
-  })) as (NftChainContract & { pendingSetBy: { id: string; name: string | null } | null })[];
+  })) as Array<{
+    chain: string;
+    address: string | null;
+    pendingAddress: string | null;
+    pendingApplyAt: Date | null;
+    pendingSetById: string | null;
+    pendingSetBy: { id: string; name: string | null } | null;
+  }>;
   const byChain = new Map(rows.map((r) => [r.chain, r]));
 
   function placeholderForChain(chain: string) {

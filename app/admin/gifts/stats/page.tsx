@@ -1,4 +1,3 @@
-import type { Gift } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +22,13 @@ export default async function GiftsStats() {
   const gifts = (await prisma.gift.findMany({
     where: { id: { in: giftIds } },
     select: { id: true, name: true, icon: true, starsCost: true, active: true },
-  })) as Gift[];
+  })) as Array<{
+    id: string;
+    name: string;
+    icon: string | null;
+    starsCost: number;
+    active: boolean;
+  }>;
   const map = new Map(gifts.map((g) => [g.id, g]));
 
   return (

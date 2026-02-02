@@ -20,7 +20,7 @@ export async function GET(req: Request) {
   });
 
   const unique = new Map<string, { chain: string; contractAddress: string; latestAt: Date }>();
-  exports.forEach((item) => {
+  exports.forEach((item: (typeof exports)[number]) => {
     if (!item.contractAddress) return;
     const keyId = `${item.chain}:${item.contractAddress}`;
     const current = unique.get(keyId);

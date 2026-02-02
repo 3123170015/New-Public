@@ -1,4 +1,3 @@
-import type { BoostOrder } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export const dynamic = "force-dynamic";
 
-type BoostOrderRow = BoostOrder & {
+type BoostOrderRow = {
+  id: string;
+  videoId: string;
+  startAt: Date;
+  endAt: Date | null;
+  status: string;
+  priceStars: number;
+  statViews: number;
+  statLikes: number;
+  statShares: number;
+  statComments: number;
+  statStars: number;
+  statGifts: number;
   user: { id: string; name: string | null; email: string | null };
   video: { id: string; title: string };
   plan: { name: string };

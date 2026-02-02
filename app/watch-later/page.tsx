@@ -35,9 +35,9 @@ export default async function WatchLaterPage() {
     take: 500,
     include: { video: true },
   });
-  const items = rows.filter((r) => r.video && (r.video as any).status === "PUBLISHED");
+  const items = rows.filter((r: WatchLaterRowWithVideo) => r.video && (r.video as any).status === "PUBLISHED");
   const progress = await prisma.videoProgress.findMany({
-    where: { userId: uid, videoId: { in: items.map((i) => i.videoId) } },
+    where: { userId: uid, videoId: { in: items.map((i: WatchLaterRowWithVideo) => i.videoId) } },
     select: { videoId: true, seconds: true, updatedAt: true },
   });
   const progressByVideo = new Map((progress as ProgressRow[]).map((p: ProgressRow) => [p.videoId, p]));
@@ -62,7 +62,7 @@ export default async function WatchLaterPage() {
           <div className="small muted">Chưa có video trong Watch Later.</div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
-            {items.map((it) => {
+            {items.map((it: WatchLaterRowWithVideo) => {
               const v: any = (it as WatchLaterRowWithVideo).video;
               const p = progressByVideo.get(it.videoId);
               const t = Math.max(0, Number(p?.seconds ?? 0));

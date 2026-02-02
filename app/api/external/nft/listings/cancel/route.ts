@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: typeof prisma) => {
       const listing = await tx.nftListing.findUnique({
         where: { id: parsed.data.listingId },
         select: { id: true, sellerId: true, status: true },

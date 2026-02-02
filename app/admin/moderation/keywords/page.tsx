@@ -1,4 +1,3 @@
-import type { CreatorModerationSetting } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,11 @@ import { Input } from "@/components/ui/input";
 
 export const dynamic = "force-dynamic";
 
-type ModerationKeywordRow = CreatorModerationSetting & {
+type ModerationKeywordRow = {
+  id: string;
+  creatorId: string;
+  keywordsCsv: string | null;
+  updatedAt: Date;
   creator: { id: string; name: string | null; email: string | null } | null;
 };
 
@@ -74,7 +77,7 @@ export default async function AdminModerationKeywordsPage() {
                   <form action="/api/admin/moderation/actions" method="post" className="flex flex-wrap items-end gap-2">
                     <input type="hidden" name="action" value="UPDATE_KEYWORDS" />
                     <input type="hidden" name="creatorId" value={r.creatorId} />
-                    <Input name="keywordsCsv" defaultValue={r.keywordsCsv} className="w-[360px]" />
+                    <Input name="keywordsCsv" defaultValue={r.keywordsCsv ?? ""} className="w-[360px]" />
                     <Button type="submit" variant="secondary">Update</Button>
                   </form>
                 </div>

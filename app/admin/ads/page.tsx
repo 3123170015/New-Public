@@ -1,9 +1,17 @@
-import type { AdPlacement } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type AdPlacementRow = AdPlacement;
+type AdPlacementRow = {
+  scope: string;
+  enabled: boolean;
+  everyN: number;
+  html: string;
+  showOnDesktop?: boolean;
+  showOnTablet?: boolean;
+  showOnMobile?: boolean;
+  hideForBots?: boolean;
+};
 
 export default async function AdminAds() {
   const list = prisma
