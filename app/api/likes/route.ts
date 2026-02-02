@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canInteractWithVideoDb, canViewVideoDb } from "@/lib/videoAccessDb";
 import { grantXp } from "@/lib/gamification/grantXp";
+import { incDailyMetric } from "@/lib/metrics";
+import { incBoostStat } from "@/lib/boost";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -46,12 +48,16 @@ export async function POST(req: Request) {
     return Response.json({ liked: false });
   }
 
-  await prisma.like.create({
-    data: { userId, videoId },
-  });
-  await prisma.video.update({
-    where: { id: videoId },
-    data: { likeCount: { increment: 1 } },
+  await prisma.$transaction(async (tx) => {
+    await tx.like.create({
+      data: { userId, videoId },
+    });
+    await tx.video.update({
+      where: { id: videoId },
+      data: { likeCount: { increment: 1 } },
+    });
+    await incDailyMetric(tx as any, videoId, "likes", 1);
+    await incBoostStat(tx as any, videoId, "statLikes", 1);
   });
   // Task 12: Gamification XP (idempotent via XpEvent.sourceKey)
   grantXp({

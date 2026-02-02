@@ -3,6 +3,7 @@ import type { PrismaClient } from "@prisma/client";
 type BoostPlanType = "DURATION" | "TARGET_INTERACTIONS";
 
 type BoostField = "statViews" | "statLikes" | "statShares" | "statComments" | "statStars" | "statGifts";
+type BoostPostField = "statComments" | "statStars" | "statGifts" | "statShares";
 
 export async function incBoostStat(tx: PrismaClient, videoId: string, field: BoostField, incBy = 1) {
   if (incBy <= 0) return;
@@ -56,4 +57,42 @@ export async function getActiveBoostedVideos(tx: PrismaClient, take = 20) {
     include: { video: true, plan: true },
   });
   return orders;
+}
+
+export async function incBoostPostStat(tx: PrismaClient, postId: string, field: BoostPostField, incBy = 1) {
+  if (incBy <= 0) return;
+  const now = new Date();
+  const order = await tx.boostPostOrder.findFirst({
+    where: {
+      postId,
+      status: "ACTIVE",
+      OR: [{ endAt: null }, { endAt: { gt: now } }],
+    },
+    orderBy: { startAt: "desc" },
+    include: { plan: true },
+  });
+  if (!order) return;
+
+  const updated = await tx.boostPostOrder.update({
+    where: { id: order.id },
+    data: { [field]: { increment: incBy } as any },
+    include: { plan: true },
+  });
+
+  if (updated.plan.type === ("DURATION" as BoostPlanType) && updated.endAt && updated.endAt <= now) {
+    await tx.boostPostOrder.update({ where: { id: updated.id }, data: { status: "EXPIRED" } });
+    return;
+  }
+
+  if (updated.plan.type === ("TARGET_INTERACTIONS" as BoostPlanType)) {
+    const t = updated.plan;
+    const ok =
+      (t.targetComments == null || updated.statComments >= t.targetComments) &&
+      (t.targetStars == null || updated.statStars >= t.targetStars) &&
+      (t.targetGifts == null || updated.statGifts >= t.targetGifts) &&
+      (t.targetShares == null || updated.statShares >= t.targetShares);
+    if (ok) {
+      await tx.boostPostOrder.update({ where: { id: updated.id }, data: { status: "EXPIRED", endAt: now } });
+    }
+  }
 }
