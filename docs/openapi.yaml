@@ -11,7 +11,7 @@ servers:
   description: Production
 - url: http://localhost:3000
   description: Local dev
-  tags: null
+tags:
 - name: External Auth
 - name: External Public
 - name: External Me
@@ -1879,7 +1879,7 @@ paths:
                   amount: '25'
                   status: CONFIRMED
                   memo: DEPOSIT:dep_1
-                  txHash: 2748
+                  txHash: 0xabc123
                 deposits: []
                 starTransactions: []
                 nftItems: []
