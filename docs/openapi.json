@@ -12,9 +12,10 @@
     },
     {
       "url": "http://localhost:3000",
-      "description": "Local dev",
-      "tags": null
-    },
+      "description": "Local dev"
+    }
+  ],
+  "tags": [
     {
       "name": "External Auth"
     },
@@ -3019,7 +3020,7 @@
                       "amount": "25",
                       "status": "CONFIRMED",
                       "memo": "DEPOSIT:dep_1",
-                      "txHash": 2748
+                      "txHash": "0xabc123"
                     }
                   ],
                   "deposits": [],
