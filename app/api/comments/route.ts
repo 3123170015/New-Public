@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import type { Prisma } from "@prisma/client";
 import { canInteractWithVideoDb, canViewVideoDb } from "@/lib/videoAccessDb";
 import { grantXp } from "@/lib/gamification/grantXp";
 import { getViewerFanClubTier } from "@/lib/creatorFanClub";
+import { incDailyMetric } from "@/lib/metrics";
+import { incBoostStat } from "@/lib/boost";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -214,15 +217,21 @@ if (video.authorId) {
   }
 }
 
-  const c = await prisma.comment.create({
-    data: {
-      videoId,
-      content,
-      userId: viewerId ?? null,
-      visibility,
-      moderatedAt: visibility === "HIDDEN" ? new Date() : null,
-    },
-    include: { user: { select: { name: true } } },
+  const c = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const created = await tx.comment.create({
+      data: {
+        videoId,
+        content,
+        userId: viewerId ?? null,
+        visibility,
+        moderatedAt: visibility === "HIDDEN" ? new Date() : null,
+      },
+      include: { user: { select: { name: true } } },
+    });
+    await tx.video.update({ where: { id: videoId }, data: { commentCount: { increment: 1 } } });
+    await incDailyMetric(tx as any, videoId, "comments", 1);
+    await incBoostStat(tx as any, videoId, "statComments", 1);
+    return created;
   });
 
   if (viewerId) {

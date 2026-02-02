@@ -34,6 +34,10 @@ Headers:
 Response:
   { ok, items: [{ id, title, thumbUrl, watchUrl, ... }], page, take, total }
 
+4.1) Ghi nhận view (đã triển khai)
+POST /api/external/videos/{id}/view
+Headers: X-API-Key + Authorization: Bearer <token>
+
 5) Ví dụ: Search
 GET /api/external/public/search?q=music
 Headers: X-API-Key
@@ -92,6 +96,9 @@ Headers: X-API-Key + Authorization: Bearer <token>
 14) Ads & Boost (đã triển khai)
  - GET /api/external/ads?scope=FEED
  - GET /api/external/boost/plans
+ - POST /api/external/boost/metrics
+ - POST /api/external/boost/targets
+  - Boost thống kê sau khi boost: views/likes/comments/stars/gifts/shares (từ boost/metrics)
 
 11) Gợi ý bổ sung endpoint theo module
 - Billing/Subscription (đề xuất):

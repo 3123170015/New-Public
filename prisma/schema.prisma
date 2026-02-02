@@ -1604,6 +1604,39 @@ model BoostOrder {
   @@index([userId, status])
 }
 
+model BoostPostOrder {
+  id           String      @id @default(cuid())
+  userId       String
+  postId       String
+  planId       String
+  status       BoostStatus @default(ACTIVE)
+
+  startAt      DateTime    @default(now())
+  endAt        DateTime?
+  priceStars   Int         @default(0)
+
+  baseComments Int         @default(0)
+  baseStars    Int         @default(0)
+  baseGifts    Int         @default(0)
+  baseShares   Int         @default(0)
+
+  statComments Int         @default(0)
+  statStars    Int         @default(0)
+  statGifts    Int         @default(0)
+  statShares   Int         @default(0)
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post         CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  plan         BoostPlan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([status, startAt])
+  @@index([postId, status])
+  @@index([userId, status])
+}
+
 
 // =============================
 // Subscriptions + Community

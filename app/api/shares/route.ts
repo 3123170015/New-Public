@@ -1,6 +1,9 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { canInteractWithVideoDb, canViewVideoDb } from "@/lib/videoAccessDb";
+import { incDailyMetric } from "@/lib/metrics";
+import { incBoostStat } from "@/lib/boost";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -29,7 +32,11 @@ export async function POST(req: Request) {
     return Response.json({ error: "Interactions disabled" }, { status: 403 });
   }
 
-  await prisma.video.update({ where: { id: videoId }, data: { shareCount: { increment: 1 } } });
-  const updated = await prisma.video.findUnique({ where: { id: videoId }, select: { shareCount: true } });
+  const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    await tx.video.update({ where: { id: videoId }, data: { shareCount: { increment: 1 } } });
+    await incDailyMetric(tx as any, videoId, "shares", 1);
+    await incBoostStat(tx as any, videoId, "statShares", 1);
+    return tx.video.findUnique({ where: { id: videoId }, select: { shareCount: true } });
+  });
   return Response.json({ shareCount: updated?.shareCount ?? 0 });
 }

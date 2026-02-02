@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { incBoostPostStat } from "@/lib/boost";
 
 const createSchema = z.object({
   type: z.enum(["TEXT", "IMAGE", "GIF", "POLL", "YOUTUBE", "LINK"]),
@@ -54,18 +55,18 @@ export async function POST(req: Request) {
     }
   }
 
-  const post = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    const created = await tx.communityPost.create({
-      data: {
-        authorId: userId,
-        type: body.type,
-        text: body.text || "",
-        mediaUrl: body.mediaUrl,
-        linkUrl: body.linkUrl,
-        youtubeUrl: body.youtubeUrl,
-        pollQuestion: body.pollQuestion,
-      },
-    });
+   const post = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+     const created = await tx.communityPost.create({
+       data: {
+         authorId: userId,
+         type: body.type,
+         text: body.text || "",
+         mediaUrl: body.mediaUrl,
+         linkUrl: body.linkUrl,
+         youtubeUrl: body.youtubeUrl,
+         pollQuestion: body.pollQuestion,
+       },
+     });
 
     if (body.type === "POLL" && body.pollOptions) {
       await tx.communityPollOption.createMany({
@@ -77,8 +78,9 @@ export async function POST(req: Request) {
       });
     }
 
-    return created;
-  });
+     await incBoostPostStat(tx as any, created.id, "statShares", 0);
+     return created;
+   });
 
   return Response.json({ ok: true, postId: post.id });
 }

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getActiveMembershipTier } from "@/lib/membership";
 import { getSiteConfig } from "@/lib/siteConfig";
 import { releaseMaturedHoldsTx } from "@/lib/stars/holds";
+import { rateLimit } from "@/lib/rateLimit";
 
 const schema = z.object({
   planId: z.string().min(1),
@@ -20,6 +21,9 @@ export async function POST(req: Request) {
   const uid = (session?.user as any)?.id as string | undefined;
   if (!uid) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
+  const rl = await rateLimit(`boost:start:${uid}`, 6, 60_000);
+  if (!rl.ok) return Response.json({ error: "Rate limit" }, { status: 429 });
+
   const { planId, videoId } = schema.parse(await req.json());
 
   const [cfg, plan, video, user] = await Promise.all([
@@ -31,6 +35,12 @@ export async function POST(req: Request) {
 
   if (!plan) return Response.json({ error: "Plan not found" }, { status: 404 });
   if (!video) return Response.json({ error: "Video not found" }, { status: 404 });
+  if (video.status !== "PUBLISHED") {
+    return Response.json({ error: "Video must be published" }, { status: 400 });
+  }
+  if (video.status !== "PUBLISHED") {
+    return Response.json({ error: "Video must be published" }, { status: 400 });
+  }
   if (video.authorId !== uid) {
     return Response.json({ error: "You can only boost your own videos" }, { status: 403 });
   }
@@ -83,6 +93,30 @@ export async function POST(req: Request) {
         });
       }
 
+      const duplicate = await tx.boostOrder.findFirst({
+        where: {
+          videoId,
+          status: "ACTIVE",
+          OR: [{ endAt: null }, { endAt: { gt: new Date() } }],
+        },
+        select: { id: true },
+      });
+      if (duplicate) {
+        throw new Error("BOOST_DUPLICATE");
+      }
+
+      const duplicate = await tx.boostOrder.findFirst({
+        where: {
+          videoId,
+          status: "ACTIVE",
+          OR: [{ endAt: null }, { endAt: { gt: new Date() } }],
+        },
+        select: { id: true },
+      });
+      if (duplicate) {
+        throw new Error("BOOST_DUPLICATE");
+      }
+
       return tx.boostOrder.create({
         data: {
           userId: uid,
@@ -107,6 +141,12 @@ export async function POST(req: Request) {
     const msg = String(e?.message || "");
     if (msg === "INSUFFICIENT_STARS") {
       return Response.json({ error: "Insufficient stars" }, { status: 400 });
+    }
+    if (msg === "BOOST_DUPLICATE") {
+      return Response.json({ error: "Boost already active" }, { status: 409 });
+    }
+    if (msg === "BOOST_DUPLICATE") {
+      return Response.json({ error: "Boost already active" }, { status: 409 });
     }
     return Response.json({ error: "Failed to start boost" }, { status: 500 });
   }
