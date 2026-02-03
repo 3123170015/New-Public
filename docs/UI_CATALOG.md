@@ -2,6 +2,19 @@
 
 > Mỗi UI tập trung một mục tiêu, gọi đúng API cần thiết, dễ tối ưu tải và phân quyền.
 
+### Tổng quan số lượng UI & domain
+
+- **Số lượng UI chính**: ~32 màn hình (chia theo 6 module lớn).
+- **Domain UI đề xuất** (tách theo mục tiêu, chung backend `api.vnhell.com`):
+  1. **Public App** (guest + user) → Home/Feed/Video/NFT/Live/WalletScan cơ bản.
+  2. **WalletScan Explorer** → tra cứu ví/ledger/on-chain chuyên sâu.
+  3. **Creator Studio** → stats, boost, payouts, playlist quản trị.
+  4. **Admin Console** → quản trị API, payments, moderation, boosts, live.
+  5. **Live Operator** (tuỳ chọn) → quản lý live schedule + ingest + moderation.
+  6. **Ads/Boost Manager** (tuỳ chọn) → theo dõi campaign/metrics.
+
+> Mỗi domain UI nên build như một app nhỏ, chia bundle nhẹ hơn, đúng luồng người dùng.
+
 ### 1) Guest / Public
 
 **1.1 Trang chủ (Home YouTube)**
